@@ -1,0 +1,5 @@
+mobile-app/build
+mobile-app/build.log
+.idea
+.project
+.DS_Store
