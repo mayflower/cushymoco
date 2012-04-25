@@ -1,5 +1,6 @@
 mobile-app/build
 mobile-app/build.log
+atlassian-ide-plugin.xml
 .idea
 .project
 .DS_Store
