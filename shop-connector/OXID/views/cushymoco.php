@@ -617,14 +617,39 @@ class cushymoco extends oxUBase
      */
     public function executeOrder()
     {
-        if ( !oxConfig::getParameter( 'ord_agb' ) && $myConfig->getConfigParam( 'blConfirmAGB' ) ) {
-            $this->_sAjaxResponse = self::errorMessage("TNS not accepted");
-            return;
+        // Try GET parameter
+        $shipping = oxConfig::getParameter( 'sShipSet' );
+        if ( !$shipping ) {
+            // ... fetch from session
+            $shipping = oxSession::getVar( 'sShipSet' );
         }
+        if ( !$shipping ) {
+            $this->_sAjaxResponse = self::errorMessage("No shipping id given");
+            return false;
+        }
+        $payment = oxConfig::getParameter( 'payment' );
+        if ( !$payment ) {
+            $payment = oxSession::getVar( 'payment' );
+        }
+
+        if ( !$payment ) {
+            $this->_sAjaxResponse = self::errorMessage("No payment type given");
+            return false;
+        }
+
+        // Check if user is logged in
         if ( !$oUser= $this->getUser() ) {
             $this->_sAjaxResponse = self::errorMessage("User not logged on");
+            return false;
         }
+
+        // Load user basket
         $oBasket  = $this->getSession()->getBasket();
+
+        // Set payment & shipping
+        $oBasket->setPayment($payment);
+        $oBasket->setShipping($shipping);
+
         if ( $oBasket->getProductsCount() ) {
 
             try {
@@ -633,17 +658,19 @@ class cushymoco extends oxUBase
                 // finalizing ordering process (validating, storing order into DB, executing payment, setting status ...)
                 $iSuccess = $oOrder->finalizeOrder( $oBasket, $oUser );
 
+                $oBasket->setOrderId($oOrder->getId());
+
                 // performing special actions after user finishes order (assignment to special user groups)
                 $oUser->onOrderExecute( $oBasket, $iSuccess );
 
-                // proceeding to next view
-                return $this->_getNextStep( $iSuccess );
             } catch ( Exception $oEx ) {
                 $this->_sAjaxResponse = self::errorMessage(array('message'=>"error executing order",'data'=>$oEx));
+                return false;
             }
         }
 
         $this->_sAjaxResponse = self::successMessage("done order");
+        return true;
     }
     /**
      * Get content by ident
