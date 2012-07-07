@@ -104,7 +104,7 @@ exports.ProductsTable = function(navigation, category, searchResult) {
         parseServerResponse(searchResult);
     }
 
-    var ProductScreen = require('views/product/ProductScreen').ProductScreen;
+    var ProductScreen = require('views/product/ProductScreen',true).ProductScreen;
     table.addEventListener('click', function(e) {
         var product = e.rowData;
         globals.httpManager.request(

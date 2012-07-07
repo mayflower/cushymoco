@@ -1,5 +1,5 @@
 exports.settings = {
-    baseUrl: 'http://192.168.25.137/?cl=cushymoco',
+    baseUrl: 'http://oxid.steinigke.dev/?cl=cushymoco',
     networkTimeout: 5000,
     loadingDialogTimeout: 1000,
     itemsPerPage: 20,
