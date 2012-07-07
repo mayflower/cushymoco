@@ -15,8 +15,6 @@ exports.monkeypatch = function(object) {
             if (moduleParts.length > 1) {
                 var modulePart = moduleParts.pop();
                 scriptRegistry[modulePart] = scriptRegistry[moduleName];
-
-                Ti.API.info(scriptRegistry[moduleName]);
             }
 		}
 		return scriptRegistry[moduleName];

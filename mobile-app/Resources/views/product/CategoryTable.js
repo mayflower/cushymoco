@@ -1,6 +1,6 @@
 var CategoryTable = function(navigation, parentCategory) {
     var globals = require('globals');
-    var ProductsTable = require('views/product/ProductsTable').ProductsTable;
+    var ProductsTable = require('views/product/ProductsTable',true).ProductsTable;
 
     var searchBar = Titanium.UI.createSearchBar({ showCancel: false });
     searchBar.addEventListener('blur', function() {
