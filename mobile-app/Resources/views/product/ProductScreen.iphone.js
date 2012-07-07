@@ -1,11 +1,11 @@
 exports.ProductScreen = function(navigation, productData) {
-	
-	Ti.API.info("std");
-	
-    var globals = require('globals');
+   
+   Ti.API.info("iphone screen");
+
+	var globals = require('globals');
     var styles = require('UIStyle');
     var topHeight = globals.screenHeight * 0.30;
-    var bottomHeight = globals.screenHeight * (globals.isAndroid ?  0.525 : 0.50);
+    var bottomHeight = globals.screenHeight * 0.50;
 
     var dataViews = [];
     globals._.each(productData.data, function(data) {
@@ -27,7 +27,7 @@ exports.ProductScreen = function(navigation, productData) {
         showPagingControl: true,
         disableBounce: true,
         height: bottomHeight,
-        top: globals.isAndroid ? '35dp' : '60dp'
+        top: '60dp'
     });
 
     var dataOverview = Titanium.UI.createView({
@@ -37,21 +37,14 @@ exports.ProductScreen = function(navigation, productData) {
     });
 
     var cartButtonoptions = {
-        backgroundImage: (globals.isAndroid) ? '../../icons/icon_shopping_cart.png' : 'icons/icon_shopping_cart.png',
-        top: globals.isAndroid ? '2dp' : '17dp',
+        backgroundImage: 'icons/icon_shopping_cart.png',
+        top: '17dp',
         right: '35dp'
     };
     globals._.defaults(cartButtonoptions, styles.PageItems.IconButton);
     var cartButton = Titanium.UI.createButton(cartButtonoptions);
     cartButton.addEventListener('click', function() {
-        if (globals.isAndroid) {
-            Titanium.UI.createAlertDialog({
-                title: '',
-                message: L('product_add_to_cart'),
-                ok: L('ok_button')
-            }).show();
-        }
-
+    
         globals.httpManager.request(
             globals.httpManager.buildUrl({ fnc: 'addToBasket', anid: productData.id , qty: 1}),
             function() {
@@ -66,8 +59,8 @@ exports.ProductScreen = function(navigation, productData) {
     });
 
     var videoButtonOptions = {
-        backgroundImage: (globals.isAndroid) ? '../../icons/icon_filming.png' : 'icons/icon_filming.png',
-        top: globals.isAndroid ? '4dp' : '19dp',
+        backgroundImage: 'icons/icon_filming.png',
+        top: '19dp',
         right: '8dp',
         visible: false
     };
@@ -82,10 +75,10 @@ exports.ProductScreen = function(navigation, productData) {
             fontSize: 16,
             fontWeight: 'bold'
         },
-        height: globals.isAndroid ? '30dp' : '60dp',
+        height: '60dp',
         width: globals.screenWidth * 0.6,
         top: '2dp',
-        left: globals.isAndroid ? '0dp' : '2dp'
+        left: '2dp'
     });
 
     var priceLabel = Titanium.UI.createLabel({
@@ -95,7 +88,7 @@ exports.ProductScreen = function(navigation, productData) {
             fontSize: 16,
             fontWeight: 'bold'
         },
-        height: globals.isAndroid ? '30dp' : '60dp',
+        height: '60dp',
         width: 'auto',
         top: '2dp',
         right: '70dp'
@@ -148,16 +141,11 @@ exports.ProductScreen = function(navigation, productData) {
     );
 
     var screen = null;
-    if (globals.isAndroid) {
-        screen = Titanium.UI.createView({
-            layout: 'vertical'
-        });
-    } else {
-        screen = Titanium.UI.createWindow({
-            title: productData.title,
-            layout: 'vertical'
-        });
-    }
+    
+    screen = Titanium.UI.createWindow({
+    	title: productData.title,
+        layout: 'vertical'
+    });
 
     screen.add(imageScrollView);
     screen.add(dataOverview);

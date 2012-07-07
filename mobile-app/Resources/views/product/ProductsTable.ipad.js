@@ -4,10 +4,14 @@ exports.ProductsTable = function(navigation, category, searchResult) {
     var table = Titanium.UI.createTableView({
         style: Titanium.UI.iPhone.TableViewStyle.PLAIN,
         scrollable: true,
-        minRowHeight: '40dp',
-        data: []
+        minRowHeight: '50dp',
+        data: [],
+        filterAttribute: 'filter'
     });
-
+    
+    // @todo: include in table definition
+    table.search = searchBar;
+    
     if (undefined === searchResult || null === searchResult) {
         var searchBar = Titanium.UI.createSearchBar({ showCancel: false });
         searchBar.addEventListener('blur', function() {
@@ -45,6 +49,97 @@ exports.ProductsTable = function(navigation, category, searchResult) {
     table.setFooterView(loadMoreView);
 
     var tableData = [];
+    var parseServerResponseNew = function(response) {
+ 		// START
+ 		loadMoreView.hide();
+		loadMoreView.visible = false;
+		
+		globals._.each(response.result.articles, function(row) {
+		
+			var rowData = row;
+			
+			// generic table row
+			var rowTable = Titanium.UI.createTableViewRow({
+				hasChild: true,
+				className: 'product-row',
+				id: rowData.id,
+				filter: rowData.title + rowData.id
+			});
+			
+			// product title label
+			var titleLabel = Titanium.UI.createLabel({
+				text: rowData.title.replace (/^\s+/, '').replace (/\s+$/, ''),
+				font: {fontSize: 14, fontWeight: 'bold' },
+				left: 5,
+				top: 15,
+				height: 20,
+				width: 400		
+			});
+			rowTable.add(titleLabel);
+			
+			// product id label
+			var idLabel = Titanium.UI.createLabel({
+				text: rowData.id.replace("ARTI_",""),
+				font: {fontSize: 10},
+				left: 7,
+				top: 0,
+				height: 20,
+				width: 200
+			}); 
+			rowTable.add(idLabel);
+			
+			// subheadline label
+			var subheadLabel = Titanium.UI.createLabel({
+				text: rowData.shortdesc,
+				font: {fontSize: 11},
+				left: 7,
+				top: 28,
+				width: 400
+			});
+			rowTable.add(subheadLabel);
+			
+			var priceLabel = Titanium.UI.createLabel({
+				text: rowData.price ? rowData.price + rowData.currency : L('price_on_request'),
+				color: rowData.campaign ? '#FF5555' : 'default',
+				textAlign: 'right',
+				font: {
+						fontSize: 16,
+						fontWeight: rowData.campaign ? 'bold' : 'normal'
+					  },
+				right: 10,
+				top: 15,
+				height: 20,
+				width: 210
+			});
+			rowTable.add(priceLabel);
+			
+			var stockLabel = Titanium.UI.createLabel({
+				text: '\u2587',
+				color: rowData.stockColor,
+				font: { fontSize: 11, fontWeight: 'bold' },
+				textAlign: 'right',
+				right: 10,
+				top: 30,
+				width: 210
+			});
+			rowTable.add(stockLabel);
+			
+			tableData.push(rowTable);
+			
+		});
+		
+		table.setData(tableData);
+		
+		if (((pagination + 1) * itemsPerPage) < parseInt(response.result.count, 10)) {
+            loadMoreView.show();
+            loadMoreView.visible = true;
+        } else {
+            loadMoreView.hide();
+            loadMoreView.visible = false;
+        }
+		// END
+    };
+    
     var parseServerResponse = function(response) {
         loadMoreView.hide();
         loadMoreView.visible = false;
@@ -77,7 +172,7 @@ exports.ProductsTable = function(navigation, category, searchResult) {
                     _artperpage: itemsPerPage
                 }),
                 function() {
-                    parseServerResponse(JSON.parse(this.responseText));
+                    parseServerResponseNew(JSON.parse(this.responseText));
                 }
             );
         };
@@ -117,13 +212,9 @@ exports.ProductsTable = function(navigation, category, searchResult) {
     });
 
     var window = null;
-    if (globals.isAndroid) {
-        window = Titanium.UI.createView();
-    } else {
         window = Titanium.UI.createWindow({
             titleid: (undefined !== searchResult && null !== searchResult) ? 'search_result_table_title' : 'product_table_title'
         });
-    }
 
     window.add(table);
 

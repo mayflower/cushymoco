@@ -5,7 +5,10 @@
 exports.monkeypatch = function(object) {
 	var scriptRegistry = {},
 		old_require = object.require;
-	object.require = function(moduleName) {
+	object.require = function(moduleName, blPlatform) {
+		if(blPlatform) {
+			moduleName = moduleName + '.' + Ti.Platform.osname;
+		}
 		if (!scriptRegistry[moduleName]) {
             scriptRegistry[moduleName] = old_require(moduleName);
             var moduleParts = moduleName.split('/');
