@@ -17,75 +17,208 @@ class cushymoco extends oxUBase
     protected $_sAjaxResponse;
 
     /**
+     * @var VersionLayerInterface
+     */
+    protected $_oVersionLayer;
+
+    /**
+     * Initializes all required components.
+     *
+     * @return null|void
+     */
+    public function init()
+    {
+        parent::init();
+
+        try {
+            $this->_initVersionLayer();
+        } catch (Exception $e) {
+            $sMessage = json_encode(
+                $this->errorMessage(
+                    $e->getMessage()
+                ),
+                JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT
+            );
+            if ($this->_hasRegistry()) {
+                $oUtils = oxRegistry::getUtils();
+            } else {
+                $oUtils = oxUtils::getInstance();
+            }
+
+            $oUtils->showMessageAndExit($sMessage);
+        }
+    }
+
+    /**
      * Render template
      *
      * @return string The template name
      */
     public function render()
     {
-        parent::render();
-        $this->_aViewData['sAjaxResponse'] = json_encode($this->_sAjaxResponse, JSON_HEX_AMP|JSON_HEX_APOS|JSON_HEX_QUOT);
-        return $this->_sThisTemplate;
+        $sTemplate                         = parent::render();
+        $this->_aViewData['sAjaxResponse'] = json_encode(
+            $this->_sAjaxResponse,
+            JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT
+        );
+
+        return $sTemplate;
+    }
+
+    /**
+     * Loads the layer class for the different OXID eShop versions.
+     *
+     * @return void
+     */
+    private function _initVersionLayer()
+    {
+        if ($this->_hasRegistry()) {
+            $oConfig = oxRegistry::getConfig();
+        } else {
+            $oConfig = $this->getConfig();
+        }
+
+        $sLayerClassFile = $oConfig->getShopConfVar('sLayerClassFile', null, 'mayflower:cushymoco');
+        $sLayerClass     = $oConfig->getShopConfVar('sLayerClass', null, 'mayflower:cushymoco');
+
+        if ($sLayerClassFile === null || $sLayerClass === null) {
+            list($sLayerClassFile, $sLayerClass) = $this->loadVersionLayer();
+        }
+
+        include_once getShopBasePath() . 'core/' . $sLayerClassFile;
+        $this->_oVersionLayer = new $sLayerClass();
+    }
+
+    /**
+     * Saves the given version layer file- and class name to the shop config.
+     *
+     * @param $sLayerClassFile
+     * @param $sLayerClass
+     */
+    private function _saveLayerConfig($sLayerClassFile, $sLayerClass)
+    {
+        if ($this->_hasRegistry()) {
+            $oConfig = oxRegistry::getConfig();
+        } else {
+            $oConfig = $this->getConfig();
+        }
+
+        $oConfig->saveShopConfVar('str', 'sLayerClassFile', $sLayerClassFile, null, 'cushymoco');
+        $oConfig->saveShopConfVar('str', 'sLayerClass', $sLayerClass, null, 'cushymoco');
+    }
+
+    /**
+     * Determines, whether we have the oxRegistry Class or not.
+     *
+     * @return bool
+     */
+    private function _hasRegistry()
+    {
+        return class_exists('oxRegistry') && method_exists('oxRegistry', 'getConfig');
+    }
+
+    /**
+     * Loads a version layer. Throws an exception if there isn't a suitable layer.
+     *
+     * @throws Exception
+     *
+     * @return array
+     */
+    public function loadVersionLayer()
+    {
+        /**
+         * @var DirectoryIterator $oEntry
+         */
+
+        $sShopVersion         = $this->getShopVersion();
+        $sMaxVersionLayerFile = 'VersionLayer' . str_replace('.', '', $sShopVersion) . '.php';
+        $sLayerClassPattern   = 'VersionLayer'
+            . str_replace('.', '', substr($sShopVersion, 0, strrpos($sShopVersion, '.')))
+            . '*.php';
+        $aLayerClasses        = array();
+        $oDI                  = new DirectoryIterator(getShopBasePath() . 'core');
+        foreach ($oDI as $oEntry) {
+            if (
+                $oEntry->isDir() ||
+                $oEntry->isDot() ||
+                !$oEntry->isReadable() ||
+                !fnmatch($sLayerClassPattern, $oEntry->getFilename())
+            ) {
+                continue;
+            }
+
+            $aLayerClasses[] = $oEntry->getFilename();
+        }
+
+        if (count($aLayerClasses) == 0) {
+            throw new Exception("Can't find suitable layer class for your shop version.");
+        }
+
+        natsort($aLayerClasses);
+
+        do {
+            $sLayerClassFile = array_pop($aLayerClasses);
+        } while (strnatcmp($sMaxVersionLayerFile, $sLayerClassFile) < 0);
+
+        $sLayerClass = basename($sLayerClassFile, '.php');
+
+        $this->_saveLayerConfig($sLayerClassFile, $sLayerClass);
+
+        return array($sLayerClassFile, $sLayerClass);
     }
 
     /**
      * Put together an message
-     *
-     * @static
      *
      * @param mixed $error   error data
      * @param mixed $result  result data
      *
      * @return array
      */
-    protected static function generateMessage($error = null, $result = null)
+    protected function generateMessage($error = null, $result = null)
     {
         return array(
-            'error'   => $error,
-            'result'  => $result,
+            'error'  => $error,
+            'result' => $result,
         );
     }
 
     /**
      * Put an error message
      *
-     * @static
-     *
      * @param $error
+     *
      * @return array
      */
-    protected static function errorMessage($error)
+    protected function errorMessage($error)
     {
-        return self::generateMessage($error);
+        return $this->generateMessage($error);
     }
 
     /**
      * Put an success message
      *
-     * @static
-     *
      * @param $result
+     *
      * @return array
      */
-    protected static function successMessage($result)
+    protected function successMessage($result)
     {
-        return self::generateMessage(null, $result);
+        return $this->generateMessage(null, $result);
     }
 
     /**
      * Get session id
-     * @static
+     *
      * @return null|string
      */
-    protected static function sessionId()
+    protected function sessionId()
     {
-        $sSessionId = NULL;
-        if (oxConfig::getParameter('sid') === '' || oxConfig::getParameter('sid') === NULL) {
-            $oSession = oxSession::getInstance();
+        $sSessionId = $this->_oVersionLayer->getRequestParam('sid');
+        $oSession   = $this->_oVersionLayer->getSession();
+        if (empty($sSessionId)) {
             $sSessionId = $oSession->getId();
         } else {
-            $sSessionId = oxConfig::getParameter('sid');
-            $oSession = oxSession::getInstance();
             $oSession->setId($sSessionId);
         }
 
@@ -101,20 +234,33 @@ class cushymoco extends oxUBase
      */
     protected function _getArticleById($key = 'anid')
     {
-        $sArticleId = oxConfig::getParameter($key);
+        /**
+         * @var oxArticle $oArticle
+         */
+        $sArticleId = $this->_oVersionLayer->getRequestParam($key);
         if (empty($sArticleId)) {
-            $this->_sAjaxResponse = self::errorMessage("article id not provided");
+            $this->_sAjaxResponse = $this->errorMessage("article id not provided");
         } else {
-            $oArticle = oxnew ('oxarticle');
-            $oArticle->load($sArticleId);
+            $oArticle = oxNew('oxarticle');
 
-            if (empty($oArticle)) {
-                $this->_sAjaxResponse = self::errorMessage("article could not be loaded");
-            } else {
+            if ($oArticle->load($sArticleId)) {
                 return $oArticle;
             }
+
+            $this->_sAjaxResponse = $this->errorMessage("article could not be loaded");
         }
+
         return false;
+    }
+
+    /**
+     * @return oxCmp_User
+     */
+    protected function _getUserCmp()
+    {
+        $aCmps = $this->getComponents();
+
+        return $aCmps['oxcmp_user'];
     }
 
     /**
@@ -127,26 +273,29 @@ class cushymoco extends oxUBase
      */
     public function login()
     {
-        $oCmps = $this->getComponents();
-        $oCmpUsr = $oCmps['oxcmp_user'];
-        $sUserName = oxConfig::getParameter('lgn_usr');
-        $sUserPwd = oxConfig::getParameter('lgn_pwd');
-        if (!empty($sUserName)  && !empty($sUserPwd)) {
-            $oCmpUsr->login_noredirect();
-            $oSession = $oCmpUsr->getSession();
-            $sSessionId = $oSession->getId();
-            $oUser = $oSession->getUser();
-                if ($oUser != NULL ) {
-                    $oLogin = new stdClass();
-                    $oLogin->username = $sUserName;
-                    $oLogin->sessionId = $sSessionId;
-                    $this->_sAjaxResponse =  self::successMessage($oLogin);
+        $sUserName = $this->_oVersionLayer->getRequestParam('lgn_usr');
+        $sUserPwd  = $this->_oVersionLayer->getRequestParam('lgn_pwd');
+        if (!empty($sUserName) && !empty($sUserPwd)) {
+            $oCmpUsr = $this->_getUserCmp();
+            try {
+                $oCmpUsr->login_noredirect();
+                $oSession   = $this->_oVersionLayer->getSession();
+                $sSessionId = $oSession->getId();
+                $oUser      = $oSession->getUser();
+                if ($oUser !== null) {
+                    $oLogin               = new stdClass();
+                    $oLogin->username     = $sUserName;
+                    $oLogin->sessionId    = $sSessionId;
+                    $this->_sAjaxResponse = $this->successMessage($oLogin);
                 } else {
-                    $this->_sAjaxResponse = self::errorMessage("User ".$sUserName." does not exist");
+                    $this->_sAjaxResponse = $this->errorMessage("User " . $sUserName . " does not exist");
                 }
-            } else {
-               $this->_sAjaxResponse = self::errorMessage("User ".$sUserName." can not be logged in");
-           }
+            } catch (oxUserException $e) {
+                $this->_sAjaxResponse = $this->errorMessage("User " . $sUserName . " does not exist");
+            }
+        } else {
+            $this->_sAjaxResponse = $this->errorMessage("User " . $sUserName . " can not be logged in");
+        }
     }
 
     /*
@@ -160,33 +309,31 @@ class cushymoco extends oxUBase
          * @todo language select is not working proper, maybe because of session language
          */
 
-        $sContentId = oxConfig::getParameter('cnid');
-        $iLangId = oxConfig::getParameter('lid');
+        $sContentId = $this->_oVersionLayer->getRequestParam('cnid');
+        $iLangId    = $this->_oVersionLayer->getRequestParam('lid');
 
-        $oContent = oxNew( 'oxcontent' );
+        $oContent = oxNew('oxcontent');
         $oContent->loadByIdent($sContentId);
 
-        if ($oContent->oxcontents__oxactive->value == 1) {
+        $aResult = array();
 
-            if ($iLangId) {
-                $sContentByLang = 'oxcontents__oxcontent_' . $iLangId;
-                $sTitleByLang = 'oxcontents__oxtitle_'. $iLangId;
-            } else {
-                $sContentByLang = 'oxcontents__oxcontent';
-                $sTitleByLang = 'oxcontents__oxtitle';
-            }
+        if ($oContent->oxcontents__oxactive->value != 1) {
+            $this->_sAjaxResponse = $this->errorMessage('EMPTY');
 
-            $aResult['title'] = $oContent->$sTitleByLang->value;
-            $aResult['content'] = htmlspecialchars($oContent->$sContentByLang->value);
-
+            return;
         }
 
-        if (count($aResult)) {
-            $this->_sAjaxResponse = self::successMessage($aResult);
+        if ($iLangId) {
+            $sContentByLang = 'oxcontents__oxcontent_' . $iLangId;
+            $sTitleByLang   = 'oxcontents__oxtitle_' . $iLangId;
         } else {
-            $this->_sAjaxResponse = self::errorMessage('EMPTY');
+            $sContentByLang = 'oxcontents__oxcontent';
+            $sTitleByLang   = 'oxcontents__oxtitle';
         }
 
+        $aResult['title']     = $oContent->$sTitleByLang->value;
+        $aResult['content']   = htmlspecialchars($oContent->$sContentByLang->value);
+        $this->_sAjaxResponse = $this->successMessage($aResult);
     }
 
     /**
@@ -196,26 +343,25 @@ class cushymoco extends oxUBase
      */
     public function logout()
     {
-        $sSessionId = self::sessionId();
-        $oCmps = $this->getComponents();
-        $oCmpUsr = $oCmps['oxcmp_user'];
+        $sSessionId = $this->sessionId();
+        $oCmpUsr    = $this->_getUserCmp();
 
         if ($sSessionId != '') {
-            $oSession = oxSession::getInstance();
+            $oSession = $this->_oVersionLayer->getSession();
             if ($sSessionId != '' && $sSessionId == $oSession->getId()) {
                 $oCmpUsr->logout();
                 $oSession->destroy();
 
-                $oLogout = new stdClass();
+                $oLogout            = new stdClass();
                 $oLogout->sessionId = $sSessionId;
-                $oLogout->logout = true;
+                $oLogout->logout    = true;
 
-                $this->_sAjaxResponse = self::successMessage($oLogout);
+                $this->_sAjaxResponse = $this->successMessage($oLogout);
             } else {
-                $this->_sAjaxResponse = self::errorMessage("User cannot be logged out");
+                $this->_sAjaxResponse = $this->errorMessage("User cannot be logged out");
             }
         } else {
-            $this->_sAjaxResponse = self::errorMessage("Session id missing");
+            $this->_sAjaxResponse = $this->errorMessage("Session id missing");
         }
     }
 
@@ -227,32 +373,37 @@ class cushymoco extends oxUBase
     {
         $oUser = $this->getUser();
         if (!empty($oUser)) {
-            $aResult = array(
+            $aResult              = array(
                 'username'  => $oUser->oxuser__oxusername->value,
                 'firstname' => $oUser->oxuser__oxfname->value,
                 'lastname'  => $oUser->oxuser__oxlname->value,
                 'company'   => $oUser->oxuser__oxcompany->value,
             );
-            $this->_sAjaxResponse = self::successMessage($aResult);
+            $this->_sAjaxResponse = $this->successMessage($aResult);
         } else {
-            $this->_sAjaxResponse = self::errorMessage("user not logged on");
+            $this->_sAjaxResponse = $this->errorMessage("user not logged on");
         }
     }
 
     protected function articleToArray($oArticle)
     {
+        /**
+         * @var oxArticle $oArticle
+         */
         $res = array(
-            'id'    => $oArticle->oxarticles__oxid->value,
-            'title' => html_entity_decode($oArticle->oxarticles__oxtitle->rawValue),
-            'short' => html_entity_decode($oArticle->oxarticles__oxshortdesc->rawValue),
-            'data'  => array($oArticle->oxarticles__oxlongdesc->value),
-            'price' => $oArticle->getFPrice(),
-            'link'  => $oArticle->getLink(),
-            'icon'  => $oArticle->getIconUrl(),
+            'id'       => $oArticle->oxarticles__oxid->value,
+            'title'    => html_entity_decode($oArticle->oxarticles__oxtitle->rawValue),
+            'short'    => html_entity_decode($oArticle->oxarticles__oxshortdesc->rawValue),
+            'data'     => array($oArticle->oxarticles__oxlongdesc->value),
+            'price'    => $oArticle->getFPrice(),
+            'link'     => $oArticle->getLink(),
+            'icon'     => $oArticle->getIconUrl(),
             'currency' => '€',
         );
+
         return $res;
     }
+
     /**
      * Provides data on the article
      *
@@ -262,10 +413,10 @@ class cushymoco extends oxUBase
     {
         $oArticle = $this->_getArticleById();
         if (!empty($oArticle)) {
-            $res = $this->articleToArray($oArticle);
-            $this->_sAjaxResponse = self::successMessage($res);
+            $res                  = $this->articleToArray($oArticle);
+            $this->_sAjaxResponse = $this->successMessage($res);
         } else {
-            $this->_sAjaxResponse = self::errorMessage('article not found');
+            $this->_sAjaxResponse = $this->errorMessage('article not found');
         }
     }
 
@@ -278,44 +429,58 @@ class cushymoco extends oxUBase
      */
     public function getArticleList()
     {
-        $oArtList = oxNew( 'oxarticlelist' );
-        $perpage = $this->getConfig()->getConfigParam( 'iNrofCatArticles' );
-        $page = $this->getActPage();
-        $oArtList->setSqlLimit( $perpage * $page, $perpage );
+        $oArtList = oxNew('oxarticlelist');
+        $perpage  = $this->_oVersionLayer->getConfig()->getConfigParam('iNrofCatArticles');
+        $page     = $this->getActPage();
+        $oArtList->setSqlLimit($perpage * $page, $perpage);
         //$oArtList->setCustomSorting( $this->getSortingSql( $oCategory->getId() ) );
-        $aSessionFilter = null;//oxSession::getVar( 'session_attrfilter' );
+        $aSessionFilter = null; //$this->_oVersionLayer->getSession()->getVariable( 'session_attrfilter' );
 
-        $sActCat = oxConfig::getParameter( 'cnid' );
-        $iACount = $oArtList->loadCategoryArticles( $sActCat, $aSessionFilter );
+        $sActCat = $this->_oVersionLayer->getRequestParam('cnid');
+        $iACount = $oArtList->loadCategoryArticles($sActCat, $aSessionFilter);
 
-        $res = new stdClass();
-        $res->count = $iACount;
+        $res           = new stdClass();
+        $res->count    = $iACount;
         $res->articles = array();
-        foreach($oArtList as $oArticle) {
+        foreach ($oArtList as $oArticle) {
             $res->articles[] = $this->articleToArray($oArticle);
         }
-        $this->_sAjaxResponse = self::successMessage($res);
+        $this->_sAjaxResponse = $this->successMessage($res);
     }
 
     public function getCategoryList()
     {
-        $oCatTree = oxNew( "oxCategoryList" );
-        $oCatTree->buildList( true );
+        /**
+         * @var oxCategoryList $oCatTree
+         * @var oxCategory     $oCategory
+         */
+        $oCatTree = oxNew("oxCategoryList");
+        $oCatTree->buildList(true);
 
-        $sActCat = oxConfig::getParameter( 'cnid' );
+        $sActCat = $this->_oVersionLayer->getRequestParam('cnid');
 
         $aCatList = array();
-        foreach ( $oCatTree as $oCategory ) {
+        foreach ($oCatTree as $oCategory) {
             $oParentCategory = $oCategory->getParentCategory();
-            if ($oCategory->getIsVisible() && ($sActCat === $oParentCategory || (null !== $oParentCategory && $sActCat == $oParentCategory->getId()))) {
+            if (
+                $oCategory->getIsVisible() && (
+                    $sActCat === $oParentCategory || (
+                        null !== $oParentCategory && $sActCat == $oParentCategory->getId()
+                    )
+                )
+            ) {
                 $aCatList[] = array(
                     'id'       => $oCategory->getId(),
-                    'title'    => preg_replace('/^[- ]+/', '', html_entity_decode($oCategory->oxcategories__oxtitle->rawValue)),
+                    'title'    => preg_replace(
+                        '/^[- ]+/',
+                        '',
+                        html_entity_decode($oCategory->oxcategories__oxtitle->rawValue)
+                    ),
                     'hasChild' => $oCategory->getHasSubCats(),
                 );
             }
         }
-        $this->_sAjaxResponse = self::successMessage($aCatList);
+        $this->_sAjaxResponse = $this->successMessage($aCatList);
     }
 
     /**
@@ -327,21 +492,21 @@ class cushymoco extends oxUBase
      */
     public function searchProducts()
     {
-        $searchParam        = oxConfig::getParameter( 'searchparam' );
-        $searchCnid         = oxConfig::getParameter( 'searchcnid' );
-        $searchVendor       = oxConfig::getParameter( 'searchvendor' );
-        $searchManufacturer = oxConfig::getParameter( 'searchmanufacturer' );
+        $searchParam        = $this->_oVersionLayer->getRequestParam('searchparam');
+        $searchCnid         = $this->_oVersionLayer->getRequestParam('searchcnid');
+        $searchVendor       = $this->_oVersionLayer->getRequestParam('searchvendor');
+        $searchManufacturer = $this->_oVersionLayer->getRequestParam('searchmanufacturer');
 
-        $oSearchHandler = oxNew( 'oxsearch' );
-        $oSearchList = $oSearchHandler->getSearchArticles(
+        $oSearchHandler = oxNew('oxsearch');
+        $oSearchList    = $oSearchHandler->getSearchArticles(
             $searchParam,
             $searchCnid,
             $searchVendor,
             $searchManufacturer,
-            $this->getSortingSql( 'oxsearch' )
+            $this->getSortingSql('oxsearch')
         );
 
-        $count = $oSearchHandler->getSearchArticleCount(
+        $count  = $oSearchHandler->getSearchArticleCount(
             $searchParam,
             $searchCnid,
             $searchVendor,
@@ -354,21 +519,22 @@ class cushymoco extends oxUBase
                 'title' => $oArticle->oxarticles__oxtitle->value,
                 'short' => $oArticle->oxarticles__oxshortdesc->value,
                 'price' => $oArticle->oxarticles__oxprice->value,
-         //       'link'  => $oArticle->getLink(),
+                //       'link'  => $oArticle->getLink(),
             );
         }
 
-        $this->_sAjaxResponse = self::successMessage(array('count' => $count, 'articles' => $result));
+        $this->_sAjaxResponse = $this->successMessage(array('count' => $count, 'articles' => $result));
     }
+
     public function getArticleMedia()
     {
         /**
          * @var oxarticle $oArticle
          */
         $oArticle = $this->_getArticleById();
-        $aMedia = $oArticle->getMediaUrls();
+        $aMedia   = $oArticle->getMediaUrls();
         $response = array();
-        foreach($aMedia as $medium) {
+        foreach ($aMedia as $medium) {
             $response[] = array(
                 'id'     => $medium->oxmediaurls__oxid->value,
                 'url'    => $medium->oxmediaurls__oxurl->value,
@@ -376,7 +542,7 @@ class cushymoco extends oxUBase
                 'upload' => $medium->oxmediaurls__oxisuploaded->value,
             );
         }
-        $this->_sAjaxResponse = self::successMessage($response);
+        $this->_sAjaxResponse = $this->successMessage($response);
     }
 
     /**
@@ -388,9 +554,9 @@ class cushymoco extends oxUBase
      */
     public function getArticleImages()
     {
-        $oArticle = $this->_getArticleById();
-        $aGallery = $oArticle->getPictureGallery();
-        $this->_sAjaxResponse = self::successMessage($aGallery);
+        $oArticle             = $this->_getArticleById();
+        $aGallery             = $oArticle->getPictureGallery();
+        $this->_sAjaxResponse = $this->successMessage($aGallery);
     }
 
     /**
@@ -400,8 +566,11 @@ class cushymoco extends oxUBase
      */
     public function getBasket()
     {
-        self::sessionId();
-        $oBasket = $this->getSession()->getBasket();
+        /**
+         * @var oxBasketItem $oBasketItem
+         */
+        $this->sessionId();
+        $oBasket = $this->_oVersionLayer->getBasket();
 
         $oBasket->calculateBasket(true);
         $response = array(
@@ -411,13 +580,13 @@ class cushymoco extends oxUBase
             'total'         => $oBasket->getFPrice(),
             'currency'      => '€',
         );
-        foreach($oBasket->getContents() as $key => $oBasketItem) {
-            $response['articles'][$key] = $this->articleToArray($oBasketItem->getArticle());
+        foreach ($oBasket->getContents() as $key => $oBasketItem) {
+            $response['articles'][$key]           = $this->articleToArray($oBasketItem->getArticle());
             $response['articles'][$key]['amount'] = $oBasketItem->getAmount();
-            $response['articles'][$key]['total'] = $oBasketItem->getFTotalPrice();
+            $response['articles'][$key]['total']  = $oBasketItem->getFTotalPrice();
         }
 
-        $this->_sAjaxResponse = self::successMessage($response);
+        $this->_sAjaxResponse = $this->successMessage($response);
     }
 
     /**
@@ -429,16 +598,16 @@ class cushymoco extends oxUBase
      */
     public function deleteFromBasket()
     {
-        self::sessionId();
-        $oBasket = $this->getSession()->getBasket();
+        $this->sessionId();
+        $oBasket  = $this->_oVersionLayer->getBasket();
         $oArticle = $this->_getArticleById();
 
-        if($oArticle) {
+        if ($oArticle) {
             $sItemKey = $oBasket->getItemKey($oArticle->oxarticles__oxid->value);
             if ($sItemKey) {
                 $oBasket->removeItem($sItemKey);
             }
-            $this->_sAjaxResponse = self::successMessage(true);
+            $this->_sAjaxResponse = $this->successMessage(true);
         }
     }
 
@@ -452,18 +621,21 @@ class cushymoco extends oxUBase
      */
     public function updateBasket()
     {
-        self::sessionId();
-        $oBasket = $this->getSession()->getBasket();
-        $oArticle = $this->_getArticleById();
-        $iQuantity = max(oxConfig::getParameter( 'qty' ), 1);
+        /**
+         * @var oxBasketItem $oBasketItem
+         */
+        $this->sessionId();
+        $oBasket   = $this->_oVersionLayer->getBasket();
+        $oArticle  = $this->_getArticleById();
+        $iQuantity = max($this->_oVersionLayer->getRequestParam('qty'), 1);
 
         if ($oArticle) {
-            $this->_sAjaxResponse = self::errorMessage('Basket item not found');
-            foreach($oBasket->getContents() as $oBasketItem) {
+            $this->_sAjaxResponse = $this->errorMessage('Basket item not found');
+            foreach ($oBasket->getContents() as $oBasketItem) {
                 if ($oBasketItem->getArticle()->oxarticles__oxid->value == $oArticle->oxarticles__oxid->value) {
                     $oBasketItem->setAmount($iQuantity);
 
-                    $this->_sAjaxResponse = self::successMessage(true);
+                    $this->_sAjaxResponse = $this->successMessage(true);
                     break;
                 }
             }
@@ -480,21 +652,18 @@ class cushymoco extends oxUBase
      */
     public function addToBasket()
     {
-        self::sessionId();
-        $oBasket = $this->getSession()->getBasket();
-        $oArticle = $this->_getArticleById();
-        $iQuantity = max(oxConfig::getParameter( 'qty' ), 1);
+        $this->sessionId();
+        $oBasket   = $this->_oVersionLayer->getBasket();
+        $oArticle  = $this->_getArticleById();
+        $iQuantity = max($this->_oVersionLayer->getRequestParam('qty'), 1);
 
-        try
-        {
+        try {
             if ($oArticle) {
                 $oBasket->addToBasket($oArticle->oxarticles__oxid->value, $iQuantity);
-                $this->_sAjaxResponse = self::successMessage(true);
+                $this->_sAjaxResponse = $this->successMessage(true);
             }
-        }
-        catch (Exception $e)
-        {
-            $this->_sAjaxResponse = self::errorMessage($e->getMessage());
+        } catch (Exception $e) {
+            $this->_sAjaxResponse = $this->errorMessage($e->getMessage());
         }
     }
 
@@ -505,10 +674,10 @@ class cushymoco extends oxUBase
      */
     public function getInvoiceAddress()
     {
-        $oUser = $this->getUser();
+        $oUser   = $this->getUser();
         $address = array();
         if (!empty($oUser)) {
-            $address = oxConfig::getParameter( 'invadr');
+            $address = $this->_oVersionLayer->getRequestParam('invadr');
             if (empty($address)) {
                 $address = array(
                     'oxuser_oxfname'     => $oUser->oxuser__oxfname->value,
@@ -527,9 +696,9 @@ class cushymoco extends oxUBase
             }
         }
         if (!empty($address)) {
-            $this->_sAjaxResponse = self::successMessage($address);
+            $this->_sAjaxResponse = $this->successMessage($address);
         } else {
-            $this->_sAjaxResponse = self::errorMessage("No address available");
+            $this->_sAjaxResponse = $this->errorMessage("No address available");
         }
     }
 
@@ -540,10 +709,14 @@ class cushymoco extends oxUBase
      */
     public function getDeliveryAddresses()
     {
-        $oUser = $this->getUser();
+        /**
+         * @var oxlist    $addresses
+         * @var oxAddress $address
+         */
+        $oUser     = $this->getUser();
         $addresses = $oUser->getUserAddresses();
-        $res = array();
-        foreach($addresses as $address) {
+        $res       = array();
+        foreach ($addresses as $address) {
             $res[$address->getId()] = array(
                 'oxuser_oxfname'     => $address->oxaddress__oxfname->value,
                 'oxuser_oxlname'     => $address->oxaddress__oxlname->value,
@@ -559,12 +732,11 @@ class cushymoco extends oxUBase
             );
         }
         if (!empty($res)) {
-            $this->_sAjaxResponse = self::successMessage($res);
+            $this->_sAjaxResponse = $this->successMessage($res);
         } else {
-            $this->_sAjaxResponse = self::errorMessage("No address available");
+            $this->_sAjaxResponse = $this->errorMessage("No address available");
         }
     }
-
 
     /**
      * Fetches All possible Delivery Sets and all payments that match the given shipping set
@@ -575,39 +747,45 @@ class cushymoco extends oxUBase
      */
     public function getShippingPayment()
     {
-        $sActShipSet = oxConfig::getParameter( 'sShipSet' );
-        if ( !$sActShipSet ) {
-            $sActShipSet = oxSession::getVar( 'sShipSet' );
+        $sActShipSet = $this->_oVersionLayer->getRequestParam('sShipSet');
+        if (!$sActShipSet) {
+            $sActShipSet = $this->_oVersionLayer->getSession()->getVariable('sShipSet');
         }
 
-        $oBasket = $this->getSession()->getBasket();
-        $oBasket->setShipping( null );
+        $oBasket = $this->_oVersionLayer->getBasket();
+        $oBasket->setShipping(null);
         $oBasket->onUpdate();
-        oxSession::setVar( 'sShipSet', $sActShipSet );
+        $this->_oVersionLayer->getSession()->setVariable('sShipSet', $sActShipSet);
 
         // load sets, active set, and active set payment list
-        list( $aAllSets, $sActShipSet, $aPaymentList ) = oxDeliverySetList::getInstance()->getDeliverySetData( $sActShipSet, $this->getUser(), $oBasket );
+        list($aAllSets, $sActShipSet, $aPaymentList) = $this->_oVersionLayer->getDeliverySetList()
+            ->getDeliverySetData($sActShipSet, $this->getUser(), $oBasket);
 
-        foreach($aAllSets as $set) {
-            $deliveries[] = array(
+        $result = array(
+            'deliveries' => array(),
+            'payments'   => array(),
+            'actship'    => $sActShipSet,
+        );
+
+        foreach ($aAllSets as $set) {
+            $result['deliveries'][] = array(
                 'id'    => $set->oxdeliveryset__oxid->value,
                 'title' => $set->oxdeliveryset__oxtitle->value,
                 'pos'   => $set->oxdeliveryset__oxpos->value,
             );
         }
-        foreach($aPaymentList as $pay) {
-            $payments[] = array(
-                'id' => $pay->oxpayments__oxid->value,
+
+        foreach ($aPaymentList as $pay) {
+            $result['payments'][] = array(
+                'id'    => $pay->oxpayments__oxid->value,
                 'title' => $pay->oxpayments__oxdesc->value,
-                'pos' => $pay->oxpayments__oxsort->value,
+                'pos'   => $pay->oxpayments__oxsort->value,
             );
         }
-        $this->_sAjaxResponse = self::successMessage(array(
-            'deliveries' => $deliveries,
-            'payments'   => $payments,
-            'actship'    => $sActShipSet,
-        ));
+
+        $this->_sAjaxResponse = $this->successMessage($result);
     }
+
     /**
      * Execute an order
      *
@@ -618,70 +796,79 @@ class cushymoco extends oxUBase
     public function executeOrder()
     {
         // Try GET parameter
-        $shipping = oxConfig::getParameter( 'sShipSet' );
-        if ( !$shipping ) {
+        $shipping = $this->_oVersionLayer->getRequestParam('sShipSet');
+        if (!$shipping) {
             // ... fetch from session
-            $shipping = oxSession::getVar( 'sShipSet' );
+            $shipping = $this->_oVersionLayer->getSession()->getVariable('sShipSet');
         }
-        if ( !$shipping ) {
-            $this->_sAjaxResponse = self::errorMessage("No shipping id given");
+        if (!$shipping) {
+            $this->_sAjaxResponse = $this->errorMessage("No shipping id given");
+
             return false;
         }
-        $payment = oxConfig::getParameter( 'payment' );
-        if ( !$payment ) {
-            $payment = oxSession::getVar( 'payment' );
+        $payment = $this->_oVersionLayer->getRequestParam('payment');
+        if (!$payment) {
+            $payment = $this->_oVersionLayer->getSession()->getVariable('payment');
         }
 
-        if ( !$payment ) {
-            $this->_sAjaxResponse = self::errorMessage("No payment type given");
+        if (!$payment) {
+            $this->_sAjaxResponse = $this->errorMessage("No payment type given");
+
             return false;
         }
 
         // Check if user is logged in
-        if ( !$oUser= $this->getUser() ) {
-            $this->_sAjaxResponse = self::errorMessage("User not logged on");
+        if (!$oUser = $this->getUser()) {
+            $this->_sAjaxResponse = $this->errorMessage("User not logged on");
+
             return false;
         }
 
         // Load user basket
-        $oBasket  = $this->getSession()->getBasket();
+        $oBasket = $this->_oVersionLayer->getBasket();
 
         // Set payment & shipping
         $oBasket->setPayment($payment);
         $oBasket->setShipping($shipping);
 
-        if ( $oBasket->getProductsCount() ) {
+        if ($oBasket->getProductsCount()) {
 
             try {
-                $oOrder = oxNew( 'oxorder' );
+                $oOrder = oxNew('oxorder');
 
-                // finalizing ordering process (validating, storing order into DB, executing payment, setting status ...)
-                $iSuccess = $oOrder->finalizeOrder( $oBasket, $oUser );
+                // finalizing ordering process (validating, storing order into DB, executing payment, setting status...)
+                $iSuccess = $oOrder->finalizeOrder($oBasket, $oUser);
 
                 $oBasket->setOrderId($oOrder->getId());
 
                 // performing special actions after user finishes order (assignment to special user groups)
-                $oUser->onOrderExecute( $oBasket, $iSuccess );
+                $oUser->onOrderExecute($oBasket, $iSuccess);
+            } catch (Exception $oEx) {
+                $this->_sAjaxResponse = $this->errorMessage(
+                    array('message' => "error executing order", 'data' => $oEx)
+                );
 
-            } catch ( Exception $oEx ) {
-                $this->_sAjaxResponse = self::errorMessage(array('message'=>"error executing order",'data'=>$oEx));
                 return false;
             }
         }
 
-        $this->_sAjaxResponse = self::successMessage("done order");
+        $this->_sAjaxResponse = $this->successMessage("done order");
+
         return true;
     }
+
     /**
      * Get content by ident
      *
      * @param string $sLoadId
+     *
      * @return string
      */
     protected function _getContentByIdent($sLoadId)
     {
-        $oContent = oxNew( 'oxcontent' );
+        $oContent = oxNew('oxcontent');
         $oContent->loadByIdent($sLoadId);
+
         return $oContent->oxcontents__oxcontent->rawValue;
     }
 
@@ -692,8 +879,8 @@ class cushymoco extends oxUBase
      */
     public function getTermsAndConditions()
     {
-        $sContent = $this->_getContentByIdent('oxagb');
-        $this->_sAjaxResponse = self::successMessage($sContent);
+        $sContent             = $this->_getContentByIdent('oxagb');
+        $this->_sAjaxResponse = $this->successMessage($sContent);
     }
 
     /**
@@ -703,44 +890,45 @@ class cushymoco extends oxUBase
      */
     public function getImprint()
     {
-        $sContent = $this->_getContentByIdent('oximpressum');
-        $this->_sAjaxResponse = self::successMessage($sContent);
+        $sContent             = $this->_getContentByIdent('oximpressum');
+        $this->_sAjaxResponse = $this->successMessage($sContent);
     }
+
     /*
      * Get list of countries
      *
      */
     public function getCountryList()
     {
-        $oCountryList = oxNew( 'oxcountrylist' );
+        $oCountryList = oxNew('oxcountrylist');
         $oCountryList->loadActiveCountries();
         $res = array();
-        foreach($oCountryList as $country) {
+        foreach ($oCountryList as $country) {
             $res[] = array(
-                'id'     => $country->oxcountry__oxid->value,
-                'title'  => $country->oxcountry__oxtitle->value,
-                'iso2'   => $country->oxcountry__oxisoalpha2->value,
-                'iso3'   => $country->oxcountry__oxisoalpha3->value,
+                'id'    => $country->oxcountry__oxid->value,
+                'title' => $country->oxcountry__oxtitle->value,
+                'iso2'  => $country->oxcountry__oxisoalpha2->value,
+                'iso3'  => $country->oxcountry__oxisoalpha3->value,
             );
         }
         if (!empty($res)) {
-            $this->_sAjaxResponse = self::successMessage($res);
+            $this->_sAjaxResponse = $this->successMessage($res);
         } else {
-            $this->_sAjaxResponse = self::errorMessage("no countries found");
+            $this->_sAjaxResponse = $this->errorMessage("no countries found");
         }
     }
 
     public function setLanguage()
     {
-        $sLang = oxConfig::getParameter( 'device_language' );
-        $oLang = oxLang::getInstance();
-        foreach($oLang->getLanguageArray() as $oLanguage) {
+        $sLang = $this->_oVersionLayer->getRequestParam('device_language');
+        $oLang = $this->_oVersionLayer->getLang();
+        foreach ($oLang->getLanguageArray() as $oLanguage) {
             if (strtolower($oLanguage->oxid) == strtolower($sLang) && $oLang->getBaseLanguage() != $oLanguage->id) {
                 $oLang->setBaseLanguage($oLanguage->id);
-                oxUtilsServer::getInstance()->setOxCookie( 'language', $oLang->getBaseLanguage() );
+                $this->_oVersionLayer->getUtilsServer()->setOxCookie('language', $oLang->getBaseLanguage());
             }
         }
-        $this->_sAjaxResponse = self::successMessage(true);
+        $this->_sAjaxResponse = $this->successMessage(true);
     }
 
     /**
@@ -748,6 +936,6 @@ class cushymoco extends oxUBase
      */
     public function getVersion()
     {
-        $this->_sAjaxResponse = self::successMessage(self::VERSION);
+        $this->_sAjaxResponse = $this->successMessage(self::VERSION);
     }
 }
