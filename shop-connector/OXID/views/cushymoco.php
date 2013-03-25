@@ -30,6 +30,9 @@ class cushymoco extends oxUBase
     {
         parent::init();
 
+        restore_error_handler();
+        restore_exception_handler();
+
         try {
             $this->_initVersionLayer();
         } catch (Exception $e) {
@@ -404,7 +407,7 @@ class cushymoco extends oxUBase
             'id'       => $oArticle->oxarticles__oxid->value,
             'title'    => html_entity_decode($oArticle->oxarticles__oxtitle->rawValue),
             'short'    => html_entity_decode($oArticle->oxarticles__oxshortdesc->rawValue),
-            'data'     => array($oArticle->oxarticles__oxlongdesc->value),
+            'data'     => array($oArticle->getLongDesc()),
             'price'    => $oArticle->getFPrice(),
             'link'     => $oArticle->getLink(),
             'icon'     => $oArticle->getIconUrl(),
