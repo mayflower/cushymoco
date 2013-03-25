@@ -215,11 +215,13 @@ class cushymoco extends oxUBase
      *
      * @return null|string
      */
-    protected function sessionId()
+    protected function _getSessionId()
     {
         $sSessionId = $this->_oVersionLayer->getRequestParam('sid');
         $oSession   = $this->_oVersionLayer->getSession();
         if (empty($sSessionId)) {
+            $oSession->setForceNewSession();
+            $oSession->start();
             $sSessionId = $oSession->getId();
         } else {
             $oSession->setId($sSessionId);
@@ -283,7 +285,7 @@ class cushymoco extends oxUBase
             try {
                 $oCmpUsr->login_noredirect();
                 $oSession   = $this->_oVersionLayer->getSession();
-                $sSessionId = $oSession->getId();
+                $sSessionId = $this->_getSessionId();
                 $oUser      = $oSession->getUser();
                 if ($oUser !== null) {
                     $oLogin               = new stdClass();
@@ -346,7 +348,7 @@ class cushymoco extends oxUBase
      */
     public function logout()
     {
-        $sSessionId = $this->sessionId();
+        $sSessionId = $this->_getSessionId();
         $oCmpUsr    = $this->_getUserCmp();
 
         if ($sSessionId != '') {
@@ -577,7 +579,7 @@ class cushymoco extends oxUBase
         /**
          * @var oxBasketItem $oBasketItem
          */
-        $this->sessionId();
+        $this->_getSessionId();
         $oBasket = $this->_oVersionLayer->getBasket();
 
         $oBasket->calculateBasket(true);
@@ -606,7 +608,7 @@ class cushymoco extends oxUBase
      */
     public function deleteFromBasket()
     {
-        $this->sessionId();
+        $this->_getSessionId();
         $oBasket  = $this->_oVersionLayer->getBasket();
         $oArticle = $this->_getArticleById();
 
@@ -632,7 +634,7 @@ class cushymoco extends oxUBase
         /**
          * @var oxBasketItem $oBasketItem
          */
-        $this->sessionId();
+        $this->_getSessionId();
         $oBasket   = $this->_oVersionLayer->getBasket();
         $oArticle  = $this->_getArticleById();
         $iQuantity = max($this->_oVersionLayer->getRequestParam('qty'), 1);
@@ -660,7 +662,7 @@ class cushymoco extends oxUBase
      */
     public function addToBasket()
     {
-        $this->sessionId();
+        $this->_getSessionId();
         $oBasket   = $this->_oVersionLayer->getBasket();
         $oArticle  = $this->_getArticleById();
         $iQuantity = max($this->_oVersionLayer->getRequestParam('qty'), 1);
@@ -671,7 +673,8 @@ class cushymoco extends oxUBase
                 $this->_sAjaxResponse = $this->successMessage(true);
             }
         } catch (Exception $e) {
-            $this->_sAjaxResponse = $this->errorMessage($e->getMessage());
+            $oLang = $this->_oVersionLayer->getLang();
+            $this->_sAjaxResponse = $this->errorMessage($oLang->translateString($e->getMessage()));
         }
     }
 
@@ -812,7 +815,7 @@ class cushymoco extends oxUBase
         if (!$shipping) {
             $this->_sAjaxResponse = $this->errorMessage("No shipping id given");
 
-            return false;
+            return;
         }
         $payment = $this->_oVersionLayer->getRequestParam('payment');
         if (!$payment) {
@@ -822,14 +825,14 @@ class cushymoco extends oxUBase
         if (!$payment) {
             $this->_sAjaxResponse = $this->errorMessage("No payment type given");
 
-            return false;
+            return;
         }
 
         // Check if user is logged in
         if (!$oUser = $this->getUser()) {
             $this->_sAjaxResponse = $this->errorMessage("User not logged on");
 
-            return false;
+            return;
         }
 
         // Load user basket
@@ -856,13 +859,13 @@ class cushymoco extends oxUBase
                     array('message' => "error executing order", 'data' => $oEx)
                 );
 
-                return false;
+                return;
             }
         }
 
         $this->_sAjaxResponse = $this->successMessage("done order");
 
-        return true;
+        return;
     }
 
     /**
