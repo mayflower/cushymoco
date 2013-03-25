@@ -151,13 +151,16 @@ class cushymoco extends oxUBase
         }
 
         if (count($aLayerClasses) == 0) {
-            throw new Exception("Can't find suitable layer class for your shop version.");
+            throw new Exception("Can't find any shop version layer.");
         }
 
         natsort($aLayerClasses);
 
         do {
             $sLayerClassFile = array_pop($aLayerClasses);
+            if ($sLayerClassFile === null) {
+                throw new Exception("Can't find suitable version layer class for your shop version.");
+            }
         } while (strnatcmp($sMaxVersionLayerFile, $sLayerClassFile) < 0);
 
         $sLayerClass = basename($sLayerClassFile, '.php');
@@ -371,14 +374,19 @@ class cushymoco extends oxUBase
      */
     public function getUserData()
     {
-        $oUser = $this->getUser();
-        if (!empty($oUser)) {
-            $aResult              = array(
+        /**
+         * @var oxUser $oUser
+         */
+        $oUser = $this->_oVersionLayer->getSession()->getUser();
+
+        if (is_object($oUser) && $oUser->isLoaded() && isset($oUser->oxuser__oxcustnr->value)) {
+            $aResult = array(
                 'username'  => $oUser->oxuser__oxusername->value,
                 'firstname' => $oUser->oxuser__oxfname->value,
                 'lastname'  => $oUser->oxuser__oxlname->value,
                 'company'   => $oUser->oxuser__oxcompany->value,
             );
+
             $this->_sAjaxResponse = $this->successMessage($aResult);
         } else {
             $this->_sAjaxResponse = $this->errorMessage("user not logged on");
