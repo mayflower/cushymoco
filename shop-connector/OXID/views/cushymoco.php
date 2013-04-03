@@ -153,6 +153,7 @@ class cushymoco extends oxUBase
         }
 
         $blMethodExists = method_exists('oxRegistry', $sMethod);
+
         return $blRegistryExists && $blMethodExists;
     }
 
@@ -272,11 +273,12 @@ class cushymoco extends oxUBase
     /**
      * load an article object
      *
-     * @param string $key Parameter that contains the id of the article
+     * @param string $key             Parameter that contains the OXID of the product.
+     * @param bool   $blReturnVariant If the product is a variant, return it or its parent product.
      *
      * @return bool|oxarticle
      */
-    protected function _getArticleById($key = 'anid')
+    protected function _getArticleById($key = 'anid', $blReturnVariant = false)
     {
         /**
          * @var oxArticle $oArticle
@@ -288,7 +290,7 @@ class cushymoco extends oxUBase
             $oArticle = oxNew('oxarticle');
 
             if ($oArticle->load($sArticleId)) {
-                if ($oArticle->isMdVariant()) {
+                if (!$blReturnVariant && $oArticle->isMdVariant()) {
                     return $oArticle->getParentArticle();
                 }
 
@@ -434,7 +436,6 @@ class cushymoco extends oxUBase
             );
 
             $this->_sAjaxResponse = $this->_successMessage($aResult);
-
         } else {
             $this->_sAjaxResponse = $this->_errorMessage("user not logged on");
         }
@@ -452,54 +453,53 @@ class cushymoco extends oxUBase
 
         if (is_object($oUser) && $oUser->isLoaded() && isset($oUser->oxuser__oxcustnr->value)) {
             $aResult = array(
-                'user' => array(
-                    'username'  => $oUser->oxuser__oxusername->value,
-                    'firstname' => $oUser->oxuser__oxfname->value,
-                    'lastname'  => $oUser->oxuser__oxlname->value,
-                    'customerNo' => $oUser->oxuser__oxcustnr->value,
-                    'company'   => $oUser->oxuser__oxcompany->value,
-                    'phone' => $oUser->oxuser__oxfon->value,
-                    'fax' => $oUser->oxuser__oxfax->value,
+                'user'     => array(
+                    'username'     => $oUser->oxuser__oxusername->value,
+                    'firstname'    => $oUser->oxuser__oxfname->value,
+                    'lastname'     => $oUser->oxuser__oxlname->value,
+                    'customerNo'   => $oUser->oxuser__oxcustnr->value,
+                    'company'      => $oUser->oxuser__oxcompany->value,
+                    'phone'        => $oUser->oxuser__oxfon->value,
+                    'fax'          => $oUser->oxuser__oxfax->value,
                     'privatePhone' => $oUser->oxuser__oxprivfon->value,
-                    'mobile' => $oUser->oxuser__oxmobfon->value,
+                    'mobile'       => $oUser->oxuser__oxmobfon->value,
                 ),
-                'billing' => array(
-                    'street' => $oUser->oxuser__oxstreet->value,
-                    'streetNo' => $oUser->oxuser__oxstreetnr->value,
+                'billing'  => array(
+                    'street'     => $oUser->oxuser__oxstreet->value,
+                    'streetNo'   => $oUser->oxuser__oxstreetnr->value,
                     'additional' => $oUser->oxuser__oxaddinfo->value,
-                    'city' => $oUser->oxuser__oxcity->value,
-                    'zip' => $oUser->oxuser__oxzip->value,
-                    'state' => $this->_stateIdToStateName(
+                    'city'       => $oUser->oxuser__oxcity->value,
+                    'zip'        => $oUser->oxuser__oxzip->value,
+                    'state'      => $this->_stateIdToStateName(
                         $oUser->oxuser__oxstateid->value,
                         $oUser->oxuser__oxcountryid->value
                     ),
-                    'country' => $this->_countryIdToCountryName($oUser->oxuser__oxcountryid->value),
+                    'country'    => $this->_countryIdToCountryName($oUser->oxuser__oxcountryid->value),
                 ),
                 'shipping' => array(),
             );
 
             foreach ($oUser->getUserAddresses() as $oUserAddress) {
                 $aResult['shipping'][] = array(
-                    'firstName' => $oUserAddress->oxaddress__oxfname->value,
-                    'lastName' => $oUserAddress->oxaddress__oxlname->value,
-                    'company' => $oUserAddress->oxaddress__oxcompany->value,
-                    'street' => $oUserAddress->oxaddress__oxstreet->value,
-                    'streetNo' => $oUserAddress->oxaddress__oxstreetnr->value,
+                    'firstName'  => $oUserAddress->oxaddress__oxfname->value,
+                    'lastName'   => $oUserAddress->oxaddress__oxlname->value,
+                    'company'    => $oUserAddress->oxaddress__oxcompany->value,
+                    'street'     => $oUserAddress->oxaddress__oxstreet->value,
+                    'streetNo'   => $oUserAddress->oxaddress__oxstreetnr->value,
                     'additional' => $oUserAddress->oxaddress__oxaddinfo->value,
-                    'city' => $oUserAddress->oxaddress__oxcity->value,
-                    'zip' => $oUserAddress->oxaddress__oxzip->value,
-                    'country' => $this->_countryIdToCountryName($oUserAddress->oxaddress__oxcountryid->value),
-                    'state' => $this->_stateIdToStateName(
+                    'city'       => $oUserAddress->oxaddress__oxcity->value,
+                    'zip'        => $oUserAddress->oxaddress__oxzip->value,
+                    'country'    => $this->_countryIdToCountryName($oUserAddress->oxaddress__oxcountryid->value),
+                    'state'      => $this->_stateIdToStateName(
                         $oUserAddress->oxaddress__oxcountryid->value,
                         $oUserAddress->oxaddress__oxstateid->value
                     ),
-                    'phone' => $oUserAddress->oxaddress__oxfon->value,
-                    'fax' =>$oUserAddress->oxaddress__oxfax->value,
+                    'phone'      => $oUserAddress->oxaddress__oxfon->value,
+                    'fax'        => $oUserAddress->oxaddress__oxfax->value,
                 );
             }
 
             $this->_sAjaxResponse = $this->_successMessage($aResult);
-
         } else {
             $this->_sAjaxResponse = $this->_errorMessage("user not logged on");
         }
@@ -523,7 +523,7 @@ class cushymoco extends oxUBase
 
         $oCountry = oxNew('oxCountry');
         $oCountry->load($sCountyId);
-        $sCountryName = $oCountry->oxcountry__oxtitle->value;
+        $sCountryName                       = $oCountry->oxcountry__oxtitle->value;
         $this->_aCountryIdCache[$sCountyId] = $sCountryName;
 
         return $sCountryName;
@@ -533,7 +533,7 @@ class cushymoco extends oxUBase
      * Returns the display name of a state.
      *
      * @param string $sCountyId OXID of the country.
-     * @param string $sStateId OXID of the state.
+     * @param string $sStateId  OXID of the state.
      *
      * @return string
      */
@@ -546,9 +546,9 @@ class cushymoco extends oxUBase
         // At this point, we can't use the OXID object "oxState".
         // There is a bug in the table structure of "oxstates", which doesn't allow to store multiple state
         // abbreviations for different countries. Further they aren't loadable with "OXCOUNTRYID" and "OXSTATEID".
-        $sViewName = getViewName('oxstates');
-        $sSelect = "SELECT `OXTITLE` FROM `$sViewName` WHERE `OXID` = ? AND `OXCOUNTRYID` = ?";
-        $oDb = oxDb::getDb();
+        $sViewName  = getViewName('oxstates');
+        $sSelect    = "SELECT `OXTITLE` FROM `$sViewName` WHERE `OXID` = ? AND `OXCOUNTRYID` = ?";
+        $oDb        = oxDb::getDb();
         $sStateName = $oDb->getOne($sSelect, array($sStateId, $sCountyId));
 
         $this->_aStateIdCache[$sCountyId][$sStateId] = $sStateName;
@@ -566,10 +566,10 @@ class cushymoco extends oxUBase
         /**
          * @var oxVariantSelectList $oVariantSelectList
          */
-        $oConfig = $this->_oVersionLayer->getConfig();
+        $oConfig       = $this->_oVersionLayer->getConfig();
         $oShopCurrency = $oConfig->getActShopCurrencyObject();
 
-        $blHasVariants = empty($oArticle->oxarticles__oxparentid->value) &&
+        $blHasVariants    = empty($oArticle->oxarticles__oxparentid->value) &&
             !empty($oArticle->oxarticles__oxvarcount->value) &&
             ($oArticle->oxarticles__oxvarcount->value > 0);
         $aCharacteristics = array();
@@ -581,15 +581,15 @@ class cushymoco extends oxUBase
         }
 
         $res = array(
-            'id'       => $oArticle->oxarticles__oxid->value,
-            'title'    => html_entity_decode($oArticle->oxarticles__oxtitle->rawValue),
-            'short'    => html_entity_decode($oArticle->oxarticles__oxshortdesc->rawValue),
-            'data'     => array($oArticle->getLongDesc()),
-            'price'    => $oArticle->getFPrice(),
-            'link'     => $oArticle->getLink(),
-            'icon'     => $oArticle->getIconUrl(),
-            'currency' => $oShopCurrency->sign,
-            'hasVariants' => $blHasVariants,
+            'id'            => $oArticle->oxarticles__oxid->value,
+            'title'         => html_entity_decode($oArticle->oxarticles__oxtitle->rawValue),
+            'short'         => html_entity_decode($oArticle->oxarticles__oxshortdesc->rawValue),
+            'data'          => array($oArticle->getLongDesc()),
+            'price'         => $oArticle->getFPrice(),
+            'link'          => $oArticle->getLink(),
+            'icon'          => $oArticle->getIconUrl(),
+            'currency'      => $oShopCurrency->sign,
+            'hasVariants'   => $blHasVariants,
             'variantGroups' => $aCharacteristics,
         );
 
@@ -621,27 +621,27 @@ class cushymoco extends oxUBase
     public function getArticleVariants()
     {
         /**
-         * @var oxSelection $oVariantSelectionItem
+         * @var oxSelection         $oVariantSelectionItem
          * @var oxVariantSelectList $oVariantSelectionList
          */
-        $oArticle = $this->_getArticleById();
+        $oArticle          = $this->_getArticleById();
         $aSelectedVariants = $this->_oVersionLayer->getRequestParam('selectedVariant', array());
-        $aVariants = $oArticle->getVariantSelections($aSelectedVariants, $oArticle->getId());
-        $aRealVariants = array();
-        $oLang = $this->_oVersionLayer->getLang();
+        $aVariants         = $oArticle->getVariantSelections($aSelectedVariants, $oArticle->getId());
+        $aRealVariants     = array();
+        $oLang             = $this->_oVersionLayer->getLang();
         foreach ($aVariants['selections'] as $iKey => $sVariantId) {
             $aRealVariants[$iKey][] = array(
-                'id' => '',
+                'id'    => '',
                 'title' => $oLang->translateString('CHOOSE_VARIANT'),
 
             );
-            $oVariantSelectionList = $aVariants['selections'][$iKey];
-            $aVariantSelectionList = $oVariantSelectionList->getSelections();
+            $oVariantSelectionList  = $aVariants['selections'][$iKey];
+            $aVariantSelectionList  = $oVariantSelectionList->getSelections();
 
             foreach ($aVariantSelectionList as $oVariantSelectionItem) {
                 if (!$oVariantSelectionItem->isDisabled()) {
                     $aRealVariants[$iKey][] = array(
-                        'id' => $oVariantSelectionItem->getValue(),
+                        'id'    => $oVariantSelectionItem->getValue(),
                         'title' => $oVariantSelectionItem->getName(),
                     );
                 }
@@ -662,9 +662,9 @@ class cushymoco extends oxUBase
         /**
          * @var oxMdVariant $oMdVariants
          */
-        $oArticle = $this->_getArticleById();
+        $oArticle          = $this->_getArticleById();
         $aSelectedVariants = $this->_oVersionLayer->getRequestParam('selectedVariant', array());
-        $oMdVariants = $oArticle->getMdVariants();
+        $oMdVariants       = $oArticle->getMdVariants();
         foreach ($aSelectedVariants as $sVariantId) {
             $aVariants = $oMdVariants->getMdSubvariants();
             if (!isset($aVariants[$sVariantId])) {
@@ -919,7 +919,7 @@ class cushymoco extends oxUBase
     {
         $this->_getSessionId();
         $oBasket   = $this->_oVersionLayer->getBasket();
-        $oArticle  = $this->_getArticleById();
+        $oArticle  = $this->_getArticleById('anid', true);
         $iQuantity = max($this->_oVersionLayer->getRequestParam('qty'), 1);
 
         try {
@@ -1149,12 +1149,12 @@ class cushymoco extends oxUBase
         /**
          * @var oxContent $oContent
          */
-        $oContent = oxNew('oxcontent');
+        $oContent     = oxNew('oxcontent');
         $blLoadResult = $oContent->loadByIdent($sLoadId);
 
         // A bad hack to avoid writing an OXID module, because OXID does not set the property "_isLoaded"!
         $oReflection = new ReflectionClass($oContent);
-        $oProperty = $oReflection->getProperty('_isLoaded');
+        $oProperty   = $oReflection->getProperty('_isLoaded');
         $oProperty->setAccessible(true);
         $oProperty->setValue($oContent, $blLoadResult);
         $oProperty->setAccessible(false);
