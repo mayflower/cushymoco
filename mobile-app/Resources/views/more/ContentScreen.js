@@ -1,11 +1,11 @@
-exports.ContentScreen = function(methode, title) {
+exports.ContentScreen = function(methode, title, returnView) {
     var globals = require('globals');
 
     var contentView = Titanium.UI.createWebView({
         backgroundColor: '#FFF',
         enableZoomControls: false
     });
-
+    
     globals.httpManager.request(
         globals.httpManager.buildUrl({ fnc: methode }),
         function() {
@@ -15,6 +15,10 @@ exports.ContentScreen = function(methode, title) {
             }
         }
     );
+    
+    if (returnView) {
+        return contentView;
+    }
 
     var window = null;
     if (globals.isAndroid) {

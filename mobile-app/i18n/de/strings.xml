@@ -3,6 +3,7 @@
     <string name="shop_title">OXID Shop</string>
     <string name="home_tab_title">Start</string>
     <string name="products_tab_title">Produkte</string>
+    <string name="products_variants">Varianten</string>
     <string name="account_tab_title">Konto</string>
     <string name="account_orders">Aufträge</string>
     <string name="account_wish_list">Merkliste</string>
@@ -80,4 +81,5 @@
     <string name="order_button">Bestellen</string>
     <string name="ok_button">OK</string>
     <string name="checkout_complete">Bestellung vollständig</string>
+    <string name="dialog_title_warning">Achtung</string>
 </resources>

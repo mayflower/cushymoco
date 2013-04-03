@@ -1,5 +1,7 @@
 exports.HomeTab = function() {
     var globals = require('globals');
+    var ContentScreen = require('views/more/ContentScreen').ContentScreen;
+    var searchBarHeight = globals.isAndroid ? '50dp' : '43dp';
 
     var outerWindow = Titanium.UI.createWindow({
         navBarHidden: true
@@ -43,25 +45,53 @@ exports.HomeTab = function() {
             homeWindow.getRightNavButton(loginButton);
         });
     }
-
-    var homeView = Titanium.UI.createScrollableView({
-        views: [
-            Titanium.UI.createImageView({
-                image: globals.isAndroid ? '/default.png' : '/Default.png',
-                backgroundColor: '#000'
-            })
-        ],
-        showPagingControl: true,
-        disableBounce: true
+    
+    // var homeView = Titanium.UI.createScrollableView({
+        // views: [
+            // Titanium.UI.createImageView({
+                // image: globals.isAndroid ? '/default.png' : '/Default.png',
+                // backgroundColor: '#000'
+            // })
+        // ],
+        // showPagingControl: true,
+        // disableBounce: true
+    // });
+    var contentView = Titanium.UI.createWebView({
+        backgroundColor: '#FFF',
+        enableZoomControls: false,
+        top:searchBarHeight
     });
-    homeWindow.add(homeView);
+    
+    var loadStartContent = function () {
+        globals.httpManager.request(
+            globals.httpManager.buildUrl({fnc:'getStartPage'}),
+            function() {
+                var response = JSON.parse(this.responseText);
+                if (response.error) {
+                    Titanium.UI.createAlertDialog({message:response.error,okid:'ok_button',titleid:'dialog_title_warning'}).show();
+                }
+                if (response.result) {
+                    contentView.html = response.result;
+                }
+            }
+        );
+    };
+
+    homeWindow.addEventListener('focus', loadStartContent);
+    
+    loadStartContent();    
+
+    homeWindow.add(contentView);
+    
+    // contentView.setHtml('<html><head></head><body>Hello world!</body></html>');
+    // alert(contentView.html);
 
     /**
      * Create search bar last to show it atop
      */
     var ProductsTable = require('views/product/ProductsTable').ProductsTable;
     var homeSearchBar = Titanium.UI.createSearchBar({
-        height: globals.isAndroid ? '50dp' : '43dp',
+        height: searchBarHeight,
         showCancel: false,
         hinttextid: 'hint_searchbar',
         top: '0dp'
@@ -94,9 +124,11 @@ exports.HomeTab = function() {
     /**
      * Create "home" tab
      */
-    return Titanium.UI.createTab({
+    var homeTab = Titanium.UI.createTab({
         icon: globals.getTabIconForDevice('icons/home.png', 'icons/home_small.png'),
         titleid: 'home_tab_title',
         window: outerWindow
     });
+        
+    return homeTab;
 };

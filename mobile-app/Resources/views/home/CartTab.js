@@ -48,7 +48,7 @@ exports.CartTab = function() {
         );
     };
 
-    var ProductScreen = require('views/product/ProductScreen').ProductScreen;
+    var ProductScreen = require('views/product/ProductScreen', true).ProductScreen;
     var onCartTableRowClicked = function(e) {
         // Workaround for iOS where e.source is "undefined"
         if (!globals.isAndroid || !(e.source instanceof Titanium.UI.Button)) {
