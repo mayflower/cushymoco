@@ -4,7 +4,12 @@
  */
 class cushymoco extends oxUBase
 {
-    const VERSION = '0.3.1';
+    /**
+     * Version of this view.
+     *
+     * @const string
+     */
+    const VERSION = '0.4.0';
 
     /**
      * @var string Template Script
@@ -22,11 +27,15 @@ class cushymoco extends oxUBase
     protected $_oVersionLayer;
 
     /**
+     * Instance cache for country to display name resolves.
+     *
      * @var array
      */
     protected $_aCountryIdCache = array();
 
     /**
+     * Instance cache for state to display name resolves.
+     *
      * @var array
      */
     protected $_aStateIdCache = array();
@@ -40,9 +49,6 @@ class cushymoco extends oxUBase
     {
         parent::init();
 
-        restore_error_handler();
-        restore_exception_handler();
-
         try {
             $this->_initVersionLayer();
         } catch (Exception $e) {
@@ -52,7 +58,7 @@ class cushymoco extends oxUBase
                 ),
                 JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT
             );
-            if ($this->_hasRegistry()) {
+            if ($this->_hasRegistry('getUtils')) {
                 $oUtils = oxRegistry::getUtils();
             } else {
                 $oUtils = oxUtils::getInstance();
@@ -85,7 +91,24 @@ class cushymoco extends oxUBase
      */
     private function _initVersionLayer()
     {
-        if ($this->_hasRegistry()) {
+        list($sLayerClassFile, $sLayerClass) = $this->_loadLayerConfig();
+
+        if ($sLayerClassFile === null || $sLayerClass === null) {
+            list($sLayerClassFile, $sLayerClass) = $this->_loadVersionLayer();
+        }
+
+        include_once getShopBasePath() . 'core/' . $sLayerClassFile;
+        $this->_oVersionLayer = new $sLayerClass();
+    }
+
+    /**
+     * Loads the version layer configuration from the database.
+     *
+     * @return array
+     */
+    private function _loadLayerConfig()
+    {
+        if ($this->_hasRegistry('getConfig')) {
             $oConfig = oxRegistry::getConfig();
         } else {
             $oConfig = $this->getConfig();
@@ -94,12 +117,7 @@ class cushymoco extends oxUBase
         $sLayerClassFile = $oConfig->getShopConfVar('sLayerClassFile', null, 'mayflower:cushymoco');
         $sLayerClass     = $oConfig->getShopConfVar('sLayerClass', null, 'mayflower:cushymoco');
 
-        if ($sLayerClassFile === null || $sLayerClass === null) {
-            list($sLayerClassFile, $sLayerClass) = $this->loadVersionLayer();
-        }
-
-        include_once getShopBasePath() . 'core/' . $sLayerClassFile;
-        $this->_oVersionLayer = new $sLayerClass();
+        return array($sLayerClassFile, $sLayerClass);
     }
 
     /**
@@ -110,7 +128,7 @@ class cushymoco extends oxUBase
      */
     private function _saveLayerConfig($sLayerClassFile, $sLayerClass)
     {
-        if ($this->_hasRegistry()) {
+        if ($this->_hasRegistry('getConfig')) {
             $oConfig = oxRegistry::getConfig();
         } else {
             $oConfig = $this->getConfig();
@@ -123,11 +141,19 @@ class cushymoco extends oxUBase
     /**
      * Determines, whether we have the oxRegistry Class or not.
      *
+     * @param string $sMethod Name of the method to check whether it exists or not.
+     *
      * @return bool
      */
-    private function _hasRegistry()
+    private function _hasRegistry($sMethod = null)
     {
-        return class_exists('oxRegistry') && method_exists('oxRegistry', 'getConfig');
+        $blRegistryExists = class_exists('oxRegistry');
+        if (!$blRegistryExists || $sMethod === null) {
+            return $blRegistryExists;
+        }
+
+        $blMethodExists = method_exists('oxRegistry', $sMethod);
+        return $blRegistryExists && $blMethodExists;
     }
 
     /**
@@ -137,7 +163,7 @@ class cushymoco extends oxUBase
      *
      * @return array
      */
-    public function loadVersionLayer()
+    private function _loadVersionLayer()
     {
         /**
          * @var DirectoryIterator $oEntry
@@ -172,7 +198,7 @@ class cushymoco extends oxUBase
         do {
             $sLayerClassFile = array_pop($aLayerClasses);
             if ($sLayerClassFile === null) {
-                throw new Exception("Can't find suitable version layer class for your shop version.");
+                throw new Exception("Can't find suitable version layer class for your shop.");
             }
         } while (strnatcmp($sMaxVersionLayerFile, $sLayerClassFile) < 0);
 
@@ -248,7 +274,7 @@ class cushymoco extends oxUBase
      *
      * @param string $key Parameter that contains the id of the article
      *
-     * @return bool|object
+     * @return bool|oxarticle
      */
     protected function _getArticleById($key = 'anid')
     {
@@ -272,6 +298,8 @@ class cushymoco extends oxUBase
     }
 
     /**
+     * Returns the "oxcmp_user" component.
+     *
      * @return oxCmp_User
      */
     protected function _getUserCmp()
@@ -316,10 +344,10 @@ class cushymoco extends oxUBase
         }
     }
 
-    /*
+    /**
      * Get content page
      *
-     * @return array
+     * Return array
      */
     public function getContent()
     {
@@ -385,7 +413,6 @@ class cushymoco extends oxUBase
 
     /**
      * Provides data on the currently logged on user
-     *
      */
     public function getUserData()
     {
@@ -409,6 +436,9 @@ class cushymoco extends oxUBase
         }
     }
 
+    /**
+     * Returns detailed information about the logged-in user.
+     */
     public function getAccountData()
     {
         /**
@@ -472,9 +502,11 @@ class cushymoco extends oxUBase
     }
 
     /**
-     * @param string $sCountyId
+     * Returns the display name of a country.
      *
-     * @return string mixed
+     * @param string $sCountyId OXID of the country.
+     *
+     * @return string
      */
     protected function _countryIdToCountryName($sCountyId)
     {
@@ -493,6 +525,14 @@ class cushymoco extends oxUBase
         return $sCountryName;
     }
 
+    /**
+     * Returns the display name of a state.
+     *
+     * @param string $sCountyId OXID of the country.
+     * @param string $sStateId OXID of the state.
+     *
+     * @return string
+     */
     protected function _stateIdToStateName($sCountyId, $sStateId)
     {
         if (isset($this->_aStateIdCache[$sCountyId][$sStateId])) {
@@ -519,21 +559,22 @@ class cushymoco extends oxUBase
      */
     protected function _articleToArray($oArticle)
     {
+        /**
+         * @var oxVariantSelectList $oVariantSelectList
+         */
         $oConfig = $this->_oVersionLayer->getConfig();
         $oShopCurrency = $oConfig->getActShopCurrencyObject();
-        $aVariants = $oArticle->getVariantSelections(null, $oArticle->getId());
-        var_dump($aVariants['selections']);
-        $aHashTable = array();
-        foreach ($aVariants['rawselections'] as $sProductOxid => $aVariantSelections) {
-            $aHash = array();
-            foreach ($aVariantSelections as $aVariant) {
-                $aHash[] = $aVariant['hash'];
-            }
-            $sHash = implode(',', $aHash);
-            $aHashTable[$sHash] = $sProductOxid;
-        }
 
-        var_dump($aHashTable);
+        $blHasVariants = empty($oArticle->oxarticles__oxparentid->value) &&
+            !empty($oArticle->oxarticles__oxvarcount->value) &&
+            ($oArticle->oxarticles__oxvarcount->value > 0);
+        $aCharacteristics = array();
+        if ($blHasVariants) {
+            $aVariantSelections = $oArticle->getVariantSelections();
+            foreach ($aVariantSelections['selections'] as $iIndex => $oVariantSelectList) {
+                $aCharacteristics[$iIndex] = $oVariantSelectList->getLabel();
+            }
+        }
 
         $res = array(
             'id'       => $oArticle->oxarticles__oxid->value,
@@ -544,7 +585,8 @@ class cushymoco extends oxUBase
             'link'     => $oArticle->getLink(),
             'icon'     => $oArticle->getIconUrl(),
             'currency' => $oShopCurrency->sign,
-            'hasVariants' => $oArticle->hasMdVariants(),
+            'hasVariants' => $blHasVariants,
+            'variantGroups' => $aCharacteristics,
         );
 
         return $res;
@@ -564,6 +606,63 @@ class cushymoco extends oxUBase
         } else {
             $this->_sAjaxResponse = $this->_errorMessage('article not found');
         }
+    }
+
+    /**
+     * Returns the variants of a product.
+     *
+     * Parameter: anid Products OXID.
+     * Parameter: selectedVariant[] Array containing selected variant IDs.
+     */
+    public function getArticleVariants()
+    {
+        /**
+         * @var oxSelection $oVariantSelectionItem
+         * @var oxVariantSelectList $oVariantSelectionList
+         */
+        $oArticle = $this->_getArticleById();
+        $aSelectedVariants = $this->_oVersionLayer->getRequestParam('selectedVariant', array());
+        $aVariants = $oArticle->getVariantSelections($aSelectedVariants, $oArticle->getId());
+        $aRealVariants = array();
+        foreach ($aVariants['selections'] as $iKey => $sVariantId) {
+            $oVariantSelectionList = $aVariants['selections'][$iKey];
+            $aVariantSelectionList = $oVariantSelectionList->getSelections();
+
+            foreach ($aVariantSelectionList as $oVariantSelectionItem) {
+                if (!$oVariantSelectionItem->isDisabled()) {
+                    $aRealVariants[$iKey][] = array(
+                        'id' => $oVariantSelectionItem->getValue(),
+                        'title' => $oVariantSelectionItem->getName(),
+                    );
+                }
+            }
+        }
+
+        $this->_sAjaxResponse = $this->_successMessage($aRealVariants);
+    }
+
+    /**
+     * Returns the OXID of a specific product variant.
+     *
+     * Parameter: anid Products OXID.
+     * Parameter: selectedVariant[] Array containing selected variant IDs.
+     */
+    public function getVariantProductId()
+    {
+        /**
+         * @var oxMdVariant $oMdVariants
+         */
+        $oArticle = $this->_getArticleById();
+        $aSelectedVariants = $this->_oVersionLayer->getRequestParam('selectedVariant', array());
+        $oMdVariants = $oArticle->getMdVariants();
+        foreach ($aSelectedVariants as $sVariantId) {
+            $aVariants = $oMdVariants->getMdSubvariants();
+            if (!isset($aVariants[$sVariantId])) {
+                break;
+            }
+            $oMdVariants = $aVariants[$sVariantId];
+        }
+        $this->_sAjaxResponse = $this->_successMessage($oMdVariants->getArticleId());
     }
 
     /**
@@ -703,6 +802,16 @@ class cushymoco extends oxUBase
         $oArticle             = $this->_getArticleById();
         $aGallery             = $oArticle->getPictureGallery();
         $this->_sAjaxResponse = $this->_successMessage($aGallery);
+    }
+
+    public function getArticleDocuments()
+    {
+        $this->_sAjaxResponse = $this->_errorMessage('NOT_IMPLEMENTED');
+    }
+
+    public function getArticleVideos()
+    {
+        $this->_sAjaxResponse = $this->_errorMessage('NOT_IMPLEMENTED');
     }
 
     /**
@@ -1007,7 +1116,7 @@ class cushymoco extends oxUBase
     /**
      * Get content by ident
      *
-     * @param string $sLoadId
+     * @param string $sLoadId OXLOADID of the CMS page.
      *
      * @return string
      */
@@ -1018,6 +1127,13 @@ class cushymoco extends oxUBase
         return $oContent->oxcontents__oxcontent->rawValue;
     }
 
+    /**
+     * Returns the oxContent object of a CMS page.
+     *
+     * @param string $sLoadId OXLOADID of the CMS page.
+     *
+     * @return oxContent
+     */
     protected function _getContentObject($sLoadId)
     {
         /**
@@ -1036,7 +1152,7 @@ class cushymoco extends oxUBase
         return $oContent;
     }
 
-    /*
+    /**
      * Get the terms and conditions
      *
      * Returns: string
@@ -1047,6 +1163,11 @@ class cushymoco extends oxUBase
         $this->_sAjaxResponse = $this->_successMessage($sContent);
     }
 
+    /**
+     * Returns the CMS page for the home screen.
+     *
+     * Return: string
+     */
     public function getStartPage()
     {
         $oContent = $this->_getContentObject('mfCushymocoStart');
@@ -1077,9 +1198,8 @@ class cushymoco extends oxUBase
         $this->_sAjaxResponse = $this->_successMessage($sContent);
     }
 
-    /*
+    /**
      * Get list of countries
-     *
      */
     public function getCountryList()
     {
@@ -1101,6 +1221,9 @@ class cushymoco extends oxUBase
         }
     }
 
+    /**
+     * Sets the language to use.
+     */
     public function setLanguage()
     {
         $sLang = $this->_oVersionLayer->getRequestParam('device_language');
