@@ -288,6 +288,10 @@ class cushymoco extends oxUBase
             $oArticle = oxNew('oxarticle');
 
             if ($oArticle->load($sArticleId)) {
+                if ($oArticle->isMdVariant()) {
+                    return $oArticle->getParentArticle();
+                }
+
                 return $oArticle;
             }
 
@@ -624,7 +628,13 @@ class cushymoco extends oxUBase
         $aSelectedVariants = $this->_oVersionLayer->getRequestParam('selectedVariant', array());
         $aVariants = $oArticle->getVariantSelections($aSelectedVariants, $oArticle->getId());
         $aRealVariants = array();
+        $oLang = $this->_oVersionLayer->getLang();
         foreach ($aVariants['selections'] as $iKey => $sVariantId) {
+            $aRealVariants[$iKey][] = array(
+                'id' => '',
+                'title' => $oLang->translateString('CHOOSE_VARIANT'),
+
+            );
             $oVariantSelectionList = $aVariants['selections'][$iKey];
             $aVariantSelectionList = $oVariantSelectionList->getSelections();
 
