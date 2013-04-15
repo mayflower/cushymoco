@@ -1,0 +1,9 @@
+<Alloy>
+	<Window title="Categories">
+		<TableView id="categoryTable" onClick="openProductDetail">
+			<HeaderView>
+				<Label id="categoriesLabel">Categories</Label>
+			</HeaderView>
+		</TableView>
+	</Window>
+</Alloy>

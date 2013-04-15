@@ -1,0 +1,6 @@
+<Alloy>
+	<TableViewRow>
+		<Label id="title"/>
+		<Label id="url"/>
+	</TableViewRow>
+</Alloy>

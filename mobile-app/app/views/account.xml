@@ -1,0 +1,7 @@
+<Alloy>
+	<Tab title="Accounts Tab">
+		<Window title="Accounts Window">
+			<Label>Brunsverreggd</Label>
+		</Window>
+	</Tab>
+</Alloy>

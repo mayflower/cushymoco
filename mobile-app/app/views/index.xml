@@ -1,0 +1,24 @@
+<Alloy>
+	<TabGroup>
+		<!-- Explicit Window declaration -->
+		<Tab id="tab1">
+			<Window id="win1">
+				<!-- <Label>Label 1</Label>
+				<Label platform="android">Label 2</Label>
+				<Label platform="ios">Label 3</Label>
+				<Label>Label 4</Label>
+				<Label>Label 5</Label>
+				<Button id="b3" class="button" onClick="showConfig">Config</Button>
+				<Button id="b" class="button" onClick="openStart">load Content</Button>
+				<Button id="b2" class="button" onClick="hello">show Url</Button>
+			 -->
+			 	<WebView id="startContent"></WebView>
+			</Window>
+		</Tab>
+
+		<!-- Tab included via <Require> tag -->
+		<Require src="products"/>
+		<Require src="search"/>
+		<Require src="account"/>
+	</TabGroup>
+</Alloy>

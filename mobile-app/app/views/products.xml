@@ -1,0 +1,9 @@
+<Alloy>
+	<Tab title="Products Tab">
+		<Window id="productWindow" title="Products">
+			<NavigationGroup id="productGroup">
+				<Require src="product/categories"/>
+			</NavigationGroup>
+		</Window>
+	</Tab>
+</Alloy>
