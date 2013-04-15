@@ -21,7 +21,7 @@ function Controller() {
     openProductDetail ? $.__views.categoryTable.addEventListener("click", openProductDetail) : __defers["$.__views.categoryTable!click!openProductDetail"] = !0;
     exports.destroy = function() {};
     _.extend($, $.__views);
-    var categories = [ {
+    var communication = require("communication"), categories = [ {
         id: "0xdeadbeef",
         title: "Wakeboards"
     }, {
@@ -31,9 +31,10 @@ function Controller() {
     _.each(categories, function(stats, name) {
         data.push(Alloy.createController("product/catRow", {
             title: stats.title,
-            url: require("communication").buildUrl([ {
-                cnid: stats.id
-            } ])
+            url: communication.buildUrl({
+                cnid: stats.id,
+                products: [ 123, 456, 789 ]
+            })
         }).getView());
     });
     $.categoryTable.setData(data);

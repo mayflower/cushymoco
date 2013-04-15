@@ -1,3 +1,4 @@
+var communication = require('communication');
 function openProductDetail()
 {}
 
@@ -9,7 +10,7 @@ var data = [];
 _.each(categories, function(stats, name){
 	data.push(Alloy.createController('product/catRow', {
 		title: stats.title,
-		url: require('communication').buildUrl([{"cnid":stats.id}])
+		url: communication.buildUrl({"cnid":stats.id})
 	}).getView());
 });
 
