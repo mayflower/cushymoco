@@ -1,5 +1,5 @@
 exports.settings = {
-    baseUrl: 'http://oxid.steinigke.dev/?cl=cushymoco',
+    baseUrl: 'http://oxid.openstack/?cl=cushymoco',
     networkTimeout: 5000,
     loadingDialogTimeout: 1000,
     itemsPerPage: 20,
