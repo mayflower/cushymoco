@@ -58,7 +58,7 @@ exports.buildUrl = function(params)
 	var url = Alloy.CFG.oxid.baseUrl;
 	// adding URL parameters, if given
 	if (params) {
-    	url += (url.indexOf("?") == -1 ? "?" : "&") + exports.serialize(params);
+        url += (url.indexOf("?") == -1 ? "?" : "&") + exports.serialize(params);
 	}
 	return url;
 }
