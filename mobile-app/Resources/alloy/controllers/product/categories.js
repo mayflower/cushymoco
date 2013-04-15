@@ -32,8 +32,7 @@ function Controller() {
         data.push(Alloy.createController("product/catRow", {
             title: stats.title,
             url: communication.buildUrl({
-                cnid: stats.id,
-                products: [ 123, 456, 789 ]
+                cnid: stats.id
             })
         }).getView());
     });
