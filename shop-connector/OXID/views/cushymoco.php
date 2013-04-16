@@ -4,7 +4,12 @@
  */
 class cushymoco extends oxUBase
 {
-    const VERSION = '0.3.1';
+    /**
+     * Version of this view.
+     *
+     * @const string
+     */
+    const VERSION = '0.4.0';
 
     /**
      * @var string Template Script
@@ -22,6 +27,20 @@ class cushymoco extends oxUBase
     protected $_oVersionLayer;
 
     /**
+     * Instance cache for country to display name resolves.
+     *
+     * @var array
+     */
+    protected $_aCountryIdCache = array();
+
+    /**
+     * Instance cache for state to display name resolves.
+     *
+     * @var array
+     */
+    protected $_aStateIdCache = array();
+
+    /**
      * Initializes all required components.
      *
      * @return null|void
@@ -30,19 +49,16 @@ class cushymoco extends oxUBase
     {
         parent::init();
 
-        restore_error_handler();
-        restore_exception_handler();
-
         try {
             $this->_initVersionLayer();
         } catch (Exception $e) {
             $sMessage = json_encode(
-                $this->errorMessage(
+                $this->_errorMessage(
                     $e->getMessage()
                 ),
                 JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT
             );
-            if ($this->_hasRegistry()) {
+            if ($this->_hasRegistry('getUtils')) {
                 $oUtils = oxRegistry::getUtils();
             } else {
                 $oUtils = oxUtils::getInstance();
@@ -75,7 +91,24 @@ class cushymoco extends oxUBase
      */
     private function _initVersionLayer()
     {
-        if ($this->_hasRegistry()) {
+        list($sLayerClassFile, $sLayerClass) = $this->_loadLayerConfig();
+
+        if ($sLayerClassFile === null || $sLayerClass === null) {
+            list($sLayerClassFile, $sLayerClass) = $this->_loadVersionLayer();
+        }
+
+        include_once getShopBasePath() . 'core/' . $sLayerClassFile;
+        $this->_oVersionLayer = new $sLayerClass();
+    }
+
+    /**
+     * Loads the version layer configuration from the database.
+     *
+     * @return array
+     */
+    private function _loadLayerConfig()
+    {
+        if ($this->_hasRegistry('getConfig')) {
             $oConfig = oxRegistry::getConfig();
         } else {
             $oConfig = $this->getConfig();
@@ -84,12 +117,7 @@ class cushymoco extends oxUBase
         $sLayerClassFile = $oConfig->getShopConfVar('sLayerClassFile', null, 'mayflower:cushymoco');
         $sLayerClass     = $oConfig->getShopConfVar('sLayerClass', null, 'mayflower:cushymoco');
 
-        if ($sLayerClassFile === null || $sLayerClass === null) {
-            list($sLayerClassFile, $sLayerClass) = $this->loadVersionLayer();
-        }
-
-        include_once getShopBasePath() . 'core/' . $sLayerClassFile;
-        $this->_oVersionLayer = new $sLayerClass();
+        return array($sLayerClassFile, $sLayerClass);
     }
 
     /**
@@ -100,7 +128,7 @@ class cushymoco extends oxUBase
      */
     private function _saveLayerConfig($sLayerClassFile, $sLayerClass)
     {
-        if ($this->_hasRegistry()) {
+        if ($this->_hasRegistry('getConfig')) {
             $oConfig = oxRegistry::getConfig();
         } else {
             $oConfig = $this->getConfig();
@@ -113,11 +141,20 @@ class cushymoco extends oxUBase
     /**
      * Determines, whether we have the oxRegistry Class or not.
      *
+     * @param string $sMethod Name of the method to check whether it exists or not.
+     *
      * @return bool
      */
-    private function _hasRegistry()
+    private function _hasRegistry($sMethod = null)
     {
-        return class_exists('oxRegistry') && method_exists('oxRegistry', 'getConfig');
+        $blRegistryExists = class_exists('oxRegistry');
+        if (!$blRegistryExists || $sMethod === null) {
+            return $blRegistryExists;
+        }
+
+        $blMethodExists = method_exists('oxRegistry', $sMethod);
+
+        return $blRegistryExists && $blMethodExists;
     }
 
     /**
@@ -127,7 +164,7 @@ class cushymoco extends oxUBase
      *
      * @return array
      */
-    public function loadVersionLayer()
+    private function _loadVersionLayer()
     {
         /**
          * @var DirectoryIterator $oEntry
@@ -162,7 +199,7 @@ class cushymoco extends oxUBase
         do {
             $sLayerClassFile = array_pop($aLayerClasses);
             if ($sLayerClassFile === null) {
-                throw new Exception("Can't find suitable version layer class for your shop version.");
+                throw new Exception("Can't find suitable version layer class for your shop.");
             }
         } while (strnatcmp($sMaxVersionLayerFile, $sLayerClassFile) < 0);
 
@@ -181,7 +218,7 @@ class cushymoco extends oxUBase
      *
      * @return array
      */
-    protected function generateMessage($error = null, $result = null)
+    protected function _generateMessage($error = null, $result = null)
     {
         return array(
             'error'  => $error,
@@ -196,9 +233,9 @@ class cushymoco extends oxUBase
      *
      * @return array
      */
-    protected function errorMessage($error)
+    protected function _errorMessage($error)
     {
-        return $this->generateMessage($error);
+        return $this->_generateMessage($error);
     }
 
     /**
@@ -208,9 +245,9 @@ class cushymoco extends oxUBase
      *
      * @return array
      */
-    protected function successMessage($result)
+    protected function _successMessage($result)
     {
-        return $this->generateMessage(null, $result);
+        return $this->_generateMessage(null, $result);
     }
 
     /**
@@ -236,32 +273,39 @@ class cushymoco extends oxUBase
     /**
      * load an article object
      *
-     * @param string $key Parameter that contains the id of the article
+     * @param string $key             Parameter that contains the OXID of the product.
+     * @param bool   $blReturnVariant If the product is a variant, return it or its parent product.
      *
-     * @return bool|object
+     * @return bool|oxarticle
      */
-    protected function _getArticleById($key = 'anid')
+    protected function _getArticleById($key = 'anid', $blReturnVariant = false)
     {
         /**
          * @var oxArticle $oArticle
          */
         $sArticleId = $this->_oVersionLayer->getRequestParam($key);
         if (empty($sArticleId)) {
-            $this->_sAjaxResponse = $this->errorMessage("article id not provided");
+            $this->_sAjaxResponse = $this->_errorMessage("article id not provided");
         } else {
             $oArticle = oxNew('oxarticle');
 
             if ($oArticle->load($sArticleId)) {
+                if (!$blReturnVariant && $oArticle->isMdVariant()) {
+                    return $oArticle->getParentArticle();
+                }
+
                 return $oArticle;
             }
 
-            $this->_sAjaxResponse = $this->errorMessage("article could not be loaded");
+            $this->_sAjaxResponse = $this->_errorMessage("article could not be loaded");
         }
 
         return false;
     }
 
     /**
+     * Returns the "oxcmp_user" component.
+     *
      * @return oxCmp_User
      */
     protected function _getUserCmp()
@@ -294,22 +338,22 @@ class cushymoco extends oxUBase
                     $oLogin               = new stdClass();
                     $oLogin->username     = $sUserName;
                     $oLogin->sessionId    = $sSessionId;
-                    $this->_sAjaxResponse = $this->successMessage($oLogin);
+                    $this->_sAjaxResponse = $this->_successMessage($oLogin);
                 } else {
-                    $this->_sAjaxResponse = $this->errorMessage("User " . $sUserName . " does not exist");
+                    $this->_sAjaxResponse = $this->_errorMessage("User " . $sUserName . " does not exist");
                 }
             } catch (oxUserException $e) {
-                $this->_sAjaxResponse = $this->errorMessage("User " . $sUserName . " does not exist");
+                $this->_sAjaxResponse = $this->_errorMessage("User " . $sUserName . " does not exist");
             }
         } else {
-            $this->_sAjaxResponse = $this->errorMessage("User " . $sUserName . " can not be logged in");
+            $this->_sAjaxResponse = $this->_errorMessage("User " . $sUserName . " can not be logged in");
         }
     }
 
-    /*
+    /**
      * Get content page
      *
-     * @return array
+     * Return array
      */
     public function getContent()
     {
@@ -326,7 +370,7 @@ class cushymoco extends oxUBase
         $aResult = array();
 
         if ($oContent->oxcontents__oxactive->value != 1) {
-            $this->_sAjaxResponse = $this->errorMessage('EMPTY');
+            $this->_sAjaxResponse = $this->_errorMessage('EMPTY');
 
             return;
         }
@@ -341,7 +385,7 @@ class cushymoco extends oxUBase
 
         $aResult['title']     = $oContent->$sTitleByLang->value;
         $aResult['content']   = htmlspecialchars($oContent->$sContentByLang->value);
-        $this->_sAjaxResponse = $this->successMessage($aResult);
+        $this->_sAjaxResponse = $this->_successMessage($aResult);
     }
 
     /**
@@ -364,18 +408,17 @@ class cushymoco extends oxUBase
                 $oLogout->sessionId = $sSessionId;
                 $oLogout->logout    = true;
 
-                $this->_sAjaxResponse = $this->successMessage($oLogout);
+                $this->_sAjaxResponse = $this->_successMessage($oLogout);
             } else {
-                $this->_sAjaxResponse = $this->errorMessage("User cannot be logged out");
+                $this->_sAjaxResponse = $this->_errorMessage("User cannot be logged out");
             }
         } else {
-            $this->_sAjaxResponse = $this->errorMessage("Session id missing");
+            $this->_sAjaxResponse = $this->_errorMessage("Session id missing");
         }
     }
 
     /**
      * Provides data on the currently logged on user
-     *
      */
     public function getUserData()
     {
@@ -392,26 +435,162 @@ class cushymoco extends oxUBase
                 'company'   => $oUser->oxuser__oxcompany->value,
             );
 
-            $this->_sAjaxResponse = $this->successMessage($aResult);
+            $this->_sAjaxResponse = $this->_successMessage($aResult);
         } else {
-            $this->_sAjaxResponse = $this->errorMessage("user not logged on");
+            $this->_sAjaxResponse = $this->_errorMessage("user not logged on");
         }
     }
 
-    protected function articleToArray($oArticle)
+    /**
+     * Returns detailed information about the logged-in user.
+     */
+    public function getAccountData()
     {
         /**
-         * @var oxArticle $oArticle
+         * @var oxAddress $oUserAddress
          */
+        $oUser = $this->_oVersionLayer->getSession()->getUser();
+
+        if (is_object($oUser) && $oUser->isLoaded() && isset($oUser->oxuser__oxcustnr->value)) {
+            $aResult = array(
+                'user'     => array(
+                    'username'     => $oUser->oxuser__oxusername->value,
+                    'firstname'    => $oUser->oxuser__oxfname->value,
+                    'lastname'     => $oUser->oxuser__oxlname->value,
+                    'customerNo'   => $oUser->oxuser__oxcustnr->value,
+                    'company'      => $oUser->oxuser__oxcompany->value,
+                    'phone'        => $oUser->oxuser__oxfon->value,
+                    'fax'          => $oUser->oxuser__oxfax->value,
+                    'privatePhone' => $oUser->oxuser__oxprivfon->value,
+                    'mobile'       => $oUser->oxuser__oxmobfon->value,
+                ),
+                'billing'  => array(
+                    'street'     => $oUser->oxuser__oxstreet->value,
+                    'streetNo'   => $oUser->oxuser__oxstreetnr->value,
+                    'additional' => $oUser->oxuser__oxaddinfo->value,
+                    'city'       => $oUser->oxuser__oxcity->value,
+                    'zip'        => $oUser->oxuser__oxzip->value,
+                    'state'      => $this->_stateIdToStateName(
+                        $oUser->oxuser__oxstateid->value,
+                        $oUser->oxuser__oxcountryid->value
+                    ),
+                    'country'    => $this->_countryIdToCountryName($oUser->oxuser__oxcountryid->value),
+                ),
+                'shipping' => array(),
+            );
+
+            foreach ($oUser->getUserAddresses() as $oUserAddress) {
+                $aResult['shipping'][] = array(
+                    'firstName'  => $oUserAddress->oxaddress__oxfname->value,
+                    'lastName'   => $oUserAddress->oxaddress__oxlname->value,
+                    'company'    => $oUserAddress->oxaddress__oxcompany->value,
+                    'street'     => $oUserAddress->oxaddress__oxstreet->value,
+                    'streetNo'   => $oUserAddress->oxaddress__oxstreetnr->value,
+                    'additional' => $oUserAddress->oxaddress__oxaddinfo->value,
+                    'city'       => $oUserAddress->oxaddress__oxcity->value,
+                    'zip'        => $oUserAddress->oxaddress__oxzip->value,
+                    'country'    => $this->_countryIdToCountryName($oUserAddress->oxaddress__oxcountryid->value),
+                    'state'      => $this->_stateIdToStateName(
+                        $oUserAddress->oxaddress__oxcountryid->value,
+                        $oUserAddress->oxaddress__oxstateid->value
+                    ),
+                    'phone'      => $oUserAddress->oxaddress__oxfon->value,
+                    'fax'        => $oUserAddress->oxaddress__oxfax->value,
+                );
+            }
+
+            $this->_sAjaxResponse = $this->_successMessage($aResult);
+        } else {
+            $this->_sAjaxResponse = $this->_errorMessage("user not logged on");
+        }
+    }
+
+    /**
+     * Returns the display name of a country.
+     *
+     * @param string $sCountyId OXID of the country.
+     *
+     * @return string
+     */
+    protected function _countryIdToCountryName($sCountyId)
+    {
+        /**
+         * @var oxCountry $oCountry
+         */
+        if (isset($this->_aCountryIdCache[$sCountyId])) {
+            return $this->_aCountryIdCache[$sCountyId];
+        }
+
+        $oCountry = oxNew('oxCountry');
+        $oCountry->load($sCountyId);
+        $sCountryName                       = $oCountry->oxcountry__oxtitle->value;
+        $this->_aCountryIdCache[$sCountyId] = $sCountryName;
+
+        return $sCountryName;
+    }
+
+    /**
+     * Returns the display name of a state.
+     *
+     * @param string $sCountyId OXID of the country.
+     * @param string $sStateId  OXID of the state.
+     *
+     * @return string
+     */
+    protected function _stateIdToStateName($sCountyId, $sStateId)
+    {
+        if (isset($this->_aStateIdCache[$sCountyId][$sStateId])) {
+            return $this->_aStateIdCache[$sCountyId][$sStateId];
+        }
+
+        // At this point, we can't use the OXID object "oxState".
+        // There is a bug in the table structure of "oxstates", which doesn't allow to store multiple state
+        // abbreviations for different countries. Further they aren't loadable with "OXCOUNTRYID" and "OXSTATEID".
+        $sViewName  = getViewName('oxstates');
+        $sSelect    = "SELECT `OXTITLE` FROM `$sViewName` WHERE `OXID` = ? AND `OXCOUNTRYID` = ?";
+        $oDb        = oxDb::getDb();
+        $sStateName = $oDb->getOne($sSelect, array($sStateId, $sCountyId));
+
+        $this->_aStateIdCache[$sCountyId][$sStateId] = $sStateName;
+
+        return $sStateName;
+    }
+
+    /**
+     * @param oxArticle $oArticle
+     *
+     * @return array
+     */
+    protected function _articleToArray($oArticle)
+    {
+        /**
+         * @var oxVariantSelectList $oVariantSelectList
+         */
+        $oConfig       = $this->_oVersionLayer->getConfig();
+        $oShopCurrency = $oConfig->getActShopCurrencyObject();
+
+        $blHasVariants    = empty($oArticle->oxarticles__oxparentid->value) &&
+            !empty($oArticle->oxarticles__oxvarcount->value) &&
+            ($oArticle->oxarticles__oxvarcount->value > 0);
+        $aCharacteristics = array();
+        if ($blHasVariants) {
+            $aVariantSelections = $oArticle->getVariantSelections();
+            foreach ($aVariantSelections['selections'] as $iIndex => $oVariantSelectList) {
+                $aCharacteristics[$iIndex] = $oVariantSelectList->getLabel();
+            }
+        }
+
         $res = array(
-            'id'       => $oArticle->oxarticles__oxid->value,
-            'title'    => html_entity_decode($oArticle->oxarticles__oxtitle->rawValue),
-            'short'    => html_entity_decode($oArticle->oxarticles__oxshortdesc->rawValue),
-            'data'     => array($oArticle->getLongDesc()),
-            'price'    => $oArticle->getFPrice(),
-            'link'     => $oArticle->getLink(),
-            'icon'     => $oArticle->getIconUrl(),
-            'currency' => '€',
+            'id'            => $oArticle->oxarticles__oxid->value,
+            'title'         => html_entity_decode($oArticle->oxarticles__oxtitle->rawValue),
+            'short'         => html_entity_decode($oArticle->oxarticles__oxshortdesc->rawValue),
+            'data'          => array($oArticle->getLongDesc()),
+            'price'         => $oArticle->getFPrice(),
+            'link'          => $oArticle->getLink(),
+            'icon'          => $oArticle->getIconUrl(),
+            'currency'      => $oShopCurrency->sign,
+            'hasVariants'   => $blHasVariants,
+            'variantGroups' => $aCharacteristics,
         );
 
         return $res;
@@ -426,11 +605,74 @@ class cushymoco extends oxUBase
     {
         $oArticle = $this->_getArticleById();
         if (!empty($oArticle)) {
-            $res                  = $this->articleToArray($oArticle);
-            $this->_sAjaxResponse = $this->successMessage($res);
+            $res                  = $this->_articleToArray($oArticle);
+            $this->_sAjaxResponse = $this->_successMessage($res);
         } else {
-            $this->_sAjaxResponse = $this->errorMessage('article not found');
+            $this->_sAjaxResponse = $this->_errorMessage('article not found');
         }
+    }
+
+    /**
+     * Returns the variants of a product.
+     *
+     * Parameter: anid Products OXID.
+     * Parameter: selectedVariant[] Array containing selected variant IDs.
+     */
+    public function getArticleVariants()
+    {
+        /**
+         * @var oxSelection         $oVariantSelectionItem
+         * @var oxVariantSelectList $oVariantSelectionList
+         */
+        $oArticle          = $this->_getArticleById();
+        $aSelectedVariants = $this->_oVersionLayer->getRequestParam('selectedVariant', array());
+        $aVariants         = $oArticle->getVariantSelections($aSelectedVariants, $oArticle->getId());
+        $aRealVariants     = array();
+        $oLang             = $this->_oVersionLayer->getLang();
+        foreach ($aVariants['selections'] as $iKey => $sVariantId) {
+            $aRealVariants[$iKey][] = array(
+                'id'    => '',
+                'title' => $oLang->translateString('CHOOSE_VARIANT'),
+
+            );
+            $oVariantSelectionList  = $aVariants['selections'][$iKey];
+            $aVariantSelectionList  = $oVariantSelectionList->getSelections();
+
+            foreach ($aVariantSelectionList as $oVariantSelectionItem) {
+                if (!$oVariantSelectionItem->isDisabled()) {
+                    $aRealVariants[$iKey][] = array(
+                        'id'    => $oVariantSelectionItem->getValue(),
+                        'title' => $oVariantSelectionItem->getName(),
+                    );
+                }
+            }
+        }
+
+        $this->_sAjaxResponse = $this->_successMessage($aRealVariants);
+    }
+
+    /**
+     * Returns the OXID of a specific product variant.
+     *
+     * Parameter: anid Products OXID.
+     * Parameter: selectedVariant[] Array containing selected variant IDs.
+     */
+    public function getVariantProductId()
+    {
+        /**
+         * @var oxMdVariant $oMdVariants
+         */
+        $oArticle          = $this->_getArticleById();
+        $aSelectedVariants = $this->_oVersionLayer->getRequestParam('selectedVariant', array());
+        $oMdVariants       = $oArticle->getMdVariants();
+        foreach ($aSelectedVariants as $sVariantId) {
+            $aVariants = $oMdVariants->getMdSubvariants();
+            if (!isset($aVariants[$sVariantId])) {
+                break;
+            }
+            $oMdVariants = $aVariants[$sVariantId];
+        }
+        $this->_sAjaxResponse = $this->_successMessage($oMdVariants->getArticleId());
     }
 
     /**
@@ -456,9 +698,9 @@ class cushymoco extends oxUBase
         $res->count    = $iACount;
         $res->articles = array();
         foreach ($oArtList as $oArticle) {
-            $res->articles[] = $this->articleToArray($oArticle);
+            $res->articles[] = $this->_articleToArray($oArticle);
         }
-        $this->_sAjaxResponse = $this->successMessage($res);
+        $this->_sAjaxResponse = $this->_successMessage($res);
     }
 
     public function getCategoryList()
@@ -493,7 +735,7 @@ class cushymoco extends oxUBase
                 );
             }
         }
-        $this->_sAjaxResponse = $this->successMessage($aCatList);
+        $this->_sAjaxResponse = $this->_successMessage($aCatList);
     }
 
     /**
@@ -536,7 +778,7 @@ class cushymoco extends oxUBase
             );
         }
 
-        $this->_sAjaxResponse = $this->successMessage(array('count' => $count, 'articles' => $result));
+        $this->_sAjaxResponse = $this->_successMessage(array('count' => $count, 'articles' => $result));
     }
 
     public function getArticleMedia()
@@ -555,7 +797,7 @@ class cushymoco extends oxUBase
                 'upload' => $medium->oxmediaurls__oxisuploaded->value,
             );
         }
-        $this->_sAjaxResponse = $this->successMessage($response);
+        $this->_sAjaxResponse = $this->_successMessage($response);
     }
 
     /**
@@ -569,7 +811,17 @@ class cushymoco extends oxUBase
     {
         $oArticle             = $this->_getArticleById();
         $aGallery             = $oArticle->getPictureGallery();
-        $this->_sAjaxResponse = $this->successMessage($aGallery);
+        $this->_sAjaxResponse = $this->_successMessage($aGallery);
+    }
+
+    public function getArticleDocuments()
+    {
+        $this->_sAjaxResponse = $this->_errorMessage('NOT_IMPLEMENTED');
+    }
+
+    public function getArticleVideos()
+    {
+        $this->_sAjaxResponse = $this->_errorMessage('NOT_IMPLEMENTED');
     }
 
     /**
@@ -594,12 +846,12 @@ class cushymoco extends oxUBase
             'currency'      => '€',
         );
         foreach ($oBasket->getContents() as $key => $oBasketItem) {
-            $response['articles'][$key]           = $this->articleToArray($oBasketItem->getArticle());
+            $response['articles'][$key]           = $this->_articleToArray($oBasketItem->getArticle());
             $response['articles'][$key]['amount'] = $oBasketItem->getAmount();
             $response['articles'][$key]['total']  = $oBasketItem->getFTotalPrice();
         }
 
-        $this->_sAjaxResponse = $this->successMessage($response);
+        $this->_sAjaxResponse = $this->_successMessage($response);
     }
 
     /**
@@ -620,7 +872,7 @@ class cushymoco extends oxUBase
             if ($sItemKey) {
                 $oBasket->removeItem($sItemKey);
             }
-            $this->_sAjaxResponse = $this->successMessage(true);
+            $this->_sAjaxResponse = $this->_successMessage(true);
         }
     }
 
@@ -643,12 +895,12 @@ class cushymoco extends oxUBase
         $iQuantity = max($this->_oVersionLayer->getRequestParam('qty'), 1);
 
         if ($oArticle) {
-            $this->_sAjaxResponse = $this->errorMessage('Basket item not found');
+            $this->_sAjaxResponse = $this->_errorMessage('Basket item not found');
             foreach ($oBasket->getContents() as $oBasketItem) {
                 if ($oBasketItem->getArticle()->oxarticles__oxid->value == $oArticle->oxarticles__oxid->value) {
                     $oBasketItem->setAmount($iQuantity);
 
-                    $this->_sAjaxResponse = $this->successMessage(true);
+                    $this->_sAjaxResponse = $this->_successMessage(true);
                     break;
                 }
             }
@@ -667,17 +919,17 @@ class cushymoco extends oxUBase
     {
         $this->_getSessionId();
         $oBasket   = $this->_oVersionLayer->getBasket();
-        $oArticle  = $this->_getArticleById();
+        $oArticle  = $this->_getArticleById('anid', true);
         $iQuantity = max($this->_oVersionLayer->getRequestParam('qty'), 1);
 
         try {
             if ($oArticle) {
                 $oBasket->addToBasket($oArticle->oxarticles__oxid->value, $iQuantity);
-                $this->_sAjaxResponse = $this->successMessage(true);
+                $this->_sAjaxResponse = $this->_successMessage(true);
             }
         } catch (Exception $e) {
-            $oLang = $this->_oVersionLayer->getLang();
-            $this->_sAjaxResponse = $this->errorMessage($oLang->translateString($e->getMessage()));
+            $oLang                = $this->_oVersionLayer->getLang();
+            $this->_sAjaxResponse = $this->_errorMessage($oLang->translateString($e->getMessage()));
         }
     }
 
@@ -710,9 +962,9 @@ class cushymoco extends oxUBase
             }
         }
         if (!empty($address)) {
-            $this->_sAjaxResponse = $this->successMessage($address);
+            $this->_sAjaxResponse = $this->_successMessage($address);
         } else {
-            $this->_sAjaxResponse = $this->errorMessage("No address available");
+            $this->_sAjaxResponse = $this->_errorMessage("No address available");
         }
     }
 
@@ -746,9 +998,9 @@ class cushymoco extends oxUBase
             );
         }
         if (!empty($res)) {
-            $this->_sAjaxResponse = $this->successMessage($res);
+            $this->_sAjaxResponse = $this->_successMessage($res);
         } else {
-            $this->_sAjaxResponse = $this->errorMessage("No address available");
+            $this->_sAjaxResponse = $this->_errorMessage("No address available");
         }
     }
 
@@ -797,7 +1049,7 @@ class cushymoco extends oxUBase
             );
         }
 
-        $this->_sAjaxResponse = $this->successMessage($result);
+        $this->_sAjaxResponse = $this->_successMessage($result);
     }
 
     /**
@@ -816,7 +1068,7 @@ class cushymoco extends oxUBase
             $shipping = $this->_oVersionLayer->getSession()->getVariable('sShipSet');
         }
         if (!$shipping) {
-            $this->_sAjaxResponse = $this->errorMessage("No shipping id given");
+            $this->_sAjaxResponse = $this->_errorMessage("No shipping id given");
 
             return;
         }
@@ -826,14 +1078,14 @@ class cushymoco extends oxUBase
         }
 
         if (!$payment) {
-            $this->_sAjaxResponse = $this->errorMessage("No payment type given");
+            $this->_sAjaxResponse = $this->_errorMessage("No payment type given");
 
             return;
         }
 
         // Check if user is logged in
         if (!$oUser = $this->getUser()) {
-            $this->_sAjaxResponse = $this->errorMessage("User not logged on");
+            $this->_sAjaxResponse = $this->_errorMessage("User not logged on");
 
             return;
         }
@@ -858,7 +1110,7 @@ class cushymoco extends oxUBase
                 // performing special actions after user finishes order (assignment to special user groups)
                 $oUser->onOrderExecute($oBasket, $iSuccess);
             } catch (Exception $oEx) {
-                $this->_sAjaxResponse = $this->errorMessage(
+                $this->_sAjaxResponse = $this->_errorMessage(
                     array('message' => "error executing order", 'data' => $oEx)
                 );
 
@@ -866,7 +1118,7 @@ class cushymoco extends oxUBase
             }
         }
 
-        $this->_sAjaxResponse = $this->successMessage("done order");
+        $this->_sAjaxResponse = $this->_successMessage("done order");
 
         return;
     }
@@ -874,19 +1126,43 @@ class cushymoco extends oxUBase
     /**
      * Get content by ident
      *
-     * @param string $sLoadId
+     * @param string $sLoadId OXLOADID of the CMS page.
      *
      * @return string
      */
     protected function _getContentByIdent($sLoadId)
     {
-        $oContent = oxNew('oxcontent');
-        $oContent->loadByIdent($sLoadId);
+        $oContent = $this->_getContentObject($sLoadId);
 
         return $oContent->oxcontents__oxcontent->rawValue;
     }
 
-    /*
+    /**
+     * Returns the oxContent object of a CMS page.
+     *
+     * @param string $sLoadId OXLOADID of the CMS page.
+     *
+     * @return oxContent
+     */
+    protected function _getContentObject($sLoadId)
+    {
+        /**
+         * @var oxContent $oContent
+         */
+        $oContent     = oxNew('oxcontent');
+        $blLoadResult = $oContent->loadByIdent($sLoadId);
+
+        // A bad hack to avoid writing an OXID module, because OXID does not set the property "_isLoaded"!
+        $oReflection = new ReflectionClass($oContent);
+        $oProperty   = $oReflection->getProperty('_isLoaded');
+        $oProperty->setAccessible(true);
+        $oProperty->setValue($oContent, $blLoadResult);
+        $oProperty->setAccessible(false);
+
+        return $oContent;
+    }
+
+    /**
      * Get the terms and conditions
      *
      * Returns: string
@@ -894,7 +1170,31 @@ class cushymoco extends oxUBase
     public function getTermsAndConditions()
     {
         $sContent             = $this->_getContentByIdent('oxagb');
-        $this->_sAjaxResponse = $this->successMessage($sContent);
+        $this->_sAjaxResponse = $this->_successMessage($sContent);
+    }
+
+    /**
+     * Returns the CMS page for the home screen.
+     *
+     * Return: string
+     */
+    public function getStartPage()
+    {
+        $oContent = $this->_getContentObject('mfCushymocoStart');
+        if (!$oContent->isLoaded()) {
+            $this->_sAjaxResponse = $this->_errorMessage(
+                $this->_oVersionLayer->getLang()->translateString('CUSHYMOCO_CMS_STARTPAGE_DOES_NOT_EXISTS')
+            );
+
+            return;
+        }
+
+        $sParsedContent = $this->_oVersionLayer->getUtilsView()->parseThroughSmarty(
+            $oContent->oxcontents__oxcontent->value,
+            $oContent->getId()
+        );
+
+        $this->_sAjaxResponse = $this->_successMessage($sParsedContent);
     }
 
     /**
@@ -905,12 +1205,11 @@ class cushymoco extends oxUBase
     public function getImprint()
     {
         $sContent             = $this->_getContentByIdent('oximpressum');
-        $this->_sAjaxResponse = $this->successMessage($sContent);
+        $this->_sAjaxResponse = $this->_successMessage($sContent);
     }
 
-    /*
+    /**
      * Get list of countries
-     *
      */
     public function getCountryList()
     {
@@ -926,12 +1225,15 @@ class cushymoco extends oxUBase
             );
         }
         if (!empty($res)) {
-            $this->_sAjaxResponse = $this->successMessage($res);
+            $this->_sAjaxResponse = $this->_successMessage($res);
         } else {
-            $this->_sAjaxResponse = $this->errorMessage("no countries found");
+            $this->_sAjaxResponse = $this->_errorMessage("no countries found");
         }
     }
 
+    /**
+     * Sets the language to use.
+     */
     public function setLanguage()
     {
         $sLang = $this->_oVersionLayer->getRequestParam('device_language');
@@ -942,7 +1244,7 @@ class cushymoco extends oxUBase
                 $this->_oVersionLayer->getUtilsServer()->setOxCookie('language', $oLang->getBaseLanguage());
             }
         }
-        $this->_sAjaxResponse = $this->successMessage(true);
+        $this->_sAjaxResponse = $this->_successMessage(true);
     }
 
     /**
@@ -950,6 +1252,6 @@ class cushymoco extends oxUBase
      */
     public function getVersion()
     {
-        $this->_sAjaxResponse = $this->successMessage(self::VERSION);
+        $this->_sAjaxResponse = $this->_successMessage(self::VERSION);
     }
 }
