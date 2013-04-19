@@ -17,7 +17,9 @@
 		</Tab>
 
 		<!-- Tab included via <Require> tag -->
-		<Require src="products"/>
+        <Tab id="productsTab" title="Products Tab">
+            <Window id="productsWindow" navBarHidden="true">
+        </Tab>
 		<Require src="search"/>
 		<Require src="account"/>
 	</TabGroup>

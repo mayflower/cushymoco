@@ -2,29 +2,25 @@ function Controller() {
     require("alloy/controllers/BaseController").apply(this, Array.prototype.slice.call(arguments));
     $model = arguments[0] ? arguments[0].$model : null;
     var $ = this, exports = {}, __defers = {};
-    $.__views.productWindow = Ti.UI.createWindow({
+    $.__views.categoriesWindow = Ti.UI.createWindow({
         backgroundColor: "#fff",
-        title: "Products",
-        id: "productWindow"
+        title: "Catalog",
+        id: "categoriesWindow"
     });
-    $.__views.__alloyId9 = Alloy.createController("product/categories", {
-        id: "__alloyId9"
+    $.__views.__alloyId7 = Alloy.createController("product/categories", {
+        catId: "",
+        id: "__alloyId7"
     });
-    $.__views.productGroup = Ti.UI.iPhone.createNavigationGroup({
-        window: $.__views.__alloyId9.getViewEx({
-            recurse: !0
-        }),
-        id: "productGroup"
+    $.__views.__alloyId7.setParent($.__views.categoriesWindow);
+    $.__views.productNavGroup = Ti.UI.iPhone.createNavigationGroup({
+        window: $.__views.categoriesWindow,
+        id: "productNavGroup"
     });
-    $.__views.productWindow.add($.__views.productGroup);
-    $.__views.products = Ti.UI.createTab({
-        window: $.__views.productWindow,
-        title: "Products Tab",
-        id: "products"
-    });
-    $.addTopLevelView($.__views.products);
+    $.addTopLevelView($.__views.productNavGroup);
     exports.destroy = function() {};
     _.extend($, $.__views);
+    var productNavGroup = $.productNavGroup;
+    Alloy.CFG.productNavGroup = $.productNavGroup;
     _.extend($, exports);
 }
 

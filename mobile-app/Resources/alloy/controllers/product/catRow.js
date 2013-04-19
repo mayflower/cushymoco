@@ -6,20 +6,13 @@ function Controller() {
         id: "catRow"
     });
     $.addTopLevelView($.__views.catRow);
-    $.__views.title = Ti.UI.createLabel({
-        id: "title"
+    $.__views.cateoryTitle = Ti.UI.createLabel({
+        id: "cateoryTitle",
+        text: typeof $model.__transform.title != "undefined" ? $model.__transform.title : $model.get("title")
     });
-    $.__views.catRow.add($.__views.title);
-    $.__views.url = Ti.UI.createLabel({
-        id: "url"
-    });
-    $.__views.catRow.add($.__views.url);
+    $.__views.catRow.add($.__views.cateoryTitle);
     exports.destroy = function() {};
     _.extend($, $.__views);
-    var args = arguments[0] || {};
-    Ti.API.info(args);
-    $.catRow.title = args.title;
-    $.url = args.url;
     _.extend($, exports);
 }
 

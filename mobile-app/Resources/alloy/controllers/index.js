@@ -1,4 +1,10 @@
 function Controller() {
+    function openProductsWin(e) {
+        if (!productsWin) {
+            productsWin = Alloy.createController("products").getView();
+            $.productsWindow.add(productsWin);
+        }
+    }
     function fillStartPage(text) {
         $.startContent.html = text;
     }
@@ -24,27 +30,35 @@ function Controller() {
         id: "tab1"
     });
     $.__views.index.addTab($.__views.tab1);
-    $.__views.__alloyId4 = Alloy.createController("products", {
+    $.__views.productsWindow = Ti.UI.createWindow({
+        backgroundColor: "#fff",
+        title: "Window Title",
+        id: "productsWindow",
+        navBarHidden: "true"
+    });
+    $.__views.productsTab = Ti.UI.createTab({
+        window: $.__views.productsWindow,
+        id: "productsTab",
+        title: "Products Tab"
+    });
+    $.__views.index.addTab($.__views.productsTab);
+    $.__views.__alloyId4 = Alloy.createController("search", {
         id: "__alloyId4"
     });
     $.__views.index.addTab($.__views.__alloyId4.getViewEx({
         recurse: !0
     }));
-    $.__views.__alloyId6 = Alloy.createController("search", {
+    $.__views.__alloyId6 = Alloy.createController("account", {
         id: "__alloyId6"
     });
     $.__views.index.addTab($.__views.__alloyId6.getViewEx({
         recurse: !0
     }));
-    $.__views.__alloyId8 = Alloy.createController("account", {
-        id: "__alloyId8"
-    });
-    $.__views.index.addTab($.__views.__alloyId8.getViewEx({
-        recurse: !0
-    }));
     $.addTopLevelView($.__views.index);
     exports.destroy = function() {};
     _.extend($, $.__views);
+    var productsWin;
+    $.productsTab.addEventListener("focus", openProductsWin);
     require("communication").startScreen(fillStartPage);
     $.index.open();
     _.extend($, exports);

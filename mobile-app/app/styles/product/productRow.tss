@@ -1,0 +1,46 @@
+"#iconView":{
+    layout:"vertical",
+    top:"0px",
+    height:Ti.UI.SIZE,
+    width:Ti.UI.SIZE
+},
+"#priceView":{
+    layout:"vertical",
+    height:Ti.UI.SIZE,
+    width:Ti.UI.SIZE
+},
+"#labelView":{
+    layout:"vertical",
+    height:Ti.UI.SIZE
+},
+"#productIcon":{
+    left:"0px",
+    top:"0px",
+    height:"48px",
+    width:"48px"
+},
+"#productTitle":{
+    top:"5px",
+    left:"5px",
+    font:{
+        fontSize:14,
+        fontWeight:"bold"
+    }
+},
+"#productShortDesc":{
+    left:"5px",
+    font:{
+        fontSize:10
+    }
+},
+"#productPrice":{
+    left:"5px",
+    top:"5px",
+    font:{
+        fontSize:12,
+        fontWeight:"bold"
+    }
+},
+".spacer":{
+    height:"5px"
+}
