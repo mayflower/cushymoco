@@ -1,7 +1,2 @@
 <Alloy>
-	<Tab title="Search Tab">
-		<Window title="Search Window">
-			<Label>Buscare</Label>
-		</Window>
-	</Tab>
 </Alloy>

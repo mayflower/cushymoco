@@ -7,11 +7,11 @@ function Controller() {
         title: "Catalog",
         id: "categoriesWindow"
     });
-    $.__views.__alloyId7 = Alloy.createController("product/categories", {
+    $.__views.__alloyId4 = Alloy.createController("product/categories", {
         catId: "",
-        id: "__alloyId7"
+        id: "__alloyId4"
     });
-    $.__views.__alloyId7.setParent($.__views.categoriesWindow);
+    $.__views.__alloyId4.setParent($.__views.categoriesWindow);
     $.__views.productNavGroup = Ti.UI.iPhone.createNavigationGroup({
         window: $.__views.categoriesWindow,
         id: "productNavGroup"
