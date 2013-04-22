@@ -557,43 +557,82 @@ class cushymoco extends oxUBase
     }
 
     /**
-     * @param oxArticle $oArticle
+     * Transforms a product object into an array.
+     *
+     * @param oxArticle $oArticle Instance of the product object.
+     * @param bool      $blShort  Return only short information (used in category view).
      *
      * @return array
      */
-    protected function _articleToArray($oArticle)
+    protected function _articleToArray($oArticle, $blShort = false)
+    {
+        $oConfig       = $this->_oVersionLayer->getConfig();
+        $oShopCurrency = $oConfig->getActShopCurrencyObject();
+
+        $blHasVariants = $this->_hasVariants($oArticle);
+
+        $iVariantGroupCount = 0;
+        if ($blHasVariants) {
+            $aVariantSelections = $oArticle->getVariantSelections();
+            $iVariantGroupCount = count($aVariantSelections['selections']);
+        }
+
+        $aProduct = array(
+            'productId'      => $oArticle->oxarticles__oxid->value,
+            'title'          => html_entity_decode($oArticle->oxarticles__oxtitle->rawValue),
+            'shortDesc'      => html_entity_decode($oArticle->oxarticles__oxshortdesc->rawValue),
+            'price'          => $oArticle->getFPrice(),
+            'currency'       => $oShopCurrency->sign,
+            'formattedPrice' => $oArticle->getFPrice() . " " . $oShopCurrency->sign,
+            'icon'           => $oArticle->getIconUrl(),
+        );
+
+        if (!$blShort) {
+            $aProduct['longDesc']          = $oArticle->getLongDesc();
+            $aProduct['link']              = $oArticle->getLink();
+            $aProduct['hasVariants']       = $blHasVariants;
+            $aProduct['variantGroupCount'] = $iVariantGroupCount;
+        }
+
+        return $aProduct;
+    }
+
+    /**
+     * Determines whether a product has variants or not.
+     *
+     * @param oxArticle $oProduct Instance of the product object.
+     *
+     * @return bool
+     */
+    protected function _hasVariants($oProduct)
+    {
+        return empty($oProduct->oxarticles__oxparentid->value) &&
+            !empty($oProduct->oxarticles__oxvarcount->value) &&
+            ($oProduct->oxarticles__oxvarcount->value > 0);
+    }
+
+    /**
+     * Returns the variant groups of the current product.
+     *
+     * Parameter: "anid" OXID of the product.
+     */
+    public function getArticleVariantGroups()
     {
         /**
          * @var oxVariantSelectList $oVariantSelectList
          */
-        $oConfig       = $this->_oVersionLayer->getConfig();
-        $oShopCurrency = $oConfig->getActShopCurrencyObject();
+        $oProduct = $this->_getArticleById();
 
-        $blHasVariants    = empty($oArticle->oxarticles__oxparentid->value) &&
-            !empty($oArticle->oxarticles__oxvarcount->value) &&
-            ($oArticle->oxarticles__oxvarcount->value > 0);
-        $aCharacteristics = array();
-        if ($blHasVariants) {
-            $aVariantSelections = $oArticle->getVariantSelections();
-            foreach ($aVariantSelections['selections'] as $iIndex => $oVariantSelectList) {
-                $aCharacteristics[$iIndex] = $oVariantSelectList->getLabel();
-            }
+        $aCharacteristics   = array();
+        $aVariantSelections = $oProduct->getVariantSelections();
+        foreach ($aVariantSelections['selections'] as $iIndex => $oVariantSelectList) {
+            $aCharacteristics[] = array(
+                'groupId' => $iIndex,
+                'title' => $oVariantSelectList->getLabel(),
+            );
         }
 
-        $res = array(
-            'id'            => $oArticle->oxarticles__oxid->value,
-            'title'         => html_entity_decode($oArticle->oxarticles__oxtitle->rawValue),
-            'short'         => html_entity_decode($oArticle->oxarticles__oxshortdesc->rawValue),
-            'data'          => array($oArticle->getLongDesc()),
-            'price'         => $oArticle->getFPrice(),
-            'link'          => $oArticle->getLink(),
-            'icon'          => $oArticle->getIconUrl(),
-            'currency'      => $oShopCurrency->sign,
-            'hasVariants'   => $blHasVariants,
-            'variantGroups' => $aCharacteristics,
-        );
-
-        return $res;
+        $this->_sAjaxResponse = $this->_successMessage($aCharacteristics);
     }
 
     /**
@@ -605,8 +644,8 @@ class cushymoco extends oxUBase
     {
         $oArticle = $this->_getArticleById();
         if (!empty($oArticle)) {
-            $res                  = $this->_articleToArray($oArticle);
-            $this->_sAjaxResponse = $this->_successMessage($res);
+            $aProductResponse     = $this->_articleToArray($oArticle);
+            $this->_sAjaxResponse = $this->_successMessage($aProductResponse);
         } else {
             $this->_sAjaxResponse = $this->_errorMessage('article not found');
         }
@@ -628,21 +667,16 @@ class cushymoco extends oxUBase
         $aSelectedVariants = $this->_oVersionLayer->getRequestParam('selectedVariant', array());
         $aVariants         = $oArticle->getVariantSelections($aSelectedVariants, $oArticle->getId());
         $aRealVariants     = array();
-        $oLang             = $this->_oVersionLayer->getLang();
         foreach ($aVariants['selections'] as $iKey => $sVariantId) {
-            $aRealVariants[$iKey][] = array(
-                'id'    => '',
-                'title' => $oLang->translateString('CHOOSE_VARIANT'),
-
-            );
-            $oVariantSelectionList  = $aVariants['selections'][$iKey];
-            $aVariantSelectionList  = $oVariantSelectionList->getSelections();
+            $oVariantSelectionList = $aVariants['selections'][$iKey];
+            $aVariantSelectionList = $oVariantSelectionList->getSelections();
 
             foreach ($aVariantSelectionList as $oVariantSelectionItem) {
                 if (!$oVariantSelectionItem->isDisabled()) {
-                    $aRealVariants[$iKey][] = array(
-                        'id'    => $oVariantSelectionItem->getValue(),
-                        'title' => $oVariantSelectionItem->getName(),
+                    $aRealVariants[] = array(
+                        'groupId'   => $iKey,
+                        'variantId' => $oVariantSelectionItem->getValue(),
+                        'title'     => $oVariantSelectionItem->getName(),
                     );
                 }
             }
@@ -692,15 +726,17 @@ class cushymoco extends oxUBase
         $aSessionFilter = null; //$this->_oVersionLayer->getSession()->getVariable( 'session_attrfilter' );
 
         $sActCat = $this->_oVersionLayer->getRequestParam('cnid');
-        $iACount = $oArtList->loadCategoryArticles($sActCat, $aSessionFilter);
+        // $iACount = $oArtList->loadCategoryArticles($sActCat, $aSessionFilter);
+        $oArtList->loadCategoryArticles($sActCat, $aSessionFilter);
 
-        $res           = new stdClass();
-        $res->count    = $iACount;
-        $res->articles = array();
+//        $res           = new stdClass();
+//        $res->count    = $iACount;
+//        $res->articles = array();
+        $aProducts = array();
         foreach ($oArtList as $oArticle) {
-            $res->articles[] = $this->_articleToArray($oArticle);
+            $aProducts[] = $this->_articleToArray($oArticle, true);
         }
-        $this->_sAjaxResponse = $this->_successMessage($res);
+        $this->_sAjaxResponse = $this->_successMessage($aProducts);
     }
 
     public function getCategoryList()
@@ -713,6 +749,9 @@ class cushymoco extends oxUBase
         $oCatTree->buildList(true);
 
         $sActCat = $this->_oVersionLayer->getRequestParam('cnid');
+        if (empty($sActCat)) {
+            $sActCat = null;
+        }
 
         $aCatList = array();
         foreach ($oCatTree as $oCategory) {
@@ -725,13 +764,14 @@ class cushymoco extends oxUBase
                 )
             ) {
                 $aCatList[] = array(
-                    'id'       => $oCategory->getId(),
-                    'title'    => preg_replace(
+                    'categoryId' => $oCategory->getId(),
+                    'title'      => preg_replace(
                         '/^[- ]+/',
                         '',
                         html_entity_decode($oCategory->oxcategories__oxtitle->rawValue)
                     ),
-                    'hasChild' => $oCategory->getHasSubCats(),
+                    'icon'       => $oCategory->getIconUrl(),
+                    'hasChild'   => $oCategory->getHasSubCats(),
                 );
             }
         }
@@ -809,9 +849,21 @@ class cushymoco extends oxUBase
      */
     public function getArticleImages()
     {
-        $oArticle             = $this->_getArticleById();
-        $aGallery             = $oArticle->getPictureGallery();
-        $this->_sAjaxResponse = $this->_successMessage($aGallery);
+        $oArticle  = $this->_getArticleById();
+        $aGallery  = $oArticle->getPictureGallery();
+        $aPictures = array();
+
+        foreach ($aGallery['Pics'] as $iKey => $sPictureUrl) {
+            $aPictures[] = array(
+                'productId' => $oArticle->getId(),
+                'pictureId' => $iKey,
+                'icon'      => $aGallery['Icons'][$iKey],
+                'image'     => $sPictureUrl,
+                'bigImage'  => $aGallery['ZoomPic'] ? $aGallery['ZoomPics'][$iKey]['file'] : '',
+            );
+        }
+
+        $this->_sAjaxResponse = $this->_successMessage($aPictures);
     }
 
     public function getArticleDocuments()
