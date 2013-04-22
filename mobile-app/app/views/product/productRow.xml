@@ -1,0 +1,13 @@
+<Alloy>
+    <TableViewRow layout="horizontal">
+        <View id="iconView">
+            <ImageView id="productIcon"/>
+        </View>
+        <View id="labelView">
+            <Label id="productTitle"/>
+            <Label id="productShortDesc"/>
+            <Label id="productPrice"/>
+            <View class="spacer"/>
+        </View>
+    </TableViewRow>
+</Alloy>

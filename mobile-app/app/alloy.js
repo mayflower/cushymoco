@@ -9,3 +9,6 @@
 // object. For example:
 //
 // Alloy.Globals.someGlobalFunction = function(){};
+String.prototype.repeat = function (count) {
+    return new Array(parseInt(count) + 1).join(this);
+}

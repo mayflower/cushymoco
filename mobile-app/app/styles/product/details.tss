@@ -1,0 +1,38 @@
+"#productDetailsPage":{
+    type:"vertical"
+},
+"#productPictures":{
+    views:[],
+    backgroundColor:"#000",
+    showPagingControl:true,
+    disableBounce:true,
+    height:"50%"
+},
+"#productTitle":{
+    left:"5px",
+    color:"#FFF",
+    font:{
+        fontSize:16,
+        fontWeight:'bold'
+    },
+    height:Ti.UI.SIZE,
+    width:"60%"
+},
+"#productPrice":{
+    right:"40px",
+    color:"#FFF",
+    font:{
+        fontSize:16,
+        fontWeight:'bold'
+    },
+    height:Ti.UI.SIZE,
+    width:Ti.UI.SIZE
+},
+"#cartButton":{
+    right:"5px",
+    backgroundImage:"/icons/icon_shopping_cart.png",
+    title: '',
+    style: Titanium.UI.iPhone.SystemButtonStyle.PLAIN,
+    height:"30px",
+    width:"30px"
+}

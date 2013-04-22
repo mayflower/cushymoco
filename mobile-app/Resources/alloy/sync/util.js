@@ -1,5 +1,5 @@
 function S4() {
-    return ((1 + Math.random()) * 65536 | 0).toString(16).substring(1);
+    return (0 | 65536 * (1 + Math.random())).toString(16).substring(1);
 }
 
 exports.guid = function() {

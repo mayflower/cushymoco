@@ -1,21 +1,22 @@
-var Alloy = require("alloy"), http = {
+var Alloy = require("alloy");
+
+var http = {
     request: function(requestMethod, url, data, callbackSuccess, callbackError) {
         var client = Ti.Network.createHTTPClient({
-            onload: function(e) {
+            onload: function() {
                 var resp = JSON.parse(this.responseText);
-                resp.error == null ? callbackSuccess(resp.result) : callbackError(resp.error);
+                null == resp.error ? callbackSuccess(resp.result) : callbackError(resp.error);
             },
             onerror: function(e) {
-                Ti.API.debug(e.error);
+                Ti.API.error(e);
                 callbackError("Internal Error");
             },
-            timeout: 5000
+            timeout: 5e3
         });
         client.open(requestMethod, url);
         client.send(data);
     },
     get: function(url, callbackSuccess, callbackError) {
-        Ti.API.info(url);
         this.request("GET", url, null, callbackSuccess, callbackError);
     },
     post: function(url, data, callbackSuccess, callbackError) {
@@ -30,23 +31,63 @@ exports.configDump = function() {
 exports.startScreen = function(callback) {
     var errorCb = function(text) {
         callback("Error: " + text);
-    }, url = Alloy.CFG.oxid.baseUrl + "&fnc=getStartPage";
+    };
     http.get(exports.buildUrl({
         fnc: "getStartPage"
     }), callback, errorCb);
+};
+
+exports.category = function(categoryId, successCallback, errorCallback) {
+    if (!errorCallback) var errorCallback = function(text) {
+        callback("Error: " + text);
+    };
+    http.get(exports.buildUrl({
+        fnc: "getCategoryList",
+        cnid: categoryId
+    }), successCallback, errorCallback);
+};
+
+exports.productList = function(categoryId, successCallback, errorCallback) {
+    if (!errorCallback) var errorCallback = function(text) {
+        callback("Error: " + text);
+    };
+    http.get(exports.buildUrl({
+        fnc: "getArticleList",
+        cnid: categoryId
+    }), successCallback, errorCallback);
+};
+
+exports.product = function(productId, successCallback, errorCallback) {
+    if (!errorCallback) var errorCallback = function(text) {
+        callback("Error: " + text);
+    };
+    http.get(exports.buildUrl({
+        fnc: "getArticle",
+        anid: productId
+    }), successCallback, errorCallback);
+};
+
+exports.productPictures = function(productId, successCallback, errorCallback) {
+    if (!errorCallback) var errorCallback = function(text) {
+        callback("Error: " + text);
+    };
+    http.get(exports.buildUrl({
+        fnc: "getArticleImages",
+        anid: productId
+    }), successCallback, errorCallback);
 };
 
 var serialize = function(obj, prefix) {
     var queryStringObj = [];
     for (var p in obj) {
         var k = prefix ? prefix + "[" + p + "]" : p, v = obj[p];
-        queryStringObj.push(typeof v == "object" ? serialize(v, k) : encodeURIComponent(k) + "=" + encodeURIComponent(v));
+        queryStringObj.push("object" == typeof v ? serialize(v, k) : encodeURIComponent(k) + "=" + encodeURIComponent(v));
     }
     return queryStringObj.join("&");
 };
 
 exports.buildUrl = function(params) {
     var url = Alloy.CFG.oxid.baseUrl;
-    params && (url += (url.indexOf("?") == -1 ? "?" : "&") + serialize(params));
+    params && (url += (-1 == url.indexOf("?") ? "?" : "&") + serialize(params));
     return url;
 };

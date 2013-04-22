@@ -1,6 +1,5 @@
 <Alloy>
-	<TableViewRow>
-		<Label id="title"/>
-		<Label id="url"/>
-	</TableViewRow>
+	<TableViewRow id="catRow">
+	    <Label id="cateoryTitle" text="{title}"/>
+    </TableViewRow>
 </Alloy>

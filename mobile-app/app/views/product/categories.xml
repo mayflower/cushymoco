@@ -1,9 +1,15 @@
 <Alloy>
-	<Window title="Categories">
-		<TableView id="categoryTable" onClick="openProductDetail">
-			<HeaderView>
-				<Label id="categoriesLabel">Categories</Label>
-			</HeaderView>
-		</TableView>
-	</Window>
+    <Collection id="categoryList" src="category" instance="true"/>
+    <!-- Collection id="productList" src="productShort" instance="true"/-->
+    <Window id="index">
+        <TableView id="categoryTable" onClick="openNav">
+	        <!-- TableViewRow title="{title}" hasChild="{hasChild}"/ -->
+    	    <!-- TableViewSection id="productTable" headerTitle="Dogs" dataCollection="$.productList">
+                <ImageView class="productIcon" image="{icon}"/>
+                <Label class="productTitle" text="{title}"/>
+                <Label class="productShortDesc" text="{shortDesc}"/>
+                <Label class="productPrice" text="{formattedPrice}"/>
+		    </TableViewSection -->
+	    </TableView>
+    </Window>
 </Alloy>

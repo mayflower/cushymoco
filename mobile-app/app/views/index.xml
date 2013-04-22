@@ -1,24 +1,32 @@
 <Alloy>
 	<TabGroup>
 		<!-- Explicit Window declaration -->
-		<Tab id="tab1">
-			<Window id="win1">
-				<!-- <Label>Label 1</Label>
-				<Label platform="android">Label 2</Label>
-				<Label platform="ios">Label 3</Label>
-				<Label>Label 4</Label>
-				<Label>Label 5</Label>
-				<Button id="b3" class="button" onClick="showConfig">Config</Button>
-				<Button id="b" class="button" onClick="openStart">load Content</Button>
-				<Button id="b2" class="button" onClick="hello">show Url</Button>
-			 -->
+		<Tab id="homeTab" title="Home" icon="/icons/home_small.png">
+			<Window id="homeWindow" title="Shop">
 			 	<WebView id="startContent"></WebView>
 			</Window>
 		</Tab>
 
-		<!-- Tab included via <Require> tag -->
-		<Require src="products"/>
-		<Require src="search"/>
-		<Require src="account"/>
+        <Tab id="productsTab" title="Products" icon="/icons/magnifier_small.png">
+            <Window id="productsWindow" navBarHidden="true"/>
+        </Tab>
+
+        <Tab id="accountTab" title="Account" icon="/icons/user_small.png">
+            <Window id="accountWindow" title="Account">
+                <Label>Brunsverreggd</Label>
+            </Window>
+        </Tab>
+
+        <Tab id="cartTab" title="Cart" icon="/icons/cart_small.png">
+            <Window id="cartWindow" title="Shopping cart">
+                <Label>Buscare</Label>
+            </Window>
+        </Tab>
+
+        <Tab id="moreTab" title="More" icon="/icons/gear_small.png">
+            <Window id="moreWindow" title="More">
+                <Label>I'm a label in a window in a tab in an iOS app!</Label>
+            </Window>
+        </Tab>
 	</TabGroup>
 </Alloy>
