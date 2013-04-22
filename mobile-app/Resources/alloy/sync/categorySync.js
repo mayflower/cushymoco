@@ -9,19 +9,19 @@ module.exports.sync = function(method, model, options) {
         }
     }
     function successCallback(response) {
-        callback(!0, response);
+        callback(true, response);
     }
     function errorCallback(response) {
-        callback(!1, response);
+        callback(false, response);
     }
     options.data.catId || (options.data.catId = "");
     communication.category(options.data.catId, successCallback, errorCallback);
 };
 
-module.exports.beforeModelCreate = function(config, name) {
+module.exports.beforeModelCreate = function(config) {
     return config;
 };
 
-module.exports.afterModelCreate = function(Model, name) {
+module.exports.afterModelCreate = function(Model) {
     return Model;
 };

@@ -74,6 +74,38 @@ exports.productList = function(categoryId, successCallback, errorCallback)
     );
 }
 
+exports.product = function(productId, successCallback, errorCallback)
+{
+    if (!errorCallback) {
+        var errorCallback = function(text)
+        {
+            callback("Error: " + text);     
+        };
+    }
+    
+    http.get(
+        exports.buildUrl({fnc:"getArticle",anid:productId}),
+        successCallback,
+        errorCallback
+    );
+}
+
+exports.productPictures = function(productId, successCallback, errorCallback)
+{
+    if (!errorCallback) {
+        var errorCallback = function(text)
+        {
+            callback("Error: " + text);     
+        };
+    }
+    
+    http.get(
+        exports.buildUrl({fnc:"getArticleImages",anid:productId}),
+        successCallback,
+        errorCallback
+    );
+}
+
 var serialize = function(obj, prefix)
 {
     var queryStringObj = [];

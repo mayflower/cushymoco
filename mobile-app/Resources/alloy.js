@@ -1,30 +1,37 @@
 function ucfirst(text) {
-    return text ? text[0].toUpperCase() + text.substr(1) : text;
+    if (!text) return text;
+    return text[0].toUpperCase() + text.substr(1);
 }
 
 function isTabletFallback() {
-    return !(Math.min(Ti.Platform.displayCaps.platformHeight, Ti.Platform.displayCaps.platformWidth) < 700);
+    return !(700 > Math.min(Ti.Platform.displayCaps.platformHeight, Ti.Platform.displayCaps.platformWidth));
 }
 
 var _ = require("alloy/underscore")._, Backbone = require("alloy/backbone");
 
-exports.version = "1.0.0";
+var DEFAULT_WIDGET = "widget";
+
+exports.version = "1.1.0";
 
 exports._ = _;
 
 exports.Backbone = Backbone;
 
 exports.M = function(name, modelDesc, migrations) {
-    var config = modelDesc.config, type = (config.adapter ? config.adapter.type : null) || "localDefault";
-    type === "localDefault" && (type = "sql");
-    var adapter = require("alloy/sync/" + type), extendObj = {
+    var config = modelDesc.config;
+    var type = (config.adapter ? config.adapter.type : null) || "localDefault";
+    "localDefault" === type && (type = "sql");
+    var adapter = require("alloy/sync/" + type);
+    var extendObj = {
         defaults: config.defaults,
         sync: function(method, model, opts) {
-            var config = model.config || {}, adapterObj = config.adapter || {}, type = (config.adapter ? config.adapter.type : null) || "localDefault";
-            type === "localDefault" && (type = "sql");
+            var config = model.config || {};
+            var type = (config.adapter ? config.adapter.type : null) || "localDefault";
+            "localDefault" === type && (type = "sql");
             require("alloy/sync/" + type).sync(method, model, opts);
         }
-    }, extendClass = {};
+    };
+    var extendClass = {};
     migrations && (extendClass.migrations = migrations);
     _.isFunction(adapter.beforeModelCreate) && (config = adapter.beforeModelCreate(config, name) || config);
     var Model = Backbone.Model.extend(extendObj, extendClass);
@@ -38,18 +45,27 @@ exports.C = function(name, modelDesc, model) {
     var extendObj = {
         model: model,
         sync: function(method, model, opts) {
-            var config = model.config || {}, type = (config.adapter ? config.adapter.type : null) || "localDefault";
-            type === "localDefault" && (type = "sql");
+            var config = model.config || {};
+            var type = (config.adapter ? config.adapter.type : null) || "localDefault";
+            "localDefault" === type && (type = "sql");
             require("alloy/sync/" + type).sync(method, model, opts);
         }
-    }, Collection = Backbone.Collection.extend(extendObj), config = Collection.prototype.config = model.prototype.config, type = (config.adapter ? config.adapter.type : null) || "localDefault", adapter = require("alloy/sync/" + type);
+    };
+    var Collection = Backbone.Collection.extend(extendObj);
+    var config = Collection.prototype.config = model.prototype.config;
+    var type = (config.adapter ? config.adapter.type : null) || "localDefault";
+    var adapter = require("alloy/sync/" + type);
     _.isFunction(adapter.afterCollectionCreate) && adapter.afterCollectionCreate(Collection);
     _.isFunction(modelDesc.extendCollection) && (Collection = modelDesc.extendCollection(Collection) || Collection);
     return Collection;
 };
 
 exports.createWidget = function(id, name, args) {
-    return new (require("alloy/widgets/" + id + "/controllers/" + (name || "widget")))(args);
+    if ("undefined" != typeof name && null !== name && _.isObject(name) && !_.isString(name)) {
+        args = name;
+        name = DEFAULT_WIDGET;
+    }
+    return new (require("alloy/widgets/" + id + "/controllers/" + (name || DEFAULT_WIDGET)))(args);
 };
 
 exports.createController = function(name, args) {
@@ -65,7 +81,7 @@ exports.createCollection = function(name, args) {
 };
 
 exports.isTablet = function() {
-    return Ti.Platform.osname === "ipad";
+    return "ipad" === Ti.Platform.osname;
 }();
 
 exports.isHandheld = !exports.isTablet;

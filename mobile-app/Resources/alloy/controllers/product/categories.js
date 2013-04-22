@@ -1,37 +1,45 @@
 function Controller() {
     function openNav(e) {
-        var isProduct = e.index >= categoryList.length, index = isProduct ? e.index - categoryList.length : e.index;
+        var isProduct = e.index >= categoryList.length;
+        var index = isProduct ? e.index - categoryList.length : e.index;
         if (isProduct) {
             var selModel = productList.at(index);
-            Ti.API.error("Selected product ID: " + selModel.get("productId"));
+            var navWin = Alloy.createController("product/details", {
+                productId: selModel.get("productId")
+            }).getView();
         } else {
-            var selModel = categoryList.at(index), navWin = Alloy.createController("product/categories", {
+            var selModel = categoryList.at(index);
+            var navWin = Alloy.createController("product/categories", {
                 catId: e.rowData.id
             }).getView();
-            Alloy.CFG.productNavGroup.open(navWin, {
-                animated: !0
-            });
-            navWin.title = selModel.get("title");
         }
+        Alloy.CFG.productNavGroup.open(navWin, {
+            animated: true
+        });
+        navWin.title = selModel.get("title");
     }
     require("alloy/controllers/BaseController").apply(this, Array.prototype.slice.call(arguments));
-    $model = arguments[0] ? arguments[0].$model : null;
-    var $ = this, exports = {}, __defers = {};
+    arguments[0] ? arguments[0]["__parentSymbol"] : null;
+    arguments[0] ? arguments[0]["$model"] : null;
+    var $ = this;
+    var exports = {};
+    var __defers = {};
     $.categoryList = Alloy.createCollection("category");
     $.__views.index = Ti.UI.createWindow({
-        backgroundColor: "#fff",
-        title: "Window Title",
         id: "index"
     });
-    $.addTopLevelView($.__views.index);
+    $.__views.index && $.addTopLevelView($.__views.index);
     $.__views.categoryTable = Ti.UI.createTableView({
         id: "categoryTable"
     });
     $.__views.index.add($.__views.categoryTable);
-    openNav ? $.__views.categoryTable.addEventListener("click", openNav) : __defers["$.__views.categoryTable!click!openNav"] = !0;
+    openNav ? $.__views.categoryTable.addEventListener("click", openNav) : __defers["$.__views.categoryTable!click!openNav"] = true;
     exports.destroy = function() {};
     _.extend($, $.__views);
-    var args = arguments[0] || {}, categoryList = Alloy.createCollection("category"), productList = Alloy.createCollection("productShort"), tableData;
+    var args = arguments[0] || {};
+    var categoryList = Alloy.createCollection("category");
+    var productList = Alloy.createCollection("productShort");
+    var tableData;
     categoryList.fetch({
         data: {
             catId: args.catId
@@ -43,7 +51,7 @@ function Controller() {
             var row = Ti.UI.createTableViewRow({
                 id: category.get("categoryId"),
                 title: category.get("title"),
-                hasChild: !0
+                hasChild: true
             });
             tableData.push(row);
         });
@@ -70,6 +78,6 @@ function Controller() {
     _.extend($, exports);
 }
 
-var Alloy = require("alloy"), Backbone = Alloy.Backbone, _ = Alloy._, $model;
+var Alloy = require("alloy"), Backbone = Alloy.Backbone, _ = Alloy._;
 
 module.exports = Controller;

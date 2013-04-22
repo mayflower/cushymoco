@@ -1,5 +1,5 @@
 function Controller() {
-    function openProductsWin(e) {
+    function openProductsWin() {
         if (!productsWin) {
             productsWin = Alloy.createController("products").getView();
             $.productsWindow.add(productsWin);
@@ -9,8 +9,10 @@ function Controller() {
         $.startContent.html = text;
     }
     require("alloy/controllers/BaseController").apply(this, Array.prototype.slice.call(arguments));
-    $model = arguments[0] ? arguments[0].$model : null;
-    var $ = this, exports = {}, __defers = {};
+    arguments[0] ? arguments[0]["__parentSymbol"] : null;
+    arguments[0] ? arguments[0]["$model"] : null;
+    var $ = this;
+    var exports = {};
     $.__views.index = Ti.UI.createTabGroup({
         id: "index"
     });
@@ -94,7 +96,7 @@ function Controller() {
         icon: "/icons/gear_small.png"
     });
     $.__views.index.addTab($.__views.moreTab);
-    $.addTopLevelView($.__views.index);
+    $.__views.index && $.addTopLevelView($.__views.index);
     exports.destroy = function() {};
     _.extend($, $.__views);
     var productsWin;
@@ -104,6 +106,6 @@ function Controller() {
     _.extend($, exports);
 }
 
-var Alloy = require("alloy"), Backbone = Alloy.Backbone, _ = Alloy._, $model;
+var Alloy = require("alloy"), Backbone = Alloy.Backbone, _ = Alloy._;
 
 module.exports = Controller;

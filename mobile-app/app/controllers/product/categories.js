@@ -41,11 +41,11 @@ function openNav(e) {
     var index = isProduct ? e.index - categoryList.length : e.index;
     if (isProduct) {
         var selModel = productList.at(index);
-        Ti.API.error("Selected product ID: " + selModel.get('productId'));
+        var navWin = Alloy.createController("product/details", {"productId":selModel.get('productId')}).getView();
     } else  {
         var selModel = categoryList.at(index);
         var navWin = Alloy.createController("product/categories", {"catId":e.rowData.id}).getView();
-        Alloy.CFG.productNavGroup.open(navWin, {animated:true});
-        navWin.title = selModel.get("title");
     }
+    Alloy.CFG.productNavGroup.open(navWin, {animated:true});
+    navWin.title = selModel.get("title");
 }

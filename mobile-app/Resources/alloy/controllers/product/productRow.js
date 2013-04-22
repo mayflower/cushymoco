@@ -1,12 +1,14 @@
 function Controller() {
     require("alloy/controllers/BaseController").apply(this, Array.prototype.slice.call(arguments));
-    $model = arguments[0] ? arguments[0].$model : null;
-    var $ = this, exports = {}, __defers = {};
+    arguments[0] ? arguments[0]["__parentSymbol"] : null;
+    arguments[0] ? arguments[0]["$model"] : null;
+    var $ = this;
+    var exports = {};
     $.__views.productRow = Ti.UI.createTableViewRow({
         layout: "horizontal",
         id: "productRow"
     });
-    $.addTopLevelView($.__views.productRow);
+    $.__views.productRow && $.addTopLevelView($.__views.productRow);
     $.__views.iconView = Ti.UI.createView({
         layout: "vertical",
         top: "0px",
@@ -57,11 +59,11 @@ function Controller() {
         id: "productPrice"
     });
     $.__views.labelView.add($.__views.productPrice);
-    $.__views.__alloyId5 = Ti.UI.createView({
+    $.__views.__alloyId9 = Ti.UI.createView({
         height: "5px",
-        id: "__alloyId5"
+        id: "__alloyId9"
     });
-    $.__views.labelView.add($.__views.__alloyId5);
+    $.__views.labelView.add($.__views.__alloyId9);
     exports.destroy = function() {};
     _.extend($, $.__views);
     var args = arguments[0] || {};
@@ -72,6 +74,6 @@ function Controller() {
     _.extend($, exports);
 }
 
-var Alloy = require("alloy"), Backbone = Alloy.Backbone, _ = Alloy._, $model;
+var Alloy = require("alloy"), Backbone = Alloy.Backbone, _ = Alloy._;
 
 module.exports = Controller;
