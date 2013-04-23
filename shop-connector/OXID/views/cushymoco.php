@@ -386,9 +386,9 @@ class cushymoco extends oxUBase
         $oContent->setLanguage($iLangId);
         $oContent->loadByIdent($sContentId);
         $aResult = array(
-            'title'    => $oContent->oxcontents__oxtitle,
-            'content'  => $oContent->oxcontents__oxcontent,
-            'cnid'     => $oContent->oxcontents__oxloadid,
+            'title'    => $oContent->oxcontents__oxtitle->value,
+            'content'  => $oContent->oxcontents__oxcontent->value,
+            'cnid'     => $oContent->oxcontents__oxloadid->value,
         );
         return $aResult;
     }
