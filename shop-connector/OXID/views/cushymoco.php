@@ -357,35 +357,58 @@ class cushymoco extends oxUBase
      */
     public function getContent()
     {
-        /**
-         * @todo language select is not working proper, maybe because of session language
-         */
-
         $sContentId = $this->_oVersionLayer->getRequestParam('cnid');
         $iLangId    = $this->_oVersionLayer->getRequestParam('lid');
+        // @TODO: shop id for EE multishops
 
-        $oContent = oxNew('oxcontent');
-        $oContent->loadByIdent($sContentId);
 
-        $aResult = array();
-
-        if ($oContent->oxcontents__oxactive->value != 1) {
-            $this->_sAjaxResponse = $this->_errorMessage('EMPTY');
-
-            return;
-        }
-
-        if ($iLangId) {
-            $sContentByLang = 'oxcontents__oxcontent_' . $iLangId;
-            $sTitleByLang   = 'oxcontents__oxtitle_' . $iLangId;
+        if (empty($sContentId)) {
+            $aResult = $this->getMobileContentList($iLangId);
         } else {
-            $sContentByLang = 'oxcontents__oxcontent';
-            $sTitleByLang   = 'oxcontents__oxtitle';
+            $aResult = $this->getMobileContent($sContentId, $iLangId);
         }
 
-        $aResult['title']     = $oContent->$sTitleByLang->value;
-        $aResult['content']   = htmlspecialchars($oContent->$sContentByLang->value);
         $this->_sAjaxResponse = $this->_successMessage($aResult);
+    }
+
+    /**
+     * Get a content snippet
+     *
+     * @param string  $sContent oxloadid for the snippet
+     * @param integer $iLangId  Language Id
+     * @param string  $sShopId  Shop Id (for EE multishops)
+     *
+     * @return array
+     */
+    protected function getMobileContent($sContentId, $iLangId = null, $sShopId = null)
+    {
+        $oContent = oxNew('oxcontent');
+        $oContent->setLanguage($iLangId);
+        $oContent->loadByIdent($sContentId);
+        $aResult = array(
+            'title'    => $oContent->oxcontents__oxtitle,
+            'content'  => $oContent->oxcontents__oxcontent,
+            'cnid'     => $oContent->oxcontents__oxloadid,
+        );
+        return $aResult;
+    }
+    /**
+     * Get all Contents for the mobile app
+     *
+     * @param integer $iLangId Language Id
+     * @param string  $sShopId Shop Id (for EE multishops)
+     *
+     * @return array
+     */
+    protected function getMobileContentList($iLangId = null, $sShopId = null)
+    {
+        $sViewName = getViewName('oxcontents', $iLangId, $sShopId);
+        $sSelect   = "SELECT oxloadid, oxtitle FROM `$sViewName`  WHERE oxloadid IN ('oxagb','oximpressum') " .
+                     "UNION SELECT oxloadid, oxtitle FROM `$sViewName` " .
+                     "WHERE oxloadid LIKE 'mfCushymoco%' AND NOT oxloadid = 'mfCushymocoStart'";
+        $oDb       = $this->_oVersionLayer->getDb(true);
+        $aContents = $oDb->getAll($sSelect);
+        return $aContents;
     }
 
     /**
