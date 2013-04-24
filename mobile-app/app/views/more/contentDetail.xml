@@ -1,1 +1,5 @@
-<Alloy></Alloy>
+<Alloy>
+    <Window id="index">
+         <WebView id="contentData" />
+    </Window>
+</Alloy>

@@ -3,7 +3,7 @@ exports.definition = {
         columns: {
             "contentId":"string",
             "title":"string",
-            "text":"string",
+            "content":"string",
         },
         adapter: {
             "type":"contentSync",
