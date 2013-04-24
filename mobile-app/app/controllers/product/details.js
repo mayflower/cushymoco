@@ -16,7 +16,7 @@ productDetails.on("change", function(){
     $.productPrice.setText(productDetails.get("formattedPrice"));
     $.cartButton.enabled = true;
     Alloy.Globals.cartButton = $.cartButton;
-    Alloy.Globals.addToBasketProductId = args.productId;
+    Alloy.Globals.addToCartProductId = args.productId;
     
     if (productDetails.get("hasVariants") == 1) {
         $.cartButton.enabled = false;
@@ -41,5 +41,5 @@ productDetails.fetch({data:{productId:args.productId}});
 function addToBasket()
 {
     // TODO Make quantity editable for the user.
-    Alloy.Globals.addToBasket(Alloy.Globals.addToBasketProductId, 1);
+    Alloy.Globals.addToCart(Alloy.Globals.addToCartProductId, 1);
 }

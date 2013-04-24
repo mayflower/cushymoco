@@ -10,7 +10,7 @@ var labels = [];
 var productVariants = Alloy.createCollection("productVariant");
 var productVariantGroups = Alloy.createCollection("productVariantGroup");
 
-Alloy.Globals.addToBasketProductId = '';
+Alloy.Globals.addToCartProductId = '';
 Alloy.Globals.cartButton.enabled = false;
 
 productVariants.on("reset", function() {
@@ -69,7 +69,7 @@ productVariants.on("reset", function() {
     
     communication.productVariantId(args.productId, selectedVariant, function(response) {
         if (response.length == 32) {
-            Alloy.Globals.addToBasketProductId = response;
+            Alloy.Globals.addToCartProductId = response;
             Alloy.Globals.cartButton.enabled = true;
         }
     }, function(errorMessage) {
@@ -78,7 +78,7 @@ productVariants.on("reset", function() {
 });
 
 productVariantGroups.on("reset", function() {
-    Alloy.Globals.addToBasketProductId = '';
+    Alloy.Globals.addToCartProductId = '';
     Alloy.Globals.cartButton.enabled = false;
     productVariants.fetch({data:{productId:args.productId,selectedVariants:selectedVariant}});
 });
