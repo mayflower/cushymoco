@@ -1,9 +1,13 @@
 function Controller() {
+    function addToBasket() {
+        Alloy.Globals.addToCart(Alloy.Globals.addToCartProductId, 1);
+    }
     require("alloy/controllers/BaseController").apply(this, Array.prototype.slice.call(arguments));
     arguments[0] ? arguments[0]["__parentSymbol"] : null;
     arguments[0] ? arguments[0]["$model"] : null;
     var $ = this;
     var exports = {};
+    var __defers = {};
     $.__views.detailsWindow = Ti.UI.createWindow({
         backgroundColor: "#fff",
         title: "Window Title",
@@ -72,6 +76,7 @@ function Controller() {
         id: "cartButton"
     });
     $.__views.__alloyId6.add($.__views.cartButton);
+    addToBasket ? $.__views.cartButton.addEventListener("click", addToBasket) : __defers["$.__views.cartButton!click!addToBasket"] = true;
     var __alloyId7 = [];
     $.__views.productInfo = Ti.UI.createScrollableView({
         type: "horizontal",
@@ -100,6 +105,8 @@ function Controller() {
         $.productTitle.setText(productDetails.get("title"));
         $.productPrice.setText(productDetails.get("formattedPrice"));
         $.cartButton.enabled = true;
+        Alloy.Globals.cartButton = $.cartButton;
+        Alloy.Globals.addToCartProductId = args.productId;
         if (1 == productDetails.get("hasVariants")) {
             $.cartButton.enabled = false;
             $.productInfo.addView(Alloy.createController("product/variants", {
@@ -117,6 +124,7 @@ function Controller() {
             productId: args.productId
         }
     });
+    __defers["$.__views.cartButton!click!addToBasket"] && $.__views.cartButton.addEventListener("click", addToBasket);
     _.extend($, exports);
 }
 

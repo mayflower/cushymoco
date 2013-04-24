@@ -37,9 +37,19 @@ exports.startScreen = function(callback) {
     }), callback, errorCb);
 };
 
+exports.contents = function(contentId, successCallback, errorCallback) {
+    if (!errorCallback) var errorCallback = function(text) {
+        successCallback("Error: " + text);
+    };
+    http.get(exports.buildUrl({
+        fnc: "getContent",
+        cnid: contentId
+    }), successCallback, errorCallback);
+};
+
 exports.category = function(categoryId, successCallback, errorCallback) {
     if (!errorCallback) var errorCallback = function(text) {
-        callback("Error: " + text);
+        successCallback("Error: " + text);
     };
     http.get(exports.buildUrl({
         fnc: "getCategoryList",
@@ -95,6 +105,28 @@ exports.productVariants = function(productId, selectedVariants, successCallback,
         fnc: "getArticleVariants",
         anid: productId,
         selectedVariant: selectedVariants
+    }), successCallback, errorCallback);
+};
+
+exports.productVariantId = function(productId, selectedVariants, successCallback, errorCallback) {
+    if (!errorCallback) var errorCallback = function(text) {
+        successCallback("Error: " + text);
+    };
+    http.get(exports.buildUrl({
+        fnc: "getVariantProductId",
+        anid: productId,
+        selectedVariant: selectedVariants
+    }), successCallback, errorCallback);
+};
+
+exports.addToCart = function(productId, quantity, successCallback, errorCallback) {
+    if (!errorCallback) var errorCallback = function() {
+        successCallback("Error: " + test);
+    };
+    http.get(exports.buildUrl({
+        fnc: "addToBasket",
+        anid: productId,
+        qty: quantity
     }), successCallback, errorCallback);
 };
 

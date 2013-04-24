@@ -9,10 +9,16 @@
 // object. For example:
 //
 // Alloy.Globals.someGlobalFunction = function(){};
+var communication = require('communication');
+
 String.prototype.repeat = function (count) {
     return new Array(parseInt(count) + 1).join(this);
 };
 
 Alloy.Globals.addToCart = function(productId, quantity) {
-    Ti.API.info("Adding " + productId + " with amount of " + quantity);
+    communication.addToCart(productId, quantity, function(response){
+        Alloy.Globals.cartTab.setBadge(response);
+    }, function(error) {
+        alert(error);
+    });
 };

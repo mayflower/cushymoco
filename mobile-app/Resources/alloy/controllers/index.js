@@ -5,6 +5,12 @@ function Controller() {
             $.productsWindow.add(productsWin);
         }
     }
+    function openMoreWin() {
+        if (!moreWin) {
+            moreWin = Alloy.createController("more").getView();
+            $.moreWindow.add(moreWin);
+        }
+    }
     function tabChanged(e) {
         Alloy.Globals.activeWindow = e.tab.getWindow();
     }
@@ -90,14 +96,9 @@ function Controller() {
     $.__views.index.addTab($.__views.cartTab);
     $.__views.moreWindow = Ti.UI.createWindow({
         backgroundColor: "#fff",
-        title: "More",
+        title: "More Info",
         id: "moreWindow"
     });
-    $.__views.__alloyId3 = Ti.UI.createLabel({
-        text: "I'm a label in a window in a tab in an iOS app!",
-        id: "__alloyId3"
-    });
-    $.__views.moreWindow.add($.__views.__alloyId3);
     $.__views.moreTab = Ti.UI.createTab({
         window: $.__views.moreWindow,
         id: "moreTab",
@@ -110,9 +111,12 @@ function Controller() {
     exports.destroy = function() {};
     _.extend($, $.__views);
     var productsWin;
+    var moreWin;
     $.productsTab.addEventListener("focus", openProductsWin);
+    $.moreTab.addEventListener("focus", openMoreWin);
     require("communication").startScreen(fillStartPage);
     Alloy.Globals.parent = $.index;
+    Alloy.Globals.cartTab = $.cartTab;
     $.index.open();
     __defers["$.__views.index!open!bindTabEvents"] && $.__views.index.addEventListener("open", bindTabEvents);
     _.extend($, exports);

@@ -17,6 +17,7 @@ function Controller() {
     exports.destroy = function() {};
     _.extend($, $.__views);
     var args = arguments[0] || {};
+    var communication = require("communication");
     var variantSelects = [];
     var structuredVariants = [];
     var currentGroupId;
@@ -24,6 +25,8 @@ function Controller() {
     var labels = [];
     var productVariants = Alloy.createCollection("productVariant");
     var productVariantGroups = Alloy.createCollection("productVariantGroup");
+    Alloy.Globals.addToCartProductId = "";
+    Alloy.Globals.cartButton.enabled = false;
     productVariants.on("reset", function() {
         variantSelects = [];
         structuredVariants = [];
@@ -62,7 +65,6 @@ function Controller() {
                 });
             });
             var labelText = variantGroup.get("title");
-            Ti.API.warn(selectedVariant[groupId]);
             if (selectedVariant[groupId]) {
                 var variant = productVariants.where({
                     groupId: groupId,
@@ -81,8 +83,18 @@ function Controller() {
             labels[groupId] = label;
             $.variantsView.add(label);
         }
+        communication.productVariantId(args.productId, selectedVariant, function(response) {
+            if (32 == response.length) {
+                Alloy.Globals.addToCartProductId = response;
+                Alloy.Globals.cartButton.enabled = true;
+            }
+        }, function(errorMessage) {
+            alert(errorMessage);
+        });
     });
     productVariantGroups.on("reset", function() {
+        Alloy.Globals.addToCartProductId = "";
+        Alloy.Globals.cartButton.enabled = false;
         productVariants.fetch({
             data: {
                 productId: args.productId,
