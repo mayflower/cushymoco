@@ -10,7 +10,8 @@ exports.definition = {
             iconUrl: "string",
             longDesc: "string",
             link: "string",
-            hasVariants: "boolean"
+            hasVariants: "boolean",
+            variantGroupCount: "integer"
         },
         adapter: {
             type: "productSync"

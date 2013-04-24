@@ -59,11 +59,11 @@ function Controller() {
         id: "productPrice"
     });
     $.__views.labelView.add($.__views.productPrice);
-    $.__views.__alloyId9 = Ti.UI.createView({
+    $.__views.__alloyId8 = Ti.UI.createView({
         height: "5px",
-        id: "__alloyId9"
+        id: "__alloyId8"
     });
-    $.__views.labelView.add($.__views.__alloyId9);
+    $.__views.labelView.add($.__views.__alloyId8);
     exports.destroy = function() {};
     _.extend($, $.__views);
     var args = arguments[0] || {};

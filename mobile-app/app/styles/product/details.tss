@@ -1,6 +1,10 @@
 "#productDetailsPage":{
     type:"vertical"
 },
+"#productDetailsView": {
+    layout:"vertical",
+    height:Ti.UI.SIZE
+},
 "#productPictures":{
     views:[],
     backgroundColor:"#000",
@@ -35,4 +39,7 @@
     style: Titanium.UI.iPhone.SystemButtonStyle.PLAIN,
     height:"30px",
     width:"30px"
+},
+"#productInfo":{
+    type:"horizontal"
 }

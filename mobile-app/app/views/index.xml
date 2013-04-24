@@ -1,5 +1,5 @@
 <Alloy>
-	<TabGroup>
+	<TabGroup onOpen="bindTabEvents">
 		<!-- Explicit Window declaration -->
 		<Tab id="homeTab" title="Home" icon="/icons/home_small.png">
 			<Window id="homeWindow" title="Shop">
