@@ -5,6 +5,14 @@ function Controller() {
             $.productsWindow.add(productsWin);
         }
     }
+    function tabChanged(e) {
+        Alloy.Globals.activeWindow = e.tab.getWindow();
+    }
+    function bindTabEvents(e) {
+        e.source.tabs.map(function(tab) {
+            tab.addEventListener("focus", tabChanged);
+        });
+    }
     function fillStartPage(text) {
         $.startContent.html = text;
     }
@@ -13,6 +21,7 @@ function Controller() {
     arguments[0] ? arguments[0]["$model"] : null;
     var $ = this;
     var exports = {};
+    var __defers = {};
     $.__views.index = Ti.UI.createTabGroup({
         id: "index"
     });
@@ -97,12 +106,15 @@ function Controller() {
     });
     $.__views.index.addTab($.__views.moreTab);
     $.__views.index && $.addTopLevelView($.__views.index);
+    bindTabEvents ? $.__views.index.addEventListener("open", bindTabEvents) : __defers["$.__views.index!open!bindTabEvents"] = true;
     exports.destroy = function() {};
     _.extend($, $.__views);
     var productsWin;
     $.productsTab.addEventListener("focus", openProductsWin);
     require("communication").startScreen(fillStartPage);
+    Alloy.Globals.parent = $.index;
     $.index.open();
+    __defers["$.__views.index!open!bindTabEvents"] && $.__views.index.addEventListener("open", bindTabEvents);
     _.extend($, exports);
 }
 

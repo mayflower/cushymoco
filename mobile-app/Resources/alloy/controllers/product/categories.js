@@ -26,6 +26,8 @@ function Controller() {
     var __defers = {};
     $.categoryList = Alloy.createCollection("category");
     $.__views.index = Ti.UI.createWindow({
+        backgroundColor: "#fff",
+        title: "Window Title",
         id: "index"
     });
     $.__views.index && $.addTopLevelView($.__views.index);

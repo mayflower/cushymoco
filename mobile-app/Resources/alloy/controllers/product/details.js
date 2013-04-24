@@ -15,28 +15,29 @@ function Controller() {
         id: "productDetailsPage"
     });
     $.__views.detailsWindow.add($.__views.productDetailsPage);
-    $.__views.__alloyId5 = Ti.UI.createView({
+    $.__views.productDetailsView = Ti.UI.createView({
         layout: "vertical",
-        id: "__alloyId5"
+        height: Ti.UI.SIZE,
+        id: "productDetailsView"
     });
-    $.__views.productDetailsPage.add($.__views.__alloyId5);
-    var __alloyId6 = [];
+    $.__views.productDetailsPage.add($.__views.productDetailsView);
+    var __alloyId5 = [];
     $.__views.productPictures = Ti.UI.createScrollableView({
-        views: __alloyId6,
+        views: __alloyId5,
         backgroundColor: "#000",
         showPagingControl: true,
         disableBounce: true,
         height: "50%",
         id: "productPictures"
     });
-    $.__views.__alloyId5.add($.__views.productPictures);
-    $.__views.__alloyId7 = Ti.UI.createView({
+    $.__views.productDetailsView.add($.__views.productPictures);
+    $.__views.__alloyId6 = Ti.UI.createView({
         backgroundColor: "#000",
         width: Ti.UI.FILL,
         height: Ti.UI.SIZE,
-        id: "__alloyId7"
+        id: "__alloyId6"
     });
-    $.__views.__alloyId5.add($.__views.__alloyId7);
+    $.__views.productDetailsView.add($.__views.__alloyId6);
     $.__views.productTitle = Ti.UI.createLabel({
         left: "5px",
         color: "#FFF",
@@ -48,7 +49,7 @@ function Controller() {
         width: "60%",
         id: "productTitle"
     });
-    $.__views.__alloyId7.add($.__views.productTitle);
+    $.__views.__alloyId6.add($.__views.productTitle);
     $.__views.productPrice = Ti.UI.createLabel({
         right: "40px",
         color: "#FFF",
@@ -60,7 +61,7 @@ function Controller() {
         width: Ti.UI.SIZE,
         id: "productPrice"
     });
-    $.__views.__alloyId7.add($.__views.productPrice);
+    $.__views.__alloyId6.add($.__views.productPrice);
     $.__views.cartButton = Ti.UI.createButton({
         right: "5px",
         backgroundImage: "/icons/icon_shopping_cart.png",
@@ -70,23 +71,19 @@ function Controller() {
         width: "30px",
         id: "cartButton"
     });
-    $.__views.__alloyId7.add($.__views.cartButton);
-    var __alloyId8 = [];
+    $.__views.__alloyId6.add($.__views.cartButton);
+    var __alloyId7 = [];
     $.__views.productInfo = Ti.UI.createScrollableView({
-        views: __alloyId8,
+        type: "horizontal",
+        views: __alloyId7,
         id: "productInfo"
     });
-    $.__views.__alloyId5.add($.__views.productInfo);
+    $.__views.productDetailsView.add($.__views.productInfo);
     exports.destroy = function() {};
     _.extend($, $.__views);
     var args = arguments[0] || {};
     var productPictures = Alloy.createCollection("productPicture");
     var productDetails = Alloy.createModel("product");
-    productPictures.fetch({
-        data: {
-            productId: args.productId
-        }
-    });
     productPictures.on("reset", function() {
         productPictures.map(function(productPicture) {
             $.productPictures.addView(Titanium.UI.createImageView({
@@ -94,7 +91,7 @@ function Controller() {
             }));
         });
     });
-    productDetails.fetch({
+    productPictures.fetch({
         data: {
             productId: args.productId
         }
@@ -102,9 +99,23 @@ function Controller() {
     productDetails.on("change", function() {
         $.productTitle.setText(productDetails.get("title"));
         $.productPrice.setText(productDetails.get("formattedPrice"));
+        $.cartButton.enabled = true;
+        if (1 == productDetails.get("hasVariants")) {
+            $.cartButton.enabled = false;
+            $.productInfo.addView(Alloy.createController("product/variants", {
+                productId: productDetails.get("productId"),
+                variantGroupCount: productDetails.get("variantGroupCount")
+            }).getView());
+        }
         $.productInfo.addView(Titanium.UI.createWebView({
-            data: productDetails.get("longDesc")
+            html: productDetails.get("longDesc")
         }));
+        $.productInfo.showPagingControl = $.productInfo.views.length > 1;
+    });
+    productDetails.fetch({
+        data: {
+            productId: args.productId
+        }
     });
     _.extend($, exports);
 }

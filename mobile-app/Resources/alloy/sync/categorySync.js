@@ -14,14 +14,6 @@ module.exports.sync = function(method, model, options) {
     function errorCallback(response) {
         callback(false, response);
     }
-    options.data.catId || (options.data.catId = "");
-    communication.category(options.data.catId, successCallback, errorCallback);
-};
-
-module.exports.beforeModelCreate = function(config) {
-    return config;
-};
-
-module.exports.afterModelCreate = function(Model) {
-    return Model;
+    var catId = options.data.catId || "";
+    communication.category(catId, successCallback, errorCallback);
 };

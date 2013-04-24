@@ -5,8 +5,9 @@ function Controller() {
     var $ = this;
     var exports = {};
     $.__views.categoriesWindow = Ti.UI.createWindow({
-        id: "categoriesWindow",
-        title: "Catalog"
+        backgroundColor: "#fff",
+        title: "Catalog",
+        id: "categoriesWindow"
     });
     $.__views.__alloyId4 = Alloy.createController("product/categories", {
         catId: "",

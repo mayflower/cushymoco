@@ -19,8 +19,6 @@ module.exports.sync = function(method, model, options) {
         callback(false, response);
     }
 
-    if (!options.data.catId) {
-        options.data.catId = '';
-    }
-    communication.productList(options.data.catId, successCallback, errorCallback);
+    var catId = options.data.catId || '';
+    communication.productList(catId, successCallback, errorCallback);
 }

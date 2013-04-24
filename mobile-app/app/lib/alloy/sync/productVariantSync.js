@@ -1,8 +1,8 @@
 var communication = require("communication");
 module.exports.sync = function(method, model, options) {
     // Simple callback function for http requests.
-    function callback(status, response) {
-        if (status) {
+    function callback(success, response) {
+        if (success) {
             options.success(response, JSON.stringify(response), options);
         } else {
             Ti.API.error(response);
@@ -19,6 +19,13 @@ module.exports.sync = function(method, model, options) {
         callback(false, response);
     }
 
-    var catId = options.data.catId || '';
-    communication.category(catId, successCallback, errorCallback);
-};
+    var productId = options.data.productId || '';
+    var selectedVariants = options.data.selectedVariants || [];
+    
+    communication.productVariants(
+        productId,
+        selectedVariants,
+        successCallback,
+        errorCallback
+    );
+}

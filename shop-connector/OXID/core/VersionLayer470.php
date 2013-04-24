@@ -35,6 +35,22 @@ class VersionLayer470 implements VersionLayerInterface
     }
 
     /**
+     * Returns the OxDb
+     *
+     * @param boolean $bAssoc Should the mode be switched to assoc?
+     * @return mixed
+     */
+    public function getDb($bAssoc = false)
+    {
+        if ($bAssoc) {
+            $oDb = oxDb::getDb(oxDb::FETCH_MODE_ASSOC);
+        } else {
+            $oDb = oxDb::getDb(oxDb::FETCH_MODE_NUM);
+        }
+        return $oDb;
+    }
+
+    /**
      * Returns the OXID delivery set list.
      *
      * @return oxDeliverySetList

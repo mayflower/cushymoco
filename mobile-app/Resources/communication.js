@@ -77,6 +77,27 @@ exports.productPictures = function(productId, successCallback, errorCallback) {
     }), successCallback, errorCallback);
 };
 
+exports.productVariantGroups = function(productId, successCallback, errorCallback) {
+    if (!errorCallback) var errorCallback = function(text) {
+        callback("Error: " + text);
+    };
+    http.get(exports.buildUrl({
+        fnc: "getArticleVariantGroups",
+        anid: productId
+    }), successCallback, errorCallback);
+};
+
+exports.productVariants = function(productId, selectedVariants, successCallback, errorCallback) {
+    if (!errorCallback) var errorCallback = function(text) {
+        callback("Error: " + text);
+    };
+    http.get(exports.buildUrl({
+        fnc: "getArticleVariants",
+        anid: productId,
+        selectedVariant: selectedVariants
+    }), successCallback, errorCallback);
+};
+
 var serialize = function(obj, prefix) {
     var queryStringObj = [];
     for (var p in obj) {
