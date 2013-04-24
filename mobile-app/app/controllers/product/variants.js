@@ -1,4 +1,6 @@
 var args = arguments[0] || {};
+var communication = require('communication');
+
 var variantSelects = [];
 var structuredVariants = [];
 var currentGroupId;
@@ -7,6 +9,9 @@ var labels = [];
 
 var productVariants = Alloy.createCollection("productVariant");
 var productVariantGroups = Alloy.createCollection("productVariantGroup");
+
+Alloy.Globals.addToBasketProductId = '';
+Alloy.Globals.cartButton.enabled = false;
 
 productVariants.on("reset", function() {
     variantSelects = [];
@@ -61,9 +66,20 @@ productVariants.on("reset", function() {
         
         $.variantsView.add(label);
     }
+    
+    communication.productVariantId(args.productId, selectedVariant, function(response) {
+        if (response.length == 32) {
+            Alloy.Globals.addToBasketProductId = response;
+            Alloy.Globals.cartButton.enabled = true;
+        }
+    }, function(errorMessage) {
+        alert(errorMessage);
+    });
 });
 
 productVariantGroups.on("reset", function() {
+    Alloy.Globals.addToBasketProductId = '';
+    Alloy.Globals.cartButton.enabled = false;
     productVariants.fetch({data:{productId:args.productId,selectedVariants:selectedVariant}});
 });
 

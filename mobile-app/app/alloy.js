@@ -11,4 +11,8 @@
 // Alloy.Globals.someGlobalFunction = function(){};
 String.prototype.repeat = function (count) {
     return new Array(parseInt(count) + 1).join(this);
-}
+};
+
+Alloy.Globals.addToBasket = function(productId, quantity) {
+    Ti.API.info("Adding " + productId + " with amount of " + quantity);
+};

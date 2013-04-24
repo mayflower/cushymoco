@@ -138,6 +138,22 @@ exports.productVariants = function(productId, selectedVariants, successCallback,
     );
 }
 
+exports.productVariantId = function(productId, selectedVariants, successCallback, errorCallback)
+{
+    if (!errorCallback) {
+        var errorCallback = function(text)
+        {
+            successCallback("Error: " + text);
+        }
+    }
+    
+    http.get(
+        exports.buildUrl({fnc:'getVariantProductId',anid:productId,selectedVariant:selectedVariants}),
+        successCallback,
+        errorCallback
+    );
+}
+
 var serialize = function(obj, prefix)
 {
     var queryStringObj = [];
