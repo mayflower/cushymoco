@@ -101,6 +101,14 @@ interface VersionLayerInterface
     public function getUtilsCount();
 
     /**
+     * Returns the OxDb
+     *
+     * @param boolean $bAssoc Should the mode be switched to assoc?
+     * @return mixed
+     */
+    public function getDb($bAssoc = false);
+
+    /**
      * Returns a request parameter.
      *
      * @param string $sName         Name of the request parameter.
