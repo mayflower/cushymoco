@@ -39,5 +39,5 @@ $.moreTab.addEventListener("focus", openMoreWin);
 require('communication').startScreen(fillStartPage);
 
 Alloy.Globals.parent = $.index;
-
+Alloy.Globals.cartTab = $.cartTab;
 $.index.open();

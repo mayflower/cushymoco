@@ -6,7 +6,7 @@
                 <View backgroundColor="#000" width="Ti.UI.FILL" height="Ti.UI.SIZE">
                     <Label id="productTitle"/>
                     <Label id="productPrice"/>
-                    <Button id="cartButton"/>
+                    <Button id="cartButton" onClick="addToBasket"/>
                 </View>
                 <ScrollableView id="productInfo"/>
             </View>

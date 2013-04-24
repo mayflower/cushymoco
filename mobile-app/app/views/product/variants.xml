@@ -1,6 +1,5 @@
 <Alloy>
     <View id="variantsView" layout="vertical">
         <Label text="Variants are gone?"/>
-        <!-- Widget id="variantSelect" src="de.mayflower.Select" hintText="Select a variant"/-->
     </View>
 </Alloy>

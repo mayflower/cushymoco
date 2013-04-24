@@ -15,6 +15,8 @@ productDetails.on("change", function(){
     $.productTitle.setText(productDetails.get("title"));
     $.productPrice.setText(productDetails.get("formattedPrice"));
     $.cartButton.enabled = true;
+    Alloy.Globals.cartButton = $.cartButton;
+    Alloy.Globals.addToCartProductId = args.productId;
     
     if (productDetails.get("hasVariants") == 1) {
         $.cartButton.enabled = false;
@@ -35,3 +37,9 @@ productDetails.on("change", function(){
     $.productInfo.showPagingControl = ($.productInfo.views.length > 1);
 });
 productDetails.fetch({data:{productId:args.productId}});
+
+function addToBasket()
+{
+    // TODO Make quantity editable for the user.
+    Alloy.Globals.addToCart(Alloy.Globals.addToCartProductId, 1);
+}
