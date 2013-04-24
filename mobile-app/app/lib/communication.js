@@ -154,6 +154,22 @@ exports.productVariantId = function(productId, selectedVariants, successCallback
     );
 }
 
+exports.addToCart = function(productId, quantity, successCallback, errorCallback)
+{
+    if (!errorCallback) {
+        var errorCallback = function(text)
+        {
+            successCallback("Error: " + test);
+        }
+    }
+    
+    http.get(
+        exports.buildUrl({fnc:"addToBasket",anid:productId,qty:quantity}),
+        successCallback,
+        errorCallback
+    );
+}
+
 var serialize = function(obj, prefix)
 {
     var queryStringObj = [];

@@ -30,5 +30,5 @@ $.productsTab.addEventListener("focus", openProductsWin);
 require('communication').startScreen(fillStartPage);
 
 Alloy.Globals.parent = $.index;
-
+Alloy.Globals.cartTab = $.cartTab;
 $.index.open();
