@@ -6,6 +6,14 @@ function openProductsWin(e)
         $.productsWindow.add(productsWin);
     }
 }
+var moreWin;
+function openMoreWin(e)
+{
+    if (!moreWin) {
+        moreWin = Alloy.createController('more').getView();
+        $.moreWindow.add(moreWin);
+    }
+}
 function fillStartPage(text)
 {
 	$.startContent.html = text;
@@ -13,6 +21,7 @@ function fillStartPage(text)
 }
 
 $.productsTab.addEventListener("focus", openProductsWin);
+$.moreTab.addEventListener("focus", openMoreWin);
 
 require('communication').startScreen(fillStartPage);
 $.index.open();

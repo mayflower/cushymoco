@@ -24,9 +24,7 @@
         </Tab>
 
         <Tab id="moreTab" title="More" icon="/icons/gear_small.png">
-            <Window id="moreWindow" title="More">
-                <Label>I'm a label in a window in a tab in an iOS app!</Label>
-            </Window>
+            <Window id="moreWindow" title="More Info"/>
         </Tab>
 	</TabGroup>
 </Alloy>

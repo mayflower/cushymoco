@@ -1,0 +1,7 @@
+<Alloy>
+    <Collection id="contentList" src="content" instance="true"/>
+    <Window id="index">
+        <TableView id="contentTable" onClick="openContent">
+	    </TableView>
+    </Window>
+</Alloy>

@@ -42,12 +42,28 @@ exports.startScreen = function(callback)
 	http.get(exports.buildUrl({fnc:"getStartPage"}), callback, errorCb);
 }
 
+exports.contents = function(contentId, successCallback, errorCallback)
+{
+    if (!errorCallback) {
+        var errorCallback = function(text)
+        {
+            successCallback("Error: " + text);     
+        };
+    }
+    
+    http.get(
+        exports.buildUrl({fnc:"getContent",cnid:contentId}),
+        successCallback,
+        errorCallback
+    );
+}
+
 exports.category = function(categoryId, successCallback, errorCallback)
 {
     if (!errorCallback) {
         var errorCallback = function(text)
         {
-            callback("Error: " + text);     
+            successCallback("Error: " + text);     
         };
     }
     
