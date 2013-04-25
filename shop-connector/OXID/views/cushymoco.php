@@ -716,20 +716,27 @@ class cushymoco extends oxUBase
      */
     public function getVariantProductId()
     {
-        /**
-         * @var oxMdVariant $oMdVariants
-         */
         $oArticle          = $this->_getArticleById();
         $aSelectedVariants = $this->_oVersionLayer->getRequestParam('selectedVariant', array());
-        $oMdVariants       = $oArticle->getMdVariants();
-        foreach ($aSelectedVariants as $sVariantId) {
-            $aVariants = $oMdVariants->getMdSubvariants();
-            if (!isset($aVariants[$sVariantId])) {
+        $aVariants         = $oArticle->getVariantSelections($aSelectedVariants, $oArticle->getId());
+        $sSelectedProductId = '';
+        foreach ($aVariants['rawselections'] as $sOXID => $aVariants) {
+            $blSelected = true;
+            foreach ($aVariants as $iKey => $aVariant) {
+                if ($aVariant['disabled']) {
+                    $blSelected = false;
+                    break;
+                }
+                $blSelected = ($aVariant['hash'] == $aSelectedVariants[$iKey]);
+            }
+
+            if ($blSelected) {
+                $sSelectedProductId = $sOXID;
                 break;
             }
-            $oMdVariants = $aVariants[$sVariantId];
         }
-        $this->_sAjaxResponse = $this->_successMessage($oMdVariants->getArticleId());
+
+        $this->_sAjaxResponse = $this->_successMessage($sSelectedProductId);
     }
 
     /**
@@ -1000,7 +1007,8 @@ class cushymoco extends oxUBase
         try {
             if ($oArticle) {
                 $oBasket->addToBasket($oArticle->oxarticles__oxid->value, $iQuantity);
-                $this->_sAjaxResponse = $this->_successMessage(true);
+                $oBasket->calculateBasket(true);
+                $this->_sAjaxResponse = $this->_successMessage($oBasket->getProductsCount());
             }
         } catch (Exception $e) {
             $oLang                = $this->_oVersionLayer->getLang();
