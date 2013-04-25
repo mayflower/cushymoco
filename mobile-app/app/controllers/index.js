@@ -21,8 +21,9 @@ function bindTabEvents(e)
     });
 }
 
-require('communication').startScreen(function(text) {
-    $.startContent.html = text;
+require('communication').startScreen(function(response) {
+    $.startContent.html = response.pageContent;
+    $.homeWindow.title = response.title;
 });
 
 Alloy.Globals.cartTab = $.cartTab;

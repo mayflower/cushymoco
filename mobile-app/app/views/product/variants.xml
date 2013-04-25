@@ -1,5 +1,5 @@
 <Alloy>
     <View id="variantsView" layout="vertical">
-        <Label text="Variants are gone?"/>
+        <Label textid="products.variants.title"/>
     </View>
 </Alloy>

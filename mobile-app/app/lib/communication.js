@@ -5,9 +5,14 @@ var http = {
         var client = Ti.Network.createHTTPClient({
             onload: function (e) {
                 if (this.status >= 300) {
-                    http.errorCallback('Network communication error!')
+                    http.errorCallback(L('error.network.generic_communication'))
                 } else {
-                    var resp = JSON.parse(this.responseText);
+                    var resp = {result:null,error:null};
+                    try {
+                        resp = JSON.parse(this.responseText);
+                    } catch (err) {
+                        resp.error = L('error.network.invalid_response');
+                    }
                     if (resp.error == null) {
                         callbackSuccess(resp.result);
                     } else {
@@ -17,7 +22,7 @@ var http = {
             },
             onerror: function(e) {
                 Ti.API.error(e.error);
-                http.errorCallback('Internal network error!');
+                http.errorCallback(L('error.network.internal'));
             },
             autoRedirect: false,
             timeout: 5000 // 5 seconds
@@ -33,7 +38,7 @@ var http = {
     },
     errorCallback: function(message) {
         var errorDialog = Titanium.UI.createAlertDialog({
-            title:'Error occurred',
+            title:L('error.dialog.generic_title'),
             message:message,
             ok:'OK'
         }).show();
