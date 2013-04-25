@@ -2,7 +2,7 @@
 
 require_once getShopBasePath() . 'core/interface/VersionLayerInterface.php';
 
-class VersionLayer470 implements VersionLayerInterface
+class VersionLayer460 implements VersionLayerInterface
 {
     /**
      * Returns the current basket from session.
@@ -11,7 +11,7 @@ class VersionLayer470 implements VersionLayerInterface
      */
     public function getBasket()
     {
-//        return $this->getSession()->getBasket();
+        return $this->getSession()->getBasket();
     }
 
     /**
@@ -21,7 +21,7 @@ class VersionLayer470 implements VersionLayerInterface
      */
     public function getSession()
     {
-//        return oxRegistry::getSession();
+        return oxSession::getInstance();
     }
 
     /**
@@ -31,7 +31,7 @@ class VersionLayer470 implements VersionLayerInterface
      */
     public function getConfig()
     {
-//        return oxRegistry::getConfig();
+        return oxConfig::getInstance();
     }
 
     /**
@@ -42,12 +42,7 @@ class VersionLayer470 implements VersionLayerInterface
      */
     public function getDb($bAssoc = false)
     {
-        if ($bAssoc) {
-            $oDb = oxDb::getDb(oxDb::FETCH_MODE_ASSOC);
-        } else {
-            $oDb = oxDb::getDb(oxDb::FETCH_MODE_NUM);
-        }
-//        return $oDb;
+        return oxDb::getDb($bAssoc);
     }
 
     /**
@@ -57,7 +52,7 @@ class VersionLayer470 implements VersionLayerInterface
      */
     public function getDeliverySetList()
     {
-//        return oxRegistry::get('oxDeliverySetList');
+        oxDeliverySetList::getInstance();
     }
 
     /**
@@ -81,14 +76,13 @@ class VersionLayer470 implements VersionLayerInterface
      */
     public function getRequestParam($sName, $mDefaultValue = null, $blRaw = false)
     {
-        $oConfig      = $this->getConfig();
-        $mReturnValue = $oConfig->getRequestParameter($sName, $blRaw);
+        $mReturnValue = oxConfig::getParameter($sName, $blRaw);
 
         if ($mReturnValue === null) {
             $mReturnValue = $mDefaultValue;
         }
 
-//        return $mReturnValue;
+        return $mReturnValue;
     }
 
     /**
@@ -98,7 +92,7 @@ class VersionLayer470 implements VersionLayerInterface
      */
     public function getLang()
     {
-//        return oxRegistry::getLang();
+        return oxLang::getInstance();
     }
 
     /**
@@ -108,7 +102,7 @@ class VersionLayer470 implements VersionLayerInterface
      */
     public function getUtilsServer()
     {
-//        return oxRegistry::get('oxUtilsServer');
+        oxUtilsServer::getInstance();
     }
 
     /**
@@ -118,7 +112,7 @@ class VersionLayer470 implements VersionLayerInterface
      */
     public function getUtilsUrl()
     {
-//        return oxRegistry::get('oxUtilsUrl');
+        oxUtilsUrl::getInstance();
     }
 
     /**
@@ -128,7 +122,7 @@ class VersionLayer470 implements VersionLayerInterface
      */
     public function getUtilsView()
     {
-//        return oxRegistry::get('oxUtilsView');
+        oxUtilsView::getInstance();
     }
 
     /**
@@ -138,7 +132,7 @@ class VersionLayer470 implements VersionLayerInterface
      */
     public function getUtilsObject()
     {
-//        return oxRegistry::get('oxUtilsObject');
+        oxUtilsObject::getInstance();
     }
 
     /**
@@ -148,7 +142,7 @@ class VersionLayer470 implements VersionLayerInterface
      */
     public function getUtilsDate()
     {
-//        return oxRegistry::get('oxUtilsDate');
+        oxUtilsDate::getInstance();
     }
 
     /**
@@ -158,7 +152,7 @@ class VersionLayer470 implements VersionLayerInterface
      */
     public function getUtilsString()
     {
-//        return oxRegistry::get('oxUtilsString');
+        oxUtilsString::getInstance();
     }
 
     /**
@@ -168,7 +162,7 @@ class VersionLayer470 implements VersionLayerInterface
      */
     public function getUtilsFile()
     {
-//        return oxRegistry::get('oxUtilsFile');
+        oxUtilsFile::getInstance();
     }
 
     /**
@@ -178,7 +172,7 @@ class VersionLayer470 implements VersionLayerInterface
      */
     public function getUtilsPic()
     {
-//        return oxRegistry::get('oxUtilsPic');
+        oxUtilsPic::getInstance();
     }
 
     /**
@@ -188,6 +182,7 @@ class VersionLayer470 implements VersionLayerInterface
      */
     public function getUtilsCount()
     {
-//        return oxRegistry::get('oxUtilsCount');
+        oxUtilsCount::getInstance();
     }
 }
+
