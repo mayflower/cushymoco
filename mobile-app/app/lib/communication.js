@@ -1,30 +1,42 @@
 var Alloy = require('alloy');
 
 var http = {
-    request: function (requestMethod, url, data, callbackSuccess, callbackError){
+    request: function (requestMethod, url, data, callbackSuccess) {
         var client = Ti.Network.createHTTPClient({
-            onload: function (e){
-                var resp = JSON.parse(this.responseText);
-                if (resp.error == null) {
-                    callbackSuccess(resp.result);
+            onload: function (e) {
+                if (this.status >= 300) {
+                    http.errorCallback('Network communication error!')
                 } else {
-                    callbackError(resp.error);
+                    var resp = JSON.parse(this.responseText);
+                    if (resp.error == null) {
+                        callbackSuccess(resp.result);
+                    } else {
+                        http.errorCallback(resp.error);
+                    }
                 }
             },
-            onerror: function(e){
-                Ti.API.error(e);
-                callbackError("Internal Error");
+            onerror: function(e) {
+                Ti.API.error(e.error);
+                http.errorCallback('Internal network error!');
             },
+            autoRedirect: false,
             timeout: 5000 // 5 seconds
         });
         client.open(requestMethod, url);
         client.send(data);
     },
-    get: function (url, callbackSuccess, callbackError){
-        this.request('GET', url, null, callbackSuccess, callbackError);
+    get: function (url, callbackSuccess){
+        this.request('GET', url, null, callbackSuccess);
     },
-    post: function (url, data, callbackSuccess, callbackError){
-        this.request('POST', url, data, callbackSuccess, callbackError);
+    post: function (url, data, callbackSuccess){
+        this.request('POST', url, data, callbackSuccess);
+    },
+    errorCallback: function(message) {
+        var errorDialog = Titanium.UI.createAlertDialog({
+            title:'Error occurred',
+            message:message,
+            ok:'OK'
+        }).show();
     }
 };
 
@@ -35,154 +47,78 @@ exports.configDump = function()
 
 exports.startScreen = function(callback)
 {
-	var errorCb = function(text)
-	{
-		callback("Error: " + text);		
-	}
-	http.get(exports.buildUrl({fnc:"getStartPage"}), callback, errorCb);
+	http.get(exports.buildUrl({fnc:"getStartPage"}), callback);
 }
 
-exports.contents = function(contentId, successCallback, errorCallback)
+exports.contents = function(contentId, successCallback)
 {
-    if (!errorCallback) {
-        var errorCallback = function(text)
-        {
-            successCallback("Error: " + text);     
-        };
-    }
-    
     http.get(
         exports.buildUrl({fnc:"getContent",cnid:contentId}),
-        successCallback,
-        errorCallback
+        successCallback
     );
 }
 
-exports.category = function(categoryId, successCallback, errorCallback)
+exports.category = function(categoryId, successCallback)
 {
-    if (!errorCallback) {
-        var errorCallback = function(text)
-        {
-            successCallback("Error: " + text);     
-        };
-    }
-    
     http.get(
         exports.buildUrl({fnc:"getCategoryList",cnid:categoryId}),
-        successCallback,
-        errorCallback
+        successCallback
     );
 }
 
-exports.productList = function(categoryId, successCallback, errorCallback)
+exports.productList = function(categoryId, successCallback)
 {
-    if (!errorCallback) {
-        var errorCallback = function(text)
-        {
-            callback("Error: " + text);     
-        };
-    }
-    
     http.get(
         exports.buildUrl({fnc:"getArticleList",cnid:categoryId}),
-        successCallback,
-        errorCallback
+        successCallback
     );
 }
 
-exports.product = function(productId, successCallback, errorCallback)
+exports.product = function(productId, successCallback)
 {
-    if (!errorCallback) {
-        var errorCallback = function(text)
-        {
-            callback("Error: " + text);     
-        };
-    }
-    
     http.get(
         exports.buildUrl({fnc:"getArticle",anid:productId}),
-        successCallback,
-        errorCallback
+        successCallback
     );
 }
 
-exports.productPictures = function(productId, successCallback, errorCallback)
+exports.productPictures = function(productId, successCallback)
 {
-    if (!errorCallback) {
-        var errorCallback = function(text)
-        {
-            callback("Error: " + text);     
-        };
-    }
-    
     http.get(
         exports.buildUrl({fnc:"getArticleImages",anid:productId}),
-        successCallback,
-        errorCallback
+        successCallback
     );
 }
 
-exports.productVariantGroups = function(productId, successCallback, errorCallback)
+exports.productVariantGroups = function(productId, successCallback)
 {
-    if (!errorCallback) {
-        var errorCallback = function(text)
-        {
-            callback("Error: " + text);     
-        };
-    }
-    
     http.get(
         exports.buildUrl({fnc:"getArticleVariantGroups", anid:productId}),
-        successCallback,
-        errorCallback
+        successCallback
     );
 }
 
-exports.productVariants = function(productId, selectedVariants, successCallback, errorCallback)
+exports.productVariants = function(productId, selectedVariants, successCallback)
 {
-    if (!errorCallback) {
-        var errorCallback = function(text)
-        {
-            callback("Error: " + text);     
-        };
-    }
-    
     http.get(
         exports.buildUrl({fnc:"getArticleVariants", anid:productId, selectedVariant:selectedVariants}),
-        successCallback,
-        errorCallback
+        successCallback
     );
 }
 
 exports.productVariantId = function(productId, selectedVariants, successCallback, errorCallback)
 {
-    if (!errorCallback) {
-        var errorCallback = function(text)
-        {
-            successCallback("Error: " + text);
-        }
-    }
-    
     http.get(
         exports.buildUrl({fnc:'getVariantProductId',anid:productId,selectedVariant:selectedVariants}),
-        successCallback,
-        errorCallback
+        successCallback
     );
 }
 
 exports.addToCart = function(productId, quantity, successCallback, errorCallback)
 {
-    if (!errorCallback) {
-        var errorCallback = function(text)
-        {
-            successCallback("Error: " + test);
-        }
-    }
-    
     http.get(
         exports.buildUrl({fnc:"addToBasket",anid:productId,qty:quantity}),
-        successCallback,
-        errorCallback
+        successCallback
     );
 }
 

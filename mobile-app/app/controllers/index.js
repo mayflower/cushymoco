@@ -1,43 +1,29 @@
-var productsWin;
-function openProductsWin(e)
-{
-    if (!productsWin) {
-        productsWin = Alloy.createController('products').getView();
-        $.productsWindow.add(productsWin);
-    }
-}
-var moreWin;
-function openMoreWin(e)
-{
-    if (!moreWin) {
-        moreWin = Alloy.createController('more').getView();
-        $.moreWindow.add(moreWin);
-    }
-}
+var windowMapping = {
+    "productsTab":{controller:"products",window:"productsWindow"},
+    "moreTab":{controller:"more",window:"moreWindow"}
+};
+var windows = {};
 
-function tabChanged(e)
+function openWindow(e)
 {
-    Alloy.Globals.activeWindow = e.tab.getWindow();
+    if (!windows[e.source.id] && windowMapping[e.source.id]) {
+        var windowInfo = windowMapping[e.source.id];
+        var window = Alloy.createController(windowInfo.controller).getView();
+        $.getView(windowInfo.window).add(window);
+        windows[e.source.id] = window;
+    }
 }
 
 function bindTabEvents(e)
 {
     e.source.tabs.map(function(tab) {
-        tab.addEventListener('focus', tabChanged);
+        tab.addEventListener('focus', openWindow);
     });
 }
 
-function fillStartPage(text)
-{
-	$.startContent.html = text;
-	
-}
+require('communication').startScreen(function(text) {
+    $.startContent.html = text;
+});
 
-$.productsTab.addEventListener("focus", openProductsWin);
-$.moreTab.addEventListener("focus", openMoreWin);
-
-require('communication').startScreen(fillStartPage);
-
-Alloy.Globals.parent = $.index;
 Alloy.Globals.cartTab = $.cartTab;
 $.index.open();
