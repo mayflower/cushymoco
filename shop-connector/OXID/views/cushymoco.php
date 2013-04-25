@@ -361,7 +361,6 @@ class cushymoco extends oxUBase
         $iLangId    = $this->_oVersionLayer->getRequestParam('lid');
         // @TODO: shop id for EE multishops
 
-
         if (empty($sContentId)) {
             $aResult = $this->getMobileContentList($iLangId);
         } else {
@@ -386,12 +385,14 @@ class cushymoco extends oxUBase
         $oContent->setLanguage($iLangId);
         $oContent->loadByIdent($sContentId);
         $aResult = array(
-            'title'    => $oContent->oxcontents__oxtitle->value,
-            'content'  => $oContent->oxcontents__oxcontent->value,
-            'cnid'     => $oContent->oxcontents__oxloadid->value,
+            'title'   => $oContent->oxcontents__oxtitle->value,
+            'content' => $oContent->oxcontents__oxcontent->value,
+            'cnid'    => $oContent->oxcontents__oxloadid->value,
         );
+
         return $aResult;
     }
+
     /**
      * Get all Contents for the mobile app
      *
@@ -404,10 +405,11 @@ class cushymoco extends oxUBase
     {
         $sViewName = getViewName('oxcontents', $iLangId, $sShopId);
         $sSelect   = "SELECT oxloadid, oxtitle FROM `$sViewName`  WHERE oxloadid IN ('oxagb','oximpressum') " .
-                     "UNION SELECT oxloadid, oxtitle FROM `$sViewName` " .
-                     "WHERE oxloadid LIKE 'mfCushymoco%' AND NOT oxloadid = 'mfCushymocoStart'";
+            "UNION SELECT oxloadid, oxtitle FROM `$sViewName` " .
+            "WHERE oxloadid LIKE 'mfCushymoco%' AND NOT oxloadid = 'mfCushymocoStart'";
         $oDb       = $this->_oVersionLayer->getDb(true);
         $aContents = $oDb->getAll($sSelect);
+
         return $aContents;
     }
 
@@ -651,7 +653,7 @@ class cushymoco extends oxUBase
         foreach ($aVariantSelections['selections'] as $iIndex => $oVariantSelectList) {
             $aCharacteristics[] = array(
                 'groupId' => $iIndex,
-                'title' => $oVariantSelectList->getLabel(),
+                'title'   => $oVariantSelectList->getLabel(),
             );
         }
 
@@ -716,9 +718,9 @@ class cushymoco extends oxUBase
      */
     public function getVariantProductId()
     {
-        $oArticle          = $this->_getArticleById();
-        $aSelectedVariants = $this->_oVersionLayer->getRequestParam('selectedVariant', array());
-        $aVariants         = $oArticle->getVariantSelections($aSelectedVariants, $oArticle->getId());
+        $oArticle           = $this->_getArticleById();
+        $aSelectedVariants  = $this->_oVersionLayer->getRequestParam('selectedVariant', array());
+        $aVariants          = $oArticle->getVariantSelections($aSelectedVariants, $oArticle->getId());
         $sSelectedProductId = '';
         foreach ($aVariants['rawselections'] as $sOXID => $aVariants) {
             $blSelected = true;
@@ -1277,7 +1279,16 @@ class cushymoco extends oxUBase
             $oContent->getId()
         );
 
-        $this->_sAjaxResponse = $this->_successMessage($sParsedContent);
+        $oConfig   = $this->_oVersionLayer->getConfig();
+        $oShop     = $oConfig->getActiveShop();
+        $sShopName = $oShop->oxshops__oxname->value;
+
+        $this->_sAjaxResponse = $this->_successMessage(
+            array(
+                'title'       => $sShopName,
+                'pageContent' => $sParsedContent
+            )
+        );
     }
 
     /**
