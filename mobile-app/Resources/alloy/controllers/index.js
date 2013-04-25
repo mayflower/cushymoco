@@ -1,26 +1,17 @@
 function Controller() {
-    function openProductsWin() {
-        if (!productsWin) {
-            productsWin = Alloy.createController("products").getView();
-            $.productsWindow.add(productsWin);
+    function openWindow(e) {
+        if (!windows[e.source.id] && windowMapping[e.source.id]) {
+            Ti.API.warn("Creating controller for: " + e.source.id);
+            var windowInfo = windowMapping[e.source.id];
+            var window = Alloy.createController(windowInfo.controller).getView();
+            $.getView(windowInfo.window).add(window);
+            windows[e.source.id] = window;
         }
-    }
-    function openMoreWin() {
-        if (!moreWin) {
-            moreWin = Alloy.createController("more").getView();
-            $.moreWindow.add(moreWin);
-        }
-    }
-    function tabChanged(e) {
-        Alloy.Globals.activeWindow = e.tab.getWindow();
     }
     function bindTabEvents(e) {
         e.source.tabs.map(function(tab) {
-            tab.addEventListener("focus", tabChanged);
+            tab.addEventListener("focus", openWindow);
         });
-    }
-    function fillStartPage(text) {
-        $.startContent.html = text;
     }
     require("alloy/controllers/BaseController").apply(this, Array.prototype.slice.call(arguments));
     arguments[0] ? arguments[0]["__parentSymbol"] : null;
@@ -110,12 +101,20 @@ function Controller() {
     bindTabEvents ? $.__views.index.addEventListener("open", bindTabEvents) : __defers["$.__views.index!open!bindTabEvents"] = true;
     exports.destroy = function() {};
     _.extend($, $.__views);
-    var productsWin;
-    var moreWin;
-    $.productsTab.addEventListener("focus", openProductsWin);
-    $.moreTab.addEventListener("focus", openMoreWin);
-    require("communication").startScreen(fillStartPage);
-    Alloy.Globals.parent = $.index;
+    var windowMapping = {
+        productsTab: {
+            controller: "products",
+            window: "productsWindow"
+        },
+        moreTab: {
+            controller: "more",
+            window: "moreWindow"
+        }
+    };
+    var windows = {};
+    require("communication").startScreen(function(text) {
+        $.startContent.html = text;
+    });
     Alloy.Globals.cartTab = $.cartTab;
     $.index.open();
     __defers["$.__views.index!open!bindTabEvents"] && $.__views.index.addEventListener("open", bindTabEvents);
