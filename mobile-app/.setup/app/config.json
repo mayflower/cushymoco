@@ -1,7 +1,7 @@
 {
 	"global": {
 		"oxid": {
-			"baseUrl": "http://oxid.openstack/?cl=cushymoco"
+			"baseUrl": "#{baseURL}"
 		}
 	}, 
 	"env:development": {}, 
