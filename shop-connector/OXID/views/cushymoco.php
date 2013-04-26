@@ -41,6 +41,23 @@ class cushymoco extends oxUBase
     protected $_aStateIdCache = array();
 
     /**
+     * Custom exception handler.
+     *
+     * @param Exception $oException Uncaught exception.
+     *
+     * @return void
+     */
+    public function exceptionHandler($oException)
+    {
+        $oLang = $this->_oVersionLayer->getLang();
+        echo $this->_encodeOutput(
+            $this->_errorMessage(
+                $oLang->translateString($oException->getMessage())
+            )
+        );
+    }
+
+    /**
      * Initializes all required components.
      *
      * @return null|void
@@ -48,6 +65,8 @@ class cushymoco extends oxUBase
     public function init()
     {
         parent::init();
+
+        set_exception_handler(array($this, 'exceptionHandler'));
 
         try {
             $this->_initVersionLayer();
@@ -76,12 +95,24 @@ class cushymoco extends oxUBase
     public function render()
     {
         $sTemplate                         = parent::render();
-        $this->_aViewData['sAjaxResponse'] = json_encode(
-            $this->_sAjaxResponse,
-            JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT
-        );
+        $this->_aViewData['sAjaxResponse'] = $this->_encodeOutput($this->_sAjaxResponse);
 
         return $sTemplate;
+    }
+
+    /**
+     * Encodes the output.
+     *
+     * @param mixed $mOutput Output to encode.
+     *
+     * @return string
+     */
+    private function _encodeOutput($mOutput)
+    {
+        return json_encode(
+            $mOutput,
+            JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT
+        );
     }
 
     /**
@@ -920,6 +951,7 @@ class cushymoco extends oxUBase
          */
         $this->_getSessionId();
         $oBasket = $this->_oVersionLayer->getBasket();
+        $this->_oVersionLayer->getConfig()->getActShopCurrencyObject()->sign;
 
         $oBasket->calculateBasket(true);
         $response = array(
@@ -927,12 +959,14 @@ class cushymoco extends oxUBase
             'totalBrutto'   => $oBasket->getFProductsPrice(),
             'totalDelivery' => $oBasket->getFDeliveryCosts(),
             'total'         => $oBasket->getFPrice(),
-            'currency'      => '€',
+            'currency'      => $this->_oVersionLayer->getConfig()->getActShopCurrencyObject()->sign,
         );
         foreach ($oBasket->getContents() as $key => $oBasketItem) {
-            $response['articles'][$key]           = $this->_articleToArray($oBasketItem->getArticle());
-            $response['articles'][$key]['amount'] = $oBasketItem->getAmount();
-            $response['articles'][$key]['total']  = $oBasketItem->getFTotalPrice();
+            $aProduct               = $this->_articleToArray($oBasketItem->getArticle());
+            $aProduct['cartItemId'] = $key;
+            $aProduct['amount']     = $oBasketItem->getAmount();
+            $aProduct['total']      = $oBasketItem->getFTotalPrice();
+            $response['articles'][] = $aProduct;
         }
 
         $this->_sAjaxResponse = $this->_successMessage($response);
