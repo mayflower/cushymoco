@@ -1,5 +1,5 @@
 #!/bin/bash
 
-cp ./.setup/tiapp.xml ./
-cp ./.setup/manifest ./
+cp -iv ./.setup/tiapp.xml ./
+cp -iv ./.setup/manifest ./
 
