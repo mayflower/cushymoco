@@ -6,6 +6,8 @@ Resources/
 build/
 .project
 build.log
+tiapp.xml
+manifest
 
 
 
