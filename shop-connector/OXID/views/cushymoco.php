@@ -435,9 +435,10 @@ class cushymoco extends oxUBase
     protected function getMobileContentList($iLangId = null, $sShopId = null)
     {
         $sViewName = getViewName('oxcontents', $iLangId, $sShopId);
-        $sSelect   = "SELECT oxloadid, oxtitle FROM `$sViewName`  WHERE oxloadid IN ('oxagb','oximpressum') " .
-            "UNION SELECT oxloadid, oxtitle FROM `$sViewName` " .
-            "WHERE oxloadid LIKE 'mfCushymoco%' AND NOT oxloadid = 'mfCushymocoStart'";
+        $sSelect   = "SELECT oxloadid AS contentId, oxtitle AS title FROM `$sViewName` " .
+                     "WHERE oxloadid IN ('oxagb','oximpressum') " .
+                     "UNION SELECT oxloadid, oxtitle FROM `$sViewName` " .
+                     "WHERE oxloadid LIKE 'mfCushymoco%' AND NOT oxloadid = 'mfCushymocoStart'";
         $oDb       = $this->_oVersionLayer->getDb(true);
         $aContents = $oDb->getAll($sSelect);
 
