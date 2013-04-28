@@ -4,6 +4,7 @@
 
 Resources/
 build/
+app/config.json
 .project
 build.log
 tiapp.xml
