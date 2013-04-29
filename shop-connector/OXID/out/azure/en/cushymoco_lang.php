@@ -1,7 +1,7 @@
 <?php
 /**
  * Language: English (en)
- * Translators: stefan (23)
+ * Translators: stefan (24)
  */
 $sLangName = "English";
 $aLang = array(
@@ -9,4 +9,5 @@ $aLang = array(
     'CUSHYMOCO_CMS_STARTPAGE_DOES_NOT_EXISTS' => 'The Cushymoco CMS Home does not exist.
 
 Please create a CMS page with the ID \'mfCushymocoStart\'.',
+    'EXCEPTION_USER_NOVALIDLOGIN' => 'Invalid e-mail or customer number and/or invalid password.',
 );
