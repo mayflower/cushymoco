@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
   Language: Deutsch (de)
-  Translators: stefan (14)
+  Translators: stefan (21)
 -->
 <resources>
     <string name="account.window.title">Konto</string>
@@ -10,6 +10,11 @@
     <string name="error.network.generic_communication">Fehler während der Datenübertragung.</string>
     <string name="error.network.internal">Interner Netzwerkfehler.</string>
     <string name="error.network.invalid_response">Die Server-Antwort enthielt ungültige Daten.</string>
+    <string name="login.headTitle">Anmeldung</string>
+    <string name="login.loginButton">Admelden</string>
+    <string name="login.password">Kennwort</string>
+    <string name="login.stayLoggedIn">Angemeldet bleiben</string>
+    <string name="login.username">Benutzername</string>
     <string name="menu.account.title">Konto</string>
     <string name="menu.cart.title">Warenkorb</string>
     <string name="menu.home.title">Start</string>

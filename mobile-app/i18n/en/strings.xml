@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
   Language: English (en)
-  Translators: stefan (14)
+  Translators: stefan (21)
 -->
 <resources>
     <string name="account.window.title">Account</string>
@@ -10,6 +10,11 @@
     <string name="error.network.generic_communication">Network communication error.</string>
     <string name="error.network.internal">Internal network error.</string>
     <string name="error.network.invalid_response">The server response contains invalid data.</string>
+    <string name="login.headTitle">Login</string>
+    <string name="login.loginButton">Login</string>
+    <string name="login.password">Password</string>
+    <string name="login.stayLoggedIn">Stay logged in</string>
+    <string name="login.username">Username</string>
     <string name="menu.account.title">Account</string>
     <string name="menu.cart.title">Cart</string>
     <string name="menu.home.title">Home</string>
