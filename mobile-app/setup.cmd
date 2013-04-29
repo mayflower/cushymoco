@@ -35,7 +35,4 @@ goto:eof
         BatchSubstitude "#{baseURL}" "!baseURL!" .\app\config.json > .\.setup\.tmp\config.json
         move /Y .\.setup\.tmp\config.json .\app\ >nul
     )
-
-    echo %baseURL%
-    echo !baseURL!
 goto:eof
