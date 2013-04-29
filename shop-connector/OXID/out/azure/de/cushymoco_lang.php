@@ -4,7 +4,7 @@
  * Translators: stefan (23)
  */
 $sLangName = "Deutsch";
-$aLnag = array(
+$aLang = array(
     'charset' => 'UTF-8',
     'CUSHYMOCO_CMS_STARTPAGE_DOES_NOT_EXISTS' => 'Die Cushymoco CMS-Startseite existiert nicht.
 
