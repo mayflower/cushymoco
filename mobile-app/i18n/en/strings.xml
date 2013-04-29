@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
   Language: English (en)
-  Translators: stefan (11)
+  Translators: stefan (14)
 -->
 <resources>
+    <string name="account.window.title">Account</string>
+    <string name="cart.window.title">Shopping Cart</string>
     <string name="error.dialog.generic_title">An error has occurred.</string>
     <string name="error.network.generic_communication">Network communication error.</string>
     <string name="error.network.internal">Internal network error.</string>
@@ -13,6 +15,7 @@
     <string name="menu.home.title">Home</string>
     <string name="menu.more.title">More</string>
     <string name="menu.products.title">Products</string>
+    <string name="more.window.title">Information</string>
     <string name="products.variants.title">Product variants</string>
     <string name="products.window.title">Catalog</string>
 </resources>
