@@ -1,10 +1,10 @@
-"#tab1": {
-	title: "Tab 1"
+"#accountWindow":{
+    title:L('account.window.title')
 },
-"#tab2": {
-	title: "Tab 2"
+"#cartWindow":{
+    title:L('cart.window.title')
 },
-"#win1": {
-	title: "Window 1",
-	layout: "vertical"
+"#moreWindow":{
+    navBarHidden:true,
+    title:L('more.window.title')
 }

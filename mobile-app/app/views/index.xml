@@ -12,19 +12,19 @@
         </Tab>
 
         <Tab id="accountTab" titleid="menu.account.title" icon="/icons/user_small.png">
-            <Window id="accountWindow" title="Account">
+            <Window id="accountWindow">
                 <Label>Brunsverreggd</Label>
             </Window>
         </Tab>
 
         <Tab id="cartTab" titleid="menu.cart.title" icon="/icons/cart_small.png">
-            <Window id="cartWindow" title="Shopping cart">
+            <Window id="cartWindow">
                 <Label>Buscare</Label>
             </Window>
         </Tab>
 
         <Tab id="moreTab" titleid="menu.more.title" icon="/icons/gear_small.png">
-            <Window id="moreWindow" title="More Info"/>
+            <Window id="moreWindow"/>
         </Tab>
 	</TabGroup>
 </Alloy>

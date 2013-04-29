@@ -8,9 +8,12 @@ function openWindow(e)
 {
     if (!windows[e.source.id] && windowMapping[e.source.id]) {
         var windowInfo = windowMapping[e.source.id];
-        var window = Alloy.createController(windowInfo.controller).getView();
-        $.getView(windowInfo.window).add(window);
-        windows[e.source.id] = window;
+        var windowInstance = Alloy.createController(windowInfo.controller).getView();
+        $.getView(windowInfo.window).add(windowInstance);
+        windows[e.source.id] = windowInstance;
+        windowInstance.addEventListener('blur', function(e){
+            Ti.API.warn(e);
+        })
     }
 }
 
