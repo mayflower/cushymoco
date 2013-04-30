@@ -439,7 +439,7 @@ class cushymoco extends oxUBase
         }
         $sViewName = getViewName('oxcontents', $iLangId, $sShopId);
         $sSelect   = "SELECT oxloadid AS contentId, oxtitle AS title FROM `$sViewName` " .
-                     "WHERE oxloadid IN ('oxagb','oximpressum') AND OXSHOPID = '$sShopId''" .
+                     "WHERE oxloadid IN ('oxagb','oximpressum') AND OXSHOPID = '$sShopId' " .
                      "UNION SELECT oxloadid, oxtitle FROM `$sViewName` " .
                      "WHERE oxloadid LIKE 'mfCushymoco%' AND NOT oxloadid = 'mfCushymocoStart' ".
                      "AND OXSHOPID = '$sShopId'";
