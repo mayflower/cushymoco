@@ -29,7 +29,7 @@ function openWindow(e)
         
         if (windowInfo.loginRequired && !Alloy.Globals.loggedIn) {
             var loginWin = Alloy.createController("login").getView();
-            loginWin.addEventListener('close', function(e){
+            loginWin.addEventListener('window.close', function(e) {
                 $.getView(windowMapping[tabId].window).remove(windows['_loginWindow']);
                 windows['_loginWindow'] = null;
                 realOpenWindow();
@@ -53,6 +53,10 @@ function bindTabEvents(e)
 require('communication').startScreen(function(response) {
     $.startContent.html = response.pageContent;
     $.homeWindow.title = response.title;
+    Alloy.Globals.loggedIn = response.loggedIn;
+    if (response.loggedIn) {
+        $.homeWindow.rightNavButton = Titanium.UI.createButton({titleid:"login.logoutButton"});
+    }
 });
 
 Alloy.Globals.cartTab = $.cartTab;

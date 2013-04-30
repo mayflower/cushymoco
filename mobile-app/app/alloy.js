@@ -26,11 +26,3 @@ Alloy.Globals.addToCart = function(productId, quantity) {
         alert(error);
     });
 };
-
-var stayLoggedIn = settings.get('stayLoggedIn');
-if (stayLoggedIn && stayLoggedIn == 1) {
-    communication.login(settings.get('user.name'), settings.get('user.pass'), function(response) {
-        Alloy.Globals.loggedIn = true;
-        Alloy.Globals.user = reponse;
-    });
-}
