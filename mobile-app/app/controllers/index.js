@@ -1,10 +1,26 @@
+var communication = require('communication');
 var windowMapping = {
     "productsTab":{controller:"products",window:"productsWindow"},
     "moreTab":{controller:"more",window:"moreWindow"},
     "accountTab":{controller:"account",window:"accountWindow",loginRequired:true}
 };
+
 var windows = {};
 var tabId;
+
+function showLogoutButton()
+{
+    $.homeWindow.rightNavButton = $.logoutButton;
+    $.accountWindow.rightNavButton = $.logoutButton;
+    $.logoutButton.visible = true;
+}
+
+function hideLogoutButton()
+{
+    $.logoutButton.visible = false;
+    $.homeWindow.rightNavButton = null;
+    $.accountWindow.rightNavButton = null;
+}
 
 function openWindow(e)
 {
@@ -29,9 +45,10 @@ function openWindow(e)
         
         if (windowInfo.loginRequired && !Alloy.Globals.loggedIn) {
             var loginWin = Alloy.createController("login").getView();
-            loginWin.addEventListener('window.close', function(e) {
+            loginWin.addEventListener('close:window.login', function(e) {
                 $.getView(windowMapping[tabId].window).remove(windows['_loginWindow']);
                 windows['_loginWindow'] = null;
+                showLogoutButton();
                 realOpenWindow();
             });
             $.getView(windowInfo.window).add(loginWin);
@@ -50,12 +67,28 @@ function bindTabEvents(e)
     });
 }
 
-require('communication').startScreen(function(response) {
+function doLogout(e)
+{
+    communication.logout(function(response) {
+        Alloy.Globals.loggedIn = false;
+        hideLogoutButton();
+        if (windowMapping[tabId] && windowMapping[tabId].loginRequired) {
+            $.getView(windowMapping[tabId].window).remove(windows[tabID]);
+            windows[tabId] = null;
+            var eventData = {
+                previousTab:$.getView(tabId),
+                source:$.getView(tabId)
+            };
+        }
+    });
+}
+
+communication.startScreen(function(response) {
     $.startContent.html = response.pageContent;
     $.homeWindow.title = response.title;
     Alloy.Globals.loggedIn = response.loggedIn;
     if (response.loggedIn) {
-        $.homeWindow.rightNavButton = Titanium.UI.createButton({titleid:"login.logoutButton"});
+        showLogoutButton();
     }
 });
 

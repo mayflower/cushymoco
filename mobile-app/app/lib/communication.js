@@ -125,7 +125,7 @@ exports.addToCart = function(productId, quantity, successCallback)
         exports.buildUrl({fnc:"addToBasket",anid:productId,qty:quantity}),
         successCallback
     );
-}
+};
 
 exports.login = function(userId, password, stayLoggedIn, successCallback)
 {
@@ -143,6 +143,13 @@ exports.login = function(userId, password, stayLoggedIn, successCallback)
         exports.buildUrl(loginData),
         successCallback
     );
+};
+exports.logout = function(successCallback)
+{
+    http.get(
+        exports.buildUrl({fnc:"logout"}),
+        successCallback
+    );
 }
 
 exports.user = function(successCallback)
@@ -151,7 +158,7 @@ exports.user = function(successCallback)
         exports.buildUrl({fnc:"getUserData"}),
         successCallback
     );
-}
+};
 
 var serialize = function(obj, prefix)
 {
