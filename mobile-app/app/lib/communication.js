@@ -111,7 +111,7 @@ exports.productVariants = function(productId, selectedVariants, successCallback)
     );
 }
 
-exports.productVariantId = function(productId, selectedVariants, successCallback, errorCallback)
+exports.productVariantId = function(productId, selectedVariants, successCallback)
 {
     http.get(
         exports.buildUrl({fnc:'getVariantProductId',anid:productId,selectedVariant:selectedVariants}),
@@ -119,11 +119,19 @@ exports.productVariantId = function(productId, selectedVariants, successCallback
     );
 }
 
-exports.addToCart = function(productId, quantity, successCallback, errorCallback)
+exports.addToCart = function(productId, quantity, successCallback)
 {
     http.get(
         exports.buildUrl({fnc:"addToBasket",anid:productId,qty:quantity}),
         successCallback
+    );
+}
+
+exports.login = function(userId, password, successCallkack)
+{
+    http.get(
+        exports.buildUrl({fnc:"login","lgn_usr":userId,"lgn_pwd":password}),
+        successCallkack
     );
 }
 

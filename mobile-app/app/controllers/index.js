@@ -1,19 +1,45 @@
 var windowMapping = {
     "productsTab":{controller:"products",window:"productsWindow"},
-    "moreTab":{controller:"more",window:"moreWindow"}
+    "moreTab":{controller:"more",window:"moreWindow"},
+    "accountTab":{controller:"account",window:"accountWindow",loginRequired:true}
 };
 var windows = {};
+var tabId;
 
 function openWindow(e)
 {
-    if (!windows[e.source.id] && windowMapping[e.source.id]) {
-        var windowInfo = windowMapping[e.source.id];
-        var windowInstance = Alloy.createController(windowInfo.controller).getView();
-        $.getView(windowInfo.window).add(windowInstance);
-        windows[e.source.id] = windowInstance;
-        windowInstance.addEventListener('blur', function(e){
-            Ti.API.warn(e);
-        })
+    var oldTabId = e.previousTab.id;
+    if (windows[oldTabId] && windowMapping[oldTabId]) {
+        $.getView(windowMapping[oldTabId].window).remove(windows[oldTabId]);
+        windows[oldTabId] = null;
+    }
+    
+    tabId = e.source.id;
+    if (!windows[tabId] && windowMapping[tabId]) {
+        var windowInfo = windowMapping[tabId];
+        
+        var realOpenWindow = function() {
+            if (!windowInfo) {
+                var windowInfo = windowMapping[tabId];
+            } 
+            var windowInstance = Alloy.createController(windowInfo.controller).getView();
+            $.getView(windowInfo.window).add(windowInstance);
+            windows[tabId] = windowInstance;
+        }
+        
+        if (windowInfo.loginRequired && !Alloy.Globals.loggedIn) {
+            var loginWin = Alloy.createController("login").getView();
+            loginWin.addEventListener('close', function(e){
+                $.getView(windowMapping[tabId].window).remove(windows['_loginWindow']);
+                windows['_loginWindow'] = null;
+                realOpenWindow();
+            });
+            $.getView(windowInfo.window).add(loginWin);
+            windows['_loginWindow'] = loginWin;
+        } else {
+            realOpenWindow();
+        }
+        
     }
 }
 
