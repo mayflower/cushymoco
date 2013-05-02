@@ -1,0 +1,5 @@
+<Alloy>
+<View id="accountView">
+         <Label id="mudda">Deine Mudda ... ist iPad</Label>
+</View>
+</Alloy>
