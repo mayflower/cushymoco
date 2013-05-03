@@ -22,24 +22,37 @@ class WebSetup extends SetupAbstract
     /**
      * @inheritdoc
      */
-    protected function _getParam($longOpt, $shortOpt = null, $defaultValue = null, $requiredOrOptional = null) {
-        $value = null;
+    protected function _getParameters() {
+        $registeredOptions = $this->_registeredOptions;
 
-        if (isset($_GET[$longOpt])) {
-            $value = $_GET[$longOpt];
-        } else if (isset($_GET[$shortOpt])) {
-            $value = $_GET[$shortOpt];
-        }
+        $parameters = array();
 
-        if (empty($value)) {
-            if ($requiredOrOptional == self::PARAMETER_REQUIRED) {
+        foreach ($registeredOptions as $opt) {
+            if (isset($_GET[$opt['longOpt']])) {
+                $value = $_GET[$opt['longOpt']];
+            } else if (isset($opt['shortOpt']) && isset($_GET[$opt['shortOpt']])) {
+                $value = $_GET[$opt['shortOpt']];
+            } else {
                 $value = null;
-            } else if ($requiredOrOptional == self::PARAMETER_REQUIRED && isset($defaultValue)) {
-                $value = $defaultValue;
             }
+
+            if ($value === '') {
+                if ($opt['requiredOrOptional'] === self::VALUE_REQUIRED) {
+                    $value = null;
+                } else if ($opt['requiredOrOptional'] === self::VALUE_REQUIRED
+                    && isset($opt['defaultValue'])
+                ) {
+                    $value = $opt['defaultValue'];
+                }
+            }
+
+            if (!is_null($value)) {
+                $parameters[$opt['longOpt']] = $value;
+            }
+
         }
 
-        return $value;
+        return $parameters;
     }
 
 }

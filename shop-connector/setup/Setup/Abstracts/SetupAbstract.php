@@ -5,8 +5,8 @@ namespace Setup\Abstracts;
 abstract class SetupAbstract
 {
 
-    const PARAMETER_OPTIONAL = 1;
-    const PARAMETER_REQUIRED = 2;
+    const VALUE_OPTIONAL = 1;
+    const VALUE_REQUIRED = 2;
 
     const USE_LINKS = true;
 
@@ -15,23 +15,27 @@ abstract class SetupAbstract
     /** @var array */
     protected $_params;
 
+    /** @var array */
+    protected $_registeredOptions = array();
+
     /**
-     * Get parameters from cli or web (or what else...)
+     * Gets all registered parameters and returns them as associative array.
      *
-     * @param      $longOpt
-     * @param null $shortOpt
-     * @param bool $defaultValue
-     * @param null $requiredOrOptional
-     *
-     * @return mixed
+     * @return array
      */
-    abstract protected function _getParam($longOpt, $shortOpt = null, $defaultValue = null, $requiredOrOptional = null);
+    abstract protected function _getParameters();
 
     /**
      * Run setup process.
      */
     public function run()
     {
+        $this->_registerOption('help',      'h');
+        $this->_registerOption('shop',      's', null, self::VALUE_REQUIRED);
+        $this->_registerOption('version',   'v', null, self::VALUE_REQUIRED);
+        $this->_registerOption('path',      'p', null, self::VALUE_REQUIRED);
+        $this->_registerOption('use-links', 'l');
+
         $params = $this->_params = $this->_getParameters();
 
         // help
@@ -80,27 +84,18 @@ abstract class SetupAbstract
     }
 
     /**
-     * Gets all possible parameters and returns them as associative array.
-     *
-     * @return array
+     * @param string $longOpt
+     * @param string $shortOpt             = null
+     * @param string $defaultValue         = null
+     * @param bool   $requiredOrOptional   = null
      */
-    protected function _getParameters()
-    {
-        $parameters = array(
-            'help'      => $this->_getParam('help',      'h'),
-            'shop'      => $this->_getParam('shop',      's', null, self::PARAMETER_REQUIRED),
-            'version'   => $this->_getParam('version',   'v', null, self::PARAMETER_REQUIRED),
-            'path'      => $this->_getParam('path',      'p', null, self::PARAMETER_REQUIRED),
-            'use-links' => $this->_getParam('use-links', 'l'),
+    protected function _registerOption($longOpt, $shortOpt = null, $defaultValue = null, $requiredOrOptional = null) {
+        $this->_registeredOptions[$longOpt] = array(
+            'longOpt'               => $longOpt,
+            'shortOpt'              => $shortOpt,
+            'defaultValue'          => $defaultValue,
+            'requiredOrOptional'    => $requiredOrOptional
         );
-
-        foreach ($parameters as $key => $param) {
-            if (is_null($param)) {
-                unset($parameters[$key]);
-            }
-        }
-
-        return $parameters;
     }
 
     /**
@@ -184,17 +179,16 @@ abstract class SetupAbstract
                 'Copyright (c) 2013+ Mayflower GmbH' . "\n" .
                 '' . "\n" .
                 'Usage: ' . "\n" .
-                '  on cli: setup.php [OPTIONS]' . "\n" .
+                '  on cli: php setup.php [OPTIONS]' . "\n" .
                 '  on web: setup.php?[OPTION_1]&[OPTION_2]&[OPTION_n]' . "\n" .
                 '' . "\n" .
                 'Example:' . "\n" .
-                '  on cli: setup.php --shop=<shop> [--version=<version>] --path=<path> [--use-links]' . "\n" .
+                '  on cli: php setup.php --shop=<shop> [--version=<version>] --path=<path> [--use-links]' . "\n" .
                 '  on web: setup.php?shop=<shop>[&version=<version>]&path=<path>[&use-links]' . "\n" .
                 '' . "\n" .
                 '' . "\n" .
-                'Short and long options can be used from cli AND web.' . "\n" .
-                'On cli, all short options that have a long option with a following \'=\' must not have a' . "\n" .
-                'whitespace between option and value: -oValue' . "\n" .
+                'Short and long options can be used from cli AND web while' . "\n" .
+                'long options dominate short ones.' . "\n" .
                 '' . "\n" .
                 '' . "\n" .
                 'OPTIONS:' . "\n" .

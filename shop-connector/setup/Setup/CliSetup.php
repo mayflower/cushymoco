@@ -11,32 +11,63 @@ class CliSetup extends SetupAbstract
     /**
      * @inheritdoc
      */
-    protected function _getParam($longOpt, $shortOpt = null, $defaultValue = null, $requiredOrOptional = null) {
-        if ($requiredOrOptional === self::PARAMETER_REQUIRED)
-            $modifier = ':';
-        else if ($requiredOrOptional === self::PARAMETER_OPTIONAL) {
-            $modifier = '::';
-        } else {
-            $modifier = '';
-        }
+    protected function _getParameters()
+    {
+        $registeredOptions = $this->_registeredOptions;
 
-        $longOpt .= $modifier;
-        $shortOpt .= $modifier;
+        $parameters = array();
 
-        $options = getopt($shortOpt, array($longOpt));
+        $longOpts = array();
+        $shortOpts = '';
 
-        if (count($options)) {
-            // get first value of array
-            $value = reset($options);
-
-            if (isset($defaultValue) && $value === false) {
-                $value = $defaultValue;
+        // make longOpts and shortOpts
+        foreach ($registeredOptions as $opt) {
+            if ($opt['requiredOrOptional'] === self::VALUE_REQUIRED) {
+                $modifier = ':';
+            } else if ($opt['requiredOrOptional'] === self::VALUE_OPTIONAL) {
+                $modifier = '::';
+            } else {
+                $modifier = null;
             }
-        } else {
-            $value = null;
+
+            $longOpt = $opt['longOpt'];
+            $longOpt .= $modifier;
+
+            // add longOpt to longOpts array
+            $longOpts[] = $longOpt;
+
+            if (isset($opt['shortOpt'])) {
+                $shortOpt = $opt['shortOpt'];
+                $shortOpt .= $modifier;
+
+                // add shortOpt to shortOpts array
+                $shortOpts .= $shortOpt;
+            }
         }
 
-        return $value;
+        $optionValues = getopt($shortOpts, $longOpts);
+
+        // get value of longOpt or shortOpt and put it in $parameters array
+        foreach ($registeredOptions as $opt) {
+            if (isset($optionValues[$opt['longOpt']])) {
+                $parameters[$opt['longOpt']] = $optionValues[$opt['longOpt']];
+            } else if (isset($opt['shortOpt']) && isset($optionValues[$opt['shortOpt']])) {
+                $parameters[$opt['longOpt']] = $optionValues[$opt['shortOpt']];
+            }
+        }
+
+        // get the default values
+        foreach ($parameters as $option => $value) {
+            if ($value === false
+                && isset($registeredOptions[$option]['requiredOrOptional'])
+                && $registeredOptions[$option]['requiredOrOptional'] === self::VALUE_OPTIONAL
+                && isset($registeredOptions[$option]['defaultValue'])
+            ) {
+                $parameters[$option] = $registeredOptions[$option]['defaultValue'];
+            }
+        }
+
+        return $parameters;
     }
 
 }
