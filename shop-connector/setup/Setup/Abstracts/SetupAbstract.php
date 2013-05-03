@@ -34,9 +34,6 @@ abstract class SetupAbstract
     {
         $params = $this->_params = $this->_getParameters();
 
-        // this might be removed
-        $this->_printParams();
-
         // help
         if (isset($params['help'])) {
             $this->_printHelp();
@@ -44,6 +41,10 @@ abstract class SetupAbstract
         }
 
         if (!empty($params)) {
+
+            // this might be removed
+            $this->_printUsedParams();
+
             // shop installation
             if (isset($params['shop'])) {
                 $shop = $params['shop'];
@@ -79,6 +80,8 @@ abstract class SetupAbstract
     }
 
     /**
+     * Gets all possible parameters and returns them as associative array.
+     *
      * @return array
      */
     protected function _getParameters()
@@ -100,8 +103,10 @@ abstract class SetupAbstract
         return $parameters;
     }
 
-    /** */
-    protected function _printParams()
+    /**
+     * Prints used params.
+     */
+    protected function _printUsedParams()
     {
         $params = $this->_params;
 
@@ -117,25 +122,37 @@ abstract class SetupAbstract
     }
 
     /**
+     * Print a message (without newline).
+     *
+     * @param string   $msg          = ''
+     * @param resource $outputStream = null
+     */
+    protected function _print($msg = '', $outputStream = null)
+    {
+        if (isset($outputStream)) {
+            fwrite($outputStream, $msg);
+        } else {
+            echo $msg;
+        }
+    }
+
+    /**
      * Print a line.
      *
-     * @param               $msg     = ''
+     * @param string   $msg          = ''
      * @param resource $outputStream = null
      */
     protected function _println($msg = '', $outputStream = null)
     {
         $newLine = "\n";
 
-        if (isset($outputStream)) {
-            fwrite($outputStream, $msg . $newLine);
-        } else {
-            echo $msg . $newLine;
-        }
+        $msg = $msg . $newLine;
+        $this->_print($msg, $outputStream);
     }
 
     /**
-     * @param      $msg
-     * @param null $outputStream
+     * @param string   $msg
+     * @param resource $outputStream
      */
     protected function _printInfo($msg, $outputStream = null) {
         $msg = '[' . self::SETUP_NAME . '] ' . $msg;
@@ -162,12 +179,48 @@ abstract class SetupAbstract
      * Prints an help page.
      */
     protected function _printHelp() {
-        $this->_println('HELP');
-        $this->_println('HELP');
-        $this->_println('HELP');
+        $this->_print(''.
+                self::SETUP_NAME . "\n" .
+                'Copyright (c) 2013+ Mayflower GmbH' . "\n" .
+                '' . "\n" .
+                'Usage: ' . "\n" .
+                '  on cli: setup.php [OPTIONS]' . "\n" .
+                '  on web: setup.php?[OPTION_1]&[OPTION_2]&[OPTION_n]' . "\n" .
+                '' . "\n" .
+                'Example:' . "\n" .
+                '  on cli: setup.php --shop=<shop> [--version=<version>] --path=<path> [--use-links]' . "\n" .
+                '  on web: setup.php?shop=<shop>[&version=<version>]&path=<path>[&use-links]' . "\n" .
+                '' . "\n" .
+                '' . "\n" .
+                'Short and long options can be used from cli AND web.' . "\n" .
+                'On cli, all short options that have a long option with a following \'=\' must not have a' . "\n" .
+                'whitespace between option and value: -oValue' . "\n" .
+                '' . "\n" .
+                '' . "\n" .
+                'OPTIONS:' . "\n" .
+                '    -h, --help        Display this help.' . "\n" .
+                '    -s, --shop=       The shop for which the connector should be installed.' . "\n" .
+                '                      Available shops along with version are listed below.' . "\n" .
+                '    -v, --version=    The version of the shop for which the shop-connector should' . "\n" .
+                '                      be installed. Available shops along with version are listed below.' . "\n" .
+                '    -p, --path=       The path to the existing shop installation.' . "\n" .
+                '    -l, --use-links   Create links instead of copying files.' . "\n" .
+                '' . "\n" .
+                '' . "\n" .
+                'SHOPS AND VERSIONS:' . "\n" .
+                '    oxid:   OXID eShop' . "\n" .
+                '                Versions: 4.6' . "\n" .
+                '                          4.7' . "\n" .
+                '' . "\n"
+        );
     }
 
     /**
+     * Copy files recursive.
+     *
+     * If $useLinks is set to true, symlinks will be created instead of being
+     * files copied.
+     *
      * @param      $src
      * @param      $dst
      * @param bool $useLinks = false
