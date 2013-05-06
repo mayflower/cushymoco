@@ -1,7 +1,7 @@
 var communication = require('communication');
 var windowMapping = {
     "productsTab":{controller:"products",window:"productsWindow"},
-    "moreTab":{controller:"more",window:"moreWindow"}
+    "moreTab":{controller:"more",window:"moreWindow"},
     "accountTab":{controller:"account",window:"accountWindow",loginRequired:true}
 };
 
