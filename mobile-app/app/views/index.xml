@@ -12,9 +12,7 @@
         </Tab>
 
         <Tab id="accountTab" titleid="menu.account.title" icon="/icons/user_small.png">
-            <Window id="accountWindow">
-                <Label>Brunsverreggd</Label>
-            </Window>
+            <Window id="accountWindow" title="Account" />
         </Tab>
 
         <Tab id="cartTab" titleid="menu.cart.title" icon="/icons/cart_small.png">

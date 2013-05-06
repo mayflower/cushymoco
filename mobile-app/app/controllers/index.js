@@ -1,5 +1,6 @@
 var windowMapping = {
     "productsTab":{controller:"products",window:"productsWindow"},
+    "accountTab":{controller:"account", window:"accountWindow"},
     "moreTab":{controller:"more",window:"moreWindow"}
 };
 var windows = {};
