@@ -1,7 +1,15 @@
-mobile-app/Resources/
-mobile-app/build/
-mobile-app/build.log
+# +-----------------------------+
+# |          PhpStorm           |
+# +-----------------------------+
+
+.idea/
 atlassian-ide-plugin.xml
-.idea
-.project
+
+
+
+# +-----------------------------+
+# |    Mac folder attributes    |
+# +-----------------------------+
+
 .DS_Store
+
