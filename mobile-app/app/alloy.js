@@ -10,6 +10,10 @@
 //
 // Alloy.Globals.someGlobalFunction = function(){};
 var communication = require('communication');
+var settings = require('localSettings');
+Alloy.Globals.settings = settings;
+
+settings.init();
 
 String.prototype.repeat = function (count) {
     return new Array(parseInt(count) + 1).join(this);

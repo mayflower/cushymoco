@@ -1,2 +1,7 @@
 <Alloy>
+	<View class="container">
+	    <Label id="accountUsername"/>
+	    <Label id="accountEmail"/>
+	    <Label id="accountCompany"/>
+	</View>
 </Alloy>

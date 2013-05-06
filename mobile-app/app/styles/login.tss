@@ -1,0 +1,32 @@
+".container": {
+	backgroundColor: "white"
+},
+"#headTitle":{
+    top:"10px",
+    font:{
+        fontSize:20,
+        fontWeight:"bold"
+    }
+},
+".heightToContent":{
+    top:"10px",
+    height:Ti.UI.SIZE
+},
+"Label":{
+    left:"10px",
+    width:"125px"
+},
+"TextField":{
+    borderStyle:Ti.UI.INPUT_BORDERSTYLE_ROUNDED,
+    width:Ti.UI.FILL,
+    right:"10px",
+    autocorrect:false
+},
+"Switch":{
+    right:"10px"
+},
+"#loginButton":{
+    style:Titanium.UI.iPhone.SystemButtonStyle.BORDERED,
+    width:"125px",
+    height:"45px"
+}
