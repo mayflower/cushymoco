@@ -390,11 +390,12 @@ class cushymoco extends oxUBase
     {
         $sContentId = $this->_oVersionLayer->getRequestParam('cnid');
         $iLangId    = $this->_oVersionLayer->getRequestParam('lid');
-        // @TODO: shop id for EE multishops
+        $sShopId    = $this->_oVersionLayer->getRequestParam('shp');
 
         if (empty($sContentId)) {
-            $aResult = $this->getMobileContentList($iLangId);
+            $aResult = $this->getMobileContentList($iLangId, $sShopId);
         } else {
+            // Oxid chooses shop on it's own
             $aResult = $this->getMobileContent($sContentId, $iLangId);
         }
 
@@ -406,11 +407,10 @@ class cushymoco extends oxUBase
      *
      * @param string  $sContent oxloadid for the snippet
      * @param integer $iLangId  Language Id
-     * @param string  $sShopId  Shop Id (for EE multishops)
      *
      * @return array
      */
-    protected function getMobileContent($sContentId, $iLangId = null, $sShopId = null)
+    protected function getMobileContent($sContentId, $iLangId = null)
     {
         $oContent = oxNew('oxcontent');
         $oContent->setLanguage($iLangId);
@@ -434,11 +434,15 @@ class cushymoco extends oxUBase
      */
     protected function getMobileContentList($iLangId = null, $sShopId = null)
     {
+        if (empty($sShopId)) {
+            $sShopId = 1; // default and fallback for CE
+        }
         $sViewName = getViewName('oxcontents', $iLangId, $sShopId);
         $sSelect   = "SELECT oxloadid AS contentId, oxtitle AS title FROM `$sViewName` " .
-                     "WHERE oxloadid IN ('oxagb','oximpressum') " .
+                     "WHERE oxloadid IN ('oxagb','oximpressum') AND OXSHOPID = '$sShopId' " .
                      "UNION SELECT oxloadid, oxtitle FROM `$sViewName` " .
-                     "WHERE oxloadid LIKE 'mfCushymoco%' AND NOT oxloadid = 'mfCushymocoStart'";
+                     "WHERE oxloadid LIKE 'mfCushymoco%' AND NOT oxloadid = 'mfCushymocoStart' ".
+                     "AND OXSHOPID = '$sShopId'";
         $oDb       = $this->_oVersionLayer->getDb(true);
         $aContents = $oDb->getAll($sSelect);
 
