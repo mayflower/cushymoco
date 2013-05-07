@@ -1,6 +1,6 @@
 #!/bin/bash
 
-defaultBaseURL="http://oxid.openstack/cl=cushymoco"
+defaultBaseURL="http://oxid.openstack/?cl=cushymoco"
 
 main() {
 	# Copy files to their desired place

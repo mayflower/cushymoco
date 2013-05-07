@@ -3,7 +3,7 @@ SETLOCAL ENABLEDELAYEDEXPANSION
 
 set "PATH=.\.setup\.cmd\;%PATH%"
 
-set "defaultBaseURL=http://oxid.openstack/cl=cushymoco"
+set "defaultBaseURL=http://oxid.openstack/?cl=cushymoco"
 set "baseURL="
 
 goto main

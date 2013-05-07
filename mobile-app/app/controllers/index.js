@@ -74,12 +74,8 @@ function doLogout(e)
         Alloy.Globals.loggedIn = false;
         hideLogoutButton();
         if (windowMapping[tabId] && windowMapping[tabId].loginRequired) {
-            $.getView(windowMapping[tabId].window).remove(windows[tabID]);
-            windows[tabId] = null;
-            var eventData = {
-                previousTab:$.getView(tabId),
-                source:$.getView(tabId)
-            };
+            var event 
+            $.index.getActiveTab().fireEvent('focus', {previousTab:$.getView(tabId),source:$.getView(tabId)});
         }
     });
 }
