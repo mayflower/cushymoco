@@ -1,4 +1,5 @@
 var communication = require('communication');
+var webStyle = require('webStyle');
 var windowMapping = {
     "productsTab":{controller:"products",window:"productsWindow"},
     "moreTab":{controller:"more",window:"moreWindow"},
@@ -83,8 +84,8 @@ function doLogout(e)
     });
 }
 
-communication.startScreen(function(response) {
-    $.startContent.html = response.pageContent;
+communication.startScreen(function(response) {	
+    $.startContent.html = webStyle.getBasicPageLayout(response.pageContent);
     $.homeWindow.title = response.title;
     Alloy.Globals.loggedIn = response.loggedIn;
     if (response.loggedIn) {
