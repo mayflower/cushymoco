@@ -80,67 +80,72 @@ b, strong {
 }
 
 /* line 23, ../../sass/styles.scss */
+p {
+  margin-bottom: 1.5em;
+}
+
+/* line 26, ../../sass/styles.scss */
 a {
   color: #fff;
   text-decoration: underlined;
 }
 
-/* line 29, ../../sass/styles.scss */
+/* line 32, ../../sass/styles.scss */
 h1 {
   font-size: 26px;
   font-weight: bold;
   margin: 1.5em 0;
 }
 
-/* line 34, ../../sass/styles.scss */
+/* line 37, ../../sass/styles.scss */
 h2 {
   font-size: 22px;
   font-weight: bold;
   margin: 1.5em 0;
 }
 
-/* line 39, ../../sass/styles.scss */
+/* line 42, ../../sass/styles.scss */
 h3 {
   font-size: 20px;
   font-weight: bold;
   margin: 1.5em 0;
 }
 
-/* line 45, ../../sass/styles.scss */
+/* line 48, ../../sass/styles.scss */
 ul, ol {
   margin: 1em 0 1em 1em;
   padding-left: 1em;
 }
-/* line 48, ../../sass/styles.scss */
+/* line 51, ../../sass/styles.scss */
 ul li, ol li {
   margin-bottom: 1.5em;
 }
 
-/* line 53, ../../sass/styles.scss */
+/* line 56, ../../sass/styles.scss */
 ul {
   list-style-type: disc;
 }
 
-/* line 56, ../../sass/styles.scss */
+/* line 59, ../../sass/styles.scss */
 ol {
   list-style-type: decimal;
 }
 
-/* line 63, ../../sass/styles.scss */
+/* line 66, ../../sass/styles.scss */
 .sub-teaser .teaser-item:nth-child(2n+1) {
   width: 48.5%;
   float: left;
   clear: both;
   margin-top: 30px;
 }
-/* line 69, ../../sass/styles.scss */
+/* line 72, ../../sass/styles.scss */
 .sub-teaser .teaser-item:nth-child(2n+2) {
   width: 48.5%;
   float: right;
   margin-top: 30px;
 }
 
-/* line 79, ../../sass/styles.scss */
+/* line 82, ../../sass/styles.scss */
 .teaser-banner {
   list-style-type: none;
   padding: 0;
@@ -148,17 +153,17 @@ ol {
   width: 100%;
   height: auto;
 }
-/* line 85, ../../sass/styles.scss */
+/* line 88, ../../sass/styles.scss */
 .teaser-banner li.teaser-item {
   padding: 0;
   margin: 0;
 }
-/* line 88, ../../sass/styles.scss */
+/* line 91, ../../sass/styles.scss */
 .teaser-banner li.teaser-item img.banner-image {
   display: block;
   width: 100%;
 }
-/* line 93, ../../sass/styles.scss */
+/* line 96, ../../sass/styles.scss */
 .teaser-banner li.teaser-item .banner-sub {
   height: 50px;
   display: block;
@@ -168,17 +173,17 @@ ol {
   background: -o-linear-gradient(top, #666666, #444444 60%, #222222);
   background: linear-gradient(top, #666666, #444444 60%, #222222);
 }
-/* line 100, ../../sass/styles.scss */
+/* line 103, ../../sass/styles.scss */
 .teaser-banner li.teaser-item .banner-sub .banner-text {
   color: #aaa;
   padding: 13px 15px;
   font-size: 12px;
 }
-/* line 105, ../../sass/styles.scss */
+/* line 108, ../../sass/styles.scss */
 .teaser-banner li.teaser-item .banner-sub .banner-text b {
   color: #fff;
 }
-/* line 109, ../../sass/styles.scss */
+/* line 112, ../../sass/styles.scss */
 .teaser-banner li.teaser-item .banner-sub .banner-icon {
   width: 30px;
   height: 30px;
