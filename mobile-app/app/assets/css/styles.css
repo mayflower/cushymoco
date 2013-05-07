@@ -74,26 +74,73 @@ html {
   color: #eee;
 }
 
-/* line 21, ../../sass/styles.scss */
-b {
+/* line 20, ../../sass/styles.scss */
+b, strong {
   font-weight: bold;
 }
 
-/* line 28, ../../sass/styles.scss */
+/* line 23, ../../sass/styles.scss */
+a {
+  color: #fff;
+  text-decoration: underlined;
+}
+
+/* line 29, ../../sass/styles.scss */
+h1 {
+  font-size: 26px;
+  font-weight: bold;
+  margin: 1.5em 0;
+}
+
+/* line 34, ../../sass/styles.scss */
+h2 {
+  font-size: 22px;
+  font-weight: bold;
+  margin: 1.5em 0;
+}
+
+/* line 39, ../../sass/styles.scss */
+h3 {
+  font-size: 20px;
+  font-weight: bold;
+  margin: 1.5em 0;
+}
+
+/* line 45, ../../sass/styles.scss */
+ul, ol {
+  margin: 1em 0 1em 1em;
+  padding-left: 1em;
+}
+/* line 48, ../../sass/styles.scss */
+ul li, ol li {
+  margin-bottom: 1.5em;
+}
+
+/* line 53, ../../sass/styles.scss */
+ul {
+  list-style-type: disc;
+}
+
+/* line 56, ../../sass/styles.scss */
+ol {
+  list-style-type: decimal;
+}
+
+/* line 63, ../../sass/styles.scss */
 .sub-teaser .teaser-item:nth-child(2n+1) {
   width: 48.5%;
   float: left;
   clear: both;
   margin-top: 30px;
 }
-/* line 34, ../../sass/styles.scss */
+/* line 69, ../../sass/styles.scss */
 .sub-teaser .teaser-item:nth-child(2n+2) {
   width: 48.5%;
   float: right;
   margin-top: 30px;
 }
 
-/* line 44, ../../sass/styles.scss */
+/* line 79, ../../sass/styles.scss */
 .teaser-banner {
   list-style-type: none;
   padding: 0;
@@ -101,18 +148,18 @@ b {
   width: 100%;
   height: auto;
 }
-/* line 50, ../../sass/styles.scss */
-.teaser-banner li {
+/* line 85, ../../sass/styles.scss */
+.teaser-banner li.teaser-item {
   padding: 0;
   margin: 0;
 }
-/* line 53, ../../sass/styles.scss */
-.teaser-banner li img.banner-image {
+/* line 88, ../../sass/styles.scss */
+.teaser-banner li.teaser-item img.banner-image {
   display: block;
   width: 100%;
 }
-/* line 58, ../../sass/styles.scss */
-.teaser-banner li .banner-sub {
+/* line 93, ../../sass/styles.scss */
+.teaser-banner li.teaser-item .banner-sub {
   height: 50px;
   display: block;
   background: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #666666), color-stop(60%, #444444), color-stop(100%, #222222));
@@ -121,18 +168,18 @@ b {
   background: -o-linear-gradient(top, #666666, #444444 60%, #222222);
   background: linear-gradient(top, #666666, #444444 60%, #222222);
 }
-/* line 65, ../../sass/styles.scss */
-.teaser-banner li .banner-sub .banner-text {
+/* line 100, ../../sass/styles.scss */
+.teaser-banner li.teaser-item .banner-sub .banner-text {
   color: #aaa;
-  padding: 12.5px 15px;
+  padding: 13px 15px;
   font-size: 12px;
 }
-/* line 70, ../../sass/styles.scss */
-.teaser-banner li .banner-sub .banner-text b {
+/* line 105, ../../sass/styles.scss */
+.teaser-banner li.teaser-item .banner-sub .banner-text b {
   color: #fff;
 }
-/* line 74, ../../sass/styles.scss */
-.teaser-banner li .banner-sub .banner-icon {
+/* line 109, ../../sass/styles.scss */
+.teaser-banner li.teaser-item .banner-sub .banner-icon {
   width: 30px;
   height: 30px;
   margin: 10px;

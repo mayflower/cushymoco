@@ -1,4 +1,5 @@
 var args = arguments[0] || {};
+var webStyle = require("webStyle");
 
 var productPictures = Alloy.createCollection('productPicture');
 var productDetails = Alloy.createModel('product');
@@ -31,7 +32,8 @@ productDetails.on("change", function(){
         );
     }
     
-    $.productInfo.addView(Titanium.UI.createWebView({html:productDetails.get("longDesc")}));
+    var content = webStyle.getBasicPageLayout(productDetails.get("longDesc"));
+    $.productInfo.addView(Titanium.UI.createWebView({html:content}));
     
     // Show paging control if there are more than one information pages.
     $.productInfo.showPagingControl = ($.productInfo.views.length > 1);
