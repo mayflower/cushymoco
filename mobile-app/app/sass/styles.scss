@@ -5,10 +5,79 @@
 
 @import "compass/reset";
 
+@import "compass/css3/images";
+@import "compass/css3/transition";
+
+
+
 html {
 	
 	font-family: "Helvetica Neue", HelveticaNeue, Helvetica, sans-serif;
 	background-color: #000;
 	
 	color: #eee;
+}
+
+b {
+	font-weight: bold;
+}
+
+
+.sub-teaser {
+	.teaser-item {
+		&:nth-child(2n+1) {
+			width: 48.5%;
+			float: left;
+			clear: both;
+			margin-top: 30px;
+		}
+		&:nth-child(2n+2) {
+			width: 48.5%;
+			float: right;
+			margin-top: 30px;
+		}
+	}
+}
+
+
+
+.teaser-banner {
+	list-style-type: none;
+	padding: 0;
+	margin: 0;
+	width: 100%;
+	height: auto;
+	li {
+		padding: 0;
+		margin: 0;
+		img.banner-image {
+			display: block;
+			width: 100%;
+		}
+		
+		.banner-sub {
+			
+			height: 50px;
+			display: block;			
+			@include background(linear-gradient(top, #555, #222));
+			
+			
+			.banner-text {
+				color: #aaa;
+				
+				padding: 15px;
+				font-size: 12px;
+				b {
+					color: #fff;
+				}
+			}
+			.banner-icon {
+				width: 30px;
+				height: 30px;
+				margin: 10px;
+				float: left;
+			}
+		}
+		
+	}
 }

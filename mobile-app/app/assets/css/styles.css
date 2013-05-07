@@ -67,9 +67,74 @@ article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, 
   display: block;
 }
 
-/* line 8, ../../sass/styles.scss */
+/* line 13, ../../sass/styles.scss */
 html {
   font-family: "Helvetica Neue", HelveticaNeue, Helvetica, sans-serif;
   background-color: #000;
   color: #eee;
+}
+
+/* line 21, ../../sass/styles.scss */
+b {
+  font-weight: bold;
+}
+
+/* line 28, ../../sass/styles.scss */
+.sub-teaser .teaser-item:nth-child(2n+1) {
+  width: 48.5%;
+  float: left;
+  clear: both;
+  margin-top: 30px;
+}
+/* line 34, ../../sass/styles.scss */
+.sub-teaser .teaser-item:nth-child(2n+2) {
+  width: 48.5%;
+  float: right;
+  margin-top: 30px;
+}
+
+/* line 44, ../../sass/styles.scss */
+.teaser-banner {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  height: auto;
+}
+/* line 50, ../../sass/styles.scss */
+.teaser-banner li {
+  padding: 0;
+  margin: 0;
+}
+/* line 53, ../../sass/styles.scss */
+.teaser-banner li img.banner-image {
+  display: block;
+  width: 100%;
+}
+/* line 58, ../../sass/styles.scss */
+.teaser-banner li .banner-sub {
+  height: 50px;
+  display: block;
+  background: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #555555), color-stop(100%, #222222));
+  background: -webkit-linear-gradient(top, #555555, #222222);
+  background: -moz-linear-gradient(top, #555555, #222222);
+  background: -o-linear-gradient(top, #555555, #222222);
+  background: linear-gradient(top, #555555, #222222);
+}
+/* line 65, ../../sass/styles.scss */
+.teaser-banner li .banner-sub .banner-text {
+  color: #aaa;
+  padding: 15px;
+  font-size: 12px;
+}
+/* line 70, ../../sass/styles.scss */
+.teaser-banner li .banner-sub .banner-text b {
+  color: #fff;
+}
+/* line 74, ../../sass/styles.scss */
+.teaser-banner li .banner-sub .banner-icon {
+  width: 30px;
+  height: 30px;
+  margin: 10px;
+  float: left;
 }
