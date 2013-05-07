@@ -155,7 +155,7 @@ exports.logout = function(successCallback)
 exports.user = function(successCallback)
 {
     http.get(
-        exports.buildUrl({fnc:"getUserData"}),
+        exports.buildUrl({fnc:"getAccountData"}),
         successCallback
     );
 };
