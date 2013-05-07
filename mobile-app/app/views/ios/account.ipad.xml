@@ -1,5 +1,8 @@
 <Alloy>
-<View id="accountView">
-         <Label id="mudda">Deine Mudda ... ist iPad</Label>
-</View>
+	<View id="accountView" class="container">
+		<Label id="mudda">Deine Mudda ... ist iPad</Label>
+	    <Label id="accountUsername" />
+	    <Label id="accountEmail" />
+	    <Label id="accountCompany" />
+	</View>
 </Alloy>
