@@ -9,6 +9,7 @@ app/config.json
 build.log
 tiapp.xml
 manifest
+app/Resources
 
 
 
@@ -18,6 +19,11 @@ manifest
 
 .setup/.tmp/*
 !.setup/.tmp/.gitkeep
+
+# +-----------------------------+
+# |             SASS            |
+# +-----------------------------+
+app/.sass-cache
 
 
 
