@@ -49,12 +49,14 @@ class cushymoco extends oxUBase
      */
     public function exceptionHandler($oException)
     {
-        $oLang = $this->_oVersionLayer->getLang();
-        echo $this->_encodeOutput(
+        $oLang    = $this->_oVersionLayer->getLang();
+        $sMessage = $this->_encodeOutput(
             $this->_errorMessage(
                 $oLang->translateString($oException->getMessage())
             )
         );
+
+        exit($sMessage);
     }
 
     /**
@@ -356,25 +358,27 @@ class cushymoco extends oxUBase
      */
     public function login()
     {
+        /**
+         * @var oxUser $oUser
+         */
         $sUserName = $this->_oVersionLayer->getRequestParam('lgn_usr');
         $sUserPwd  = $this->_oVersionLayer->getRequestParam('lgn_pwd');
+        $sCookie   = $this->_oVersionLayer->getRequestParam('lgn_cook');
         if (!empty($sUserName) && !empty($sUserPwd)) {
-            $oCmpUsr = $this->_getUserCmp();
             try {
-                $oCmpUsr->login_noredirect();
-                $oSession   = $this->_oVersionLayer->getSession();
-                $sSessionId = $this->_getSessionId();
-                $oUser      = $oSession->getUser();
-                if ($oUser !== null) {
-                    $oLogin               = new stdClass();
-                    $oLogin->username     = $sUserName;
-                    $oLogin->sessionId    = $sSessionId;
-                    $this->_sAjaxResponse = $this->_successMessage($oLogin);
-                } else {
-                    $this->_sAjaxResponse = $this->_errorMessage("User " . $sUserName . " does not exist");
-                }
-            } catch (oxUserException $e) {
-                $this->_sAjaxResponse = $this->_errorMessage("User " . $sUserName . " does not exist");
+                $oUser = oxNew('oxUser');
+                $oUser->login($sUserName, $sUserPwd, $sCookie);
+                $aLogin = array(
+                    'username'   => $oUser->oxuser__oxfname->value . ' ' . $oUser->oxuser__oxlname->value,
+                    'customerNo' => $oUser->oxuser__oxcustnr->value,
+                    'email'      => $oUser->oxuser__oxusername->value,
+                    'userId'     => $oUser->getId(),
+                    'sessionId'  => $this->_getSessionId(),
+                );
+
+                $this->_sAjaxResponse = $this->_successMessage($aLogin);
+            } catch (Exception $e) {
+                $this->exceptionHandler($e);
             }
         } else {
             $this->_sAjaxResponse = $this->_errorMessage("User " . $sUserName . " can not be logged in");
@@ -436,9 +440,9 @@ class cushymoco extends oxUBase
     {
         $sViewName = getViewName('oxcontents', $iLangId, $sShopId);
         $sSelect   = "SELECT oxloadid AS contentId, oxtitle AS title FROM `$sViewName` " .
-                     "WHERE oxloadid IN ('oxagb','oximpressum') " .
-                     "UNION SELECT oxloadid, oxtitle FROM `$sViewName` " .
-                     "WHERE oxloadid LIKE 'mfCushymoco%' AND NOT oxloadid = 'mfCushymocoStart'";
+            "WHERE oxloadid IN ('oxagb','oximpressum') " .
+            "UNION SELECT oxloadid, oxtitle FROM `$sViewName` " .
+            "WHERE oxloadid LIKE 'mfCushymoco%' AND NOT oxloadid = 'mfCushymocoStart'";
         $oDb       = $this->_oVersionLayer->getDb(true);
         $aContents = $oDb->getAll($sSelect);
 
@@ -461,11 +465,12 @@ class cushymoco extends oxUBase
                 $oCmpUsr->logout();
                 $oSession->destroy();
 
-                $oLogout            = new stdClass();
-                $oLogout->sessionId = $sSessionId;
-                $oLogout->logout    = true;
+                $aLogout = array(
+                    'sessionId' => $sSessionId,
+                    'logout'    => true,
+                );
 
-                $this->_sAjaxResponse = $this->_successMessage($oLogout);
+                $this->_sAjaxResponse = $this->_successMessage($aLogout);
             } else {
                 $this->_sAjaxResponse = $this->_errorMessage("User cannot be logged out");
             }
@@ -607,6 +612,9 @@ class cushymoco extends oxUBase
         $sSelect    = "SELECT `OXTITLE` FROM `$sViewName` WHERE `OXID` = ? AND `OXCOUNTRYID` = ?";
         $oDb        = oxDb::getDb();
         $sStateName = $oDb->getOne($sSelect, array($sStateId, $sCountyId));
+        if (null === $sStateName || !$sStateName) {
+            $sStateName = '';
+        }
 
         $this->_aStateIdCache[$sCountyId][$sStateId] = $sStateName;
 
@@ -1318,10 +1326,13 @@ class cushymoco extends oxUBase
         $oShop     = $oConfig->getActiveShop();
         $sShopName = $oShop->oxshops__oxname->value;
 
+        $oUser = $this->getUser();
+
         $this->_sAjaxResponse = $this->_successMessage(
             array(
                 'title'       => $sShopName,
-                'pageContent' => $sParsedContent
+                'pageContent' => $sParsedContent,
+                'loggedIn'    => isset($oUser->oxuser__oxcustnr->value),
             )
         );
     }
