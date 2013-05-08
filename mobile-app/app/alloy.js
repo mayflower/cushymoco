@@ -26,3 +26,8 @@ Alloy.Globals.addToCart = function(productId, quantity) {
         alert(error);
     });
 };
+
+
+Ti.App.addEventListener('linkClickEvent', function(e) {
+	alert(e);
+});
