@@ -82,6 +82,9 @@ function doLogout(e)
 
 communication.startScreen(function(response) {	
     $.startContent.html = webStyle.getBasicPageLayout(response.pageContent);
+    Ti.App.addEventListener('linkClickEvent', function(e) {
+    	alert(e);
+    });
     $.homeWindow.title = response.title;
     Alloy.Globals.loggedIn = response.loggedIn;
     if (response.loggedIn) {
