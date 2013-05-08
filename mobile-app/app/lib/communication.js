@@ -30,10 +30,10 @@ var http = {
         client.open(requestMethod, url);
         client.send(data);
     },
-    get: function (url, callbackSuccess){
+    get: function (url, callbackSuccess) {
         this.request('GET', url, null, callbackSuccess);
     },
-    post: function (url, data, callbackSuccess){
+    post: function (url, data, callbackSuccess) {
         this.request('POST', url, data, callbackSuccess);
     },
     errorCallback: function(message) {
@@ -111,7 +111,7 @@ exports.productVariants = function(productId, selectedVariants, successCallback)
     );
 }
 
-exports.productVariantId = function(productId, selectedVariants, successCallback, errorCallback)
+exports.productVariantId = function(productId, selectedVariants, successCallback)
 {
     http.get(
         exports.buildUrl({fnc:'getVariantProductId',anid:productId,selectedVariant:selectedVariants}),
@@ -119,13 +119,46 @@ exports.productVariantId = function(productId, selectedVariants, successCallback
     );
 }
 
-exports.addToCart = function(productId, quantity, successCallback, errorCallback)
+exports.addToCart = function(productId, quantity, successCallback)
 {
     http.get(
         exports.buildUrl({fnc:"addToBasket",anid:productId,qty:quantity}),
         successCallback
     );
+};
+
+exports.login = function(userId, password, stayLoggedIn, successCallback)
+{
+    var loginData = {
+        fnc:"login",
+        "lgn_usr":userId,
+        "lgn_pwd":password
+    };
+    
+    if (stayLoggedIn) {
+        loginData.lgn_cook = 1;
+    }
+    
+    http.get(
+        exports.buildUrl(loginData),
+        successCallback
+    );
+};
+exports.logout = function(successCallback)
+{
+    http.get(
+        exports.buildUrl({fnc:"logout"}),
+        successCallback
+    );
 }
+
+exports.user = function(successCallback)
+{
+    http.get(
+        exports.buildUrl({fnc:"getAccountData"}),
+        successCallback
+    );
+};
 
 var serialize = function(obj, prefix)
 {

@@ -3,6 +3,7 @@
 		<!-- Explicit Window declaration -->
 		<Tab id="homeTab" titleid="menu.home.title" icon="/icons/home_small.png">
 			<Window id="homeWindow" title="Shop">
+			    <Button id="logoutButton" titleid="login.logoutButton" visible="false" onClick="doLogout"/>
 			 	<WebView id="startContent"></WebView>
 			</Window>
 		</Tab>
@@ -12,9 +13,7 @@
         </Tab>
 
         <Tab id="accountTab" titleid="menu.account.title" icon="/icons/user_small.png">
-            <Window id="accountWindow">
-                <Label>Brunsverreggd</Label>
-            </Window>
+            <Window id="accountWindow" title="Account" />
         </Tab>
 
         <Tab id="cartTab" titleid="menu.cart.title" icon="/icons/cart_small.png">

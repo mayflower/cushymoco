@@ -1,0 +1,18 @@
+<Alloy>
+	<View layout="vertical">
+	    <Label id="headTitle" textid="login.headTitle"/>
+	    <View class="heightToContent" layout="horizontal">
+	        <Label textid="login.username"/>
+	        <TextField id="loginUser"/>
+        </View>
+        <View class="heightToContent" layout="horizontal">
+            <Label textid="login.password"/>
+            <TextField id="loginPass" passwordMask="true"/>
+        </View>
+        <View class="heightToContent" layout="horizontal">
+            <Label textid="login.stayLoggedIn"/>
+            <Switch id="loginStayLoggedIn" value="false"/>
+        </View>
+        <Button id="loginButton" titleid="login.loginButton" onClick="doLogin"/>
+	</View>
+</Alloy>

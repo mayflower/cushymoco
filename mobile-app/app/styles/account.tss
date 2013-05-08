@@ -1,0 +1,36 @@
+".container": {
+    color:"#000",
+    backgroundColor:"#FFF",
+	layout:"vertical"
+},
+"Label":{
+    left:"10px",
+    width:Ti.UI.SIZE,
+    height:Ti.UI.SIZE,
+    font:{
+        fontSize:12,
+        fontWeight:"normal"
+    }
+},
+"#accountUsername":{
+    font:{
+        fontSize:18,
+        fontWeight:"bold"
+    }
+},
+".title":{
+    top:"10px",
+    font:{
+        fontSize:14,
+        fontWeight:"bold"
+    }
+},
+"#accountCallButton":{
+    backgroundImage:"/icons/icon_call.png",
+    top:"35px",
+    right:"6px",
+    width:"24px",
+    height:"24px",
+    style:Titanium.UI.iPhone.SystemButtonStyle.PLAIN,
+    title:""
+}

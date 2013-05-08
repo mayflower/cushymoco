@@ -1,5 +1,30 @@
-.DS_Store
+# +-----------------------------+
+# |       Titanium Studio       |
+# +-----------------------------+
+
+Resources/
+build/
+app/config.json
+.project
 build.log
-build
+tiapp.xml
+manifest
+
+
+
+# +-----------------------------+
+# |            Setup            |
+# +-----------------------------+
+
+.setup/.tmp/*
+!.setup/.tmp/.gitkeep
+
+
+
+# +-----------------------------+
+# |            misc             |
+# +-----------------------------+
+
 npm-debug.log
 tmp
+

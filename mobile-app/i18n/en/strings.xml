@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
   Language: English (en)
-  Translators: stefan (24)
+  Translators: stefan (26)
 -->
 <resources>
+    <string name="account.billingAddress.title">Billing address</string>
     <string name="account.window.title">Account</string>
     <string name="cart.window.title">Shopping Cart</string>
     <string name="error.dialog.generic_title">An error has occurred.</string>
@@ -12,6 +13,7 @@
     <string name="error.network.invalid_response">The server response contains invalid data.</string>
     <string name="login.headTitle">Login</string>
     <string name="login.loginButton">Login</string>
+    <string name="login.logoutButton">Log out</string>
     <string name="login.password">Password</string>
     <string name="login.stayLoggedIn">Stay logged in</string>
     <string name="login.username">Username</string>
