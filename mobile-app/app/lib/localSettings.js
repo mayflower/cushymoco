@@ -24,7 +24,7 @@ var settings = {
         realValue = value || '';
         this.db.execute('INSERT OR REPLACE INTO settings (name, value) VALUES (?, ?)', name, realValue);
     },
-    delete: function(name) {
+    "delete": function(name) {
         this.db.execute('DELETE FROM settings WHERE name = ?', name);
     },
     has:function(name) {

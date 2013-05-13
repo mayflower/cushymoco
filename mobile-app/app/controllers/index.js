@@ -1,7 +1,8 @@
 var communication = require('communication');
+var webStyle = require('webStyle');
 var windowMapping = {
     "productsTab":{controller:"products",window:"productsWindow"},
-    "moreTab":{controller:"more",window:"moreWindow"}
+    "moreTab":{controller:"more",window:"moreWindow"},
     "accountTab":{controller:"account",window:"accountWindow",loginRequired:true}
 };
 
@@ -73,18 +74,15 @@ function doLogout(e)
         Alloy.Globals.loggedIn = false;
         hideLogoutButton();
         if (windowMapping[tabId] && windowMapping[tabId].loginRequired) {
-            $.getView(windowMapping[tabId].window).remove(windows[tabID]);
-            windows[tabId] = null;
-            var eventData = {
-                previousTab:$.getView(tabId),
-                source:$.getView(tabId)
-            };
+            var event 
+            $.index.getActiveTab().fireEvent('focus', {previousTab:$.getView(tabId),source:$.getView(tabId)});
         }
     });
 }
 
-communication.startScreen(function(response) {
-    $.startContent.html = response.pageContent;
+communication.startScreen(function(response) {	
+    $.startContent.html = webStyle.getBasicPageLayout(response.pageContent, false);
+
     $.homeWindow.title = response.title;
     Alloy.Globals.loggedIn = response.loggedIn;
     if (response.loggedIn) {

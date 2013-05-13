@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
   Language: English (en)
-  Translators: stefan (25)
+  Translators: stefan (26)
 -->
 <resources>
+    <string name="account.billingAddress.title">Billing address</string>
     <string name="account.window.title">Account</string>
     <string name="cart.window.title">Shopping Cart</string>
     <string name="error.dialog.generic_title">An error has occurred.</string>
