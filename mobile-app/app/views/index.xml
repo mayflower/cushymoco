@@ -8,7 +8,7 @@
 			</Window>
 		</Tab>
 
-        <Tab id="productsTab" titleid="menu.products.title" icon="/icons/magnifier_small.png">
+        <Tab id="productsTab" titleid="menu.products.title" icon="/icons/shopping_bag_small.png">
             <Window id="productsWindow" navBarHidden="true"/>
         </Tab>
 
