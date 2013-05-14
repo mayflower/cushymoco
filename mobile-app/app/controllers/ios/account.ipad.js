@@ -1,4 +1,4 @@
 exports.baseController="account.base";
 
-// this.run();
+this.run();
 doCall = exports.baseController.doCall;

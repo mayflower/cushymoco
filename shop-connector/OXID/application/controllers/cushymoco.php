@@ -40,6 +40,8 @@ class cushymoco extends oxUBase
      */
     protected $_aStateIdCache = array();
 
+    protected $_iBasketProductsCount;
+
     /**
      * Custom exception handler.
      *
@@ -253,9 +255,16 @@ class cushymoco extends oxUBase
      */
     protected function _generateMessage($error = null, $result = null)
     {
+        if ($this->_iBasketProductsCount === null) {
+            $oBasket = $this->_oVersionLayer->getBasket();
+            $oBasket->calculateBasket();
+            $this->_iBasketProductsCount = $oBasket->getProductsCount();
+        }
+
         return array(
-            'error'  => $error,
-            'result' => $result,
+            'error'         => $error,
+            'result'        => $result,
+            'cartItemCount' => $this->_iBasketProductsCount,
         );
     }
 
@@ -439,14 +448,19 @@ class cushymoco extends oxUBase
     protected function getMobileContentList($iLangId = null, $sShopId = null)
     {
         if (empty($sShopId)) {
-            $sShopId = 1; // default and fallback for CE
+            $sEdition = $this->getShopEdition();
+	    if ($sEdition == "EE") {
+                $sShopId = 1; // default to first shop
+            } else {
+                $sShopId = "oxbaseshop"; // CE and PE use this as shopid
+            }
         }
         $sViewName = getViewName('oxcontents', $iLangId, $sShopId);
         $sSelect   = "SELECT oxloadid AS contentId, oxtitle AS title FROM `$sViewName` " .
-                     "WHERE oxloadid IN ('oxagb','oximpressum') AND OXSHOPID = '$sShopId' " .
-                     "UNION SELECT oxloadid, oxtitle FROM `$sViewName` " .
-                     "WHERE oxloadid LIKE 'mfCushymoco%' AND NOT oxloadid = 'mfCushymocoStart' ".
-                     "AND OXSHOPID = '$sShopId'";
+            "WHERE oxloadid IN ('oxagb','oximpressum') AND OXSHOPID = '$sShopId' " .
+            "UNION SELECT oxloadid, oxtitle FROM `$sViewName` " .
+            "WHERE oxloadid LIKE 'mfCushymoco%' AND NOT oxloadid = 'mfCushymocoStart' " .
+            "AND OXSHOPID = '$sShopId'";
         $oDb       = $this->_oVersionLayer->getDb(true);
         $aContents = $oDb->getAll($sSelect);
 
@@ -969,8 +983,8 @@ class cushymoco extends oxUBase
         $oBasket->calculateBasket(true);
         $response = array(
             'articles'      => array(),
-            'totalBrutto'   => $oBasket->getFProductsPrice(),
-            'totalDelivery' => $oBasket->getFDeliveryCosts(),
+            'totalProducts' => $oBasket->getFProductsPrice(),
+            'shipping'      => $oBasket->getFDeliveryCosts(),
             'total'         => $oBasket->getFPrice(),
             'currency'      => $this->_oVersionLayer->getConfig()->getActShopCurrencyObject()->sign,
         );
@@ -979,7 +993,7 @@ class cushymoco extends oxUBase
             $aProduct['cartItemId'] = $key;
             $aProduct['amount']     = $oBasketItem->getAmount();
             $aProduct['total']      = $oBasketItem->getFTotalPrice();
-            $response['articles'][] = $aProduct;
+            $response['products'][] = $aProduct;
         }
 
         $this->_sAjaxResponse = $this->_successMessage($response);
@@ -996,15 +1010,29 @@ class cushymoco extends oxUBase
     {
         $this->_getSessionId();
         $oBasket  = $this->_oVersionLayer->getBasket();
-        $oArticle = $this->_getArticleById();
+        $oArticle = $this->_getArticleById('anid', true);
 
         if ($oArticle) {
             $sItemKey = $oBasket->getItemKey($oArticle->oxarticles__oxid->value);
             if ($sItemKey) {
                 $oBasket->removeItem($sItemKey);
+                $oBasket->calculateBasket(true);
+                $this->_iBasketProductsCount = $oBasket->getProductsCount();
             }
-            $this->_sAjaxResponse = $this->_successMessage(true);
+            $this->_sAjaxResponse = $this->_successMessage(
+                array(
+                    'success'       => true,
+                    'totalProducts' => $oBasket->getFProductsPrice(),
+                    'shipping'      => $oBasket->getFDeliveryCosts(),
+                    'total'         => $oBasket->getFPrice(),
+                    'currency'      => $this->_oVersionLayer->getConfig()->getActShopCurrencyObject()->sign,
+                )
+            );
+
+            return;
         }
+
+        $this->_sAjaxResponse = $this->_errorMessage('Shopping cart update failed.');
     }
 
     /**
@@ -1022,7 +1050,7 @@ class cushymoco extends oxUBase
          */
         $this->_getSessionId();
         $oBasket   = $this->_oVersionLayer->getBasket();
-        $oArticle  = $this->_getArticleById();
+        $oArticle  = $this->_getArticleById('anid', true);
         $iQuantity = max($this->_oVersionLayer->getRequestParam('qty'), 1);
 
         if ($oArticle) {
@@ -1030,8 +1058,22 @@ class cushymoco extends oxUBase
             foreach ($oBasket->getContents() as $oBasketItem) {
                 if ($oBasketItem->getArticle()->oxarticles__oxid->value == $oArticle->oxarticles__oxid->value) {
                     $oBasketItem->setAmount($iQuantity);
+                    $oBasket->calculateBasket(true);
 
-                    $this->_sAjaxResponse = $this->_successMessage(true);
+                    $oConfig       = $this->_oVersionLayer->getConfig();
+                    $oShopCurrency = $oConfig->getActShopCurrencyObject();
+                    $sPrice        = $oBasketItem->getFTotalPrice() . ' ' . $oShopCurrency->sign;
+
+                    $this->_sAjaxResponse = $this->_successMessage(
+                        array(
+                            'success'       => true,
+                            'productPrice'  => $sPrice,
+                            'totalProducts' => $oBasket->getFProductsPrice(),
+                            'shipping'      => $oBasket->getFDeliveryCosts(),
+                            'total'         => $oBasket->getFPrice(),
+                            'currency'      => $oShopCurrency->sign,
+                        )
+                    );
                     break;
                 }
             }
@@ -1057,7 +1099,8 @@ class cushymoco extends oxUBase
             if ($oArticle) {
                 $oBasket->addToBasket($oArticle->oxarticles__oxid->value, $iQuantity);
                 $oBasket->calculateBasket(true);
-                $this->_sAjaxResponse = $this->_successMessage($oBasket->getProductsCount());
+                $this->_iBasketProductsCount = $oBasket->getProductsCount();
+                $this->_sAjaxResponse        = $this->_successMessage($oBasket->getProductsCount());
             }
         } catch (Exception $e) {
             $oLang                = $this->_oVersionLayer->getLang();

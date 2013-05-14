@@ -7,7 +7,7 @@
         </View>
         <View class="heightToContent" layout="horizontal">
             <Label textid="login.password"/>
-            <TextField id="loginPass" passwordMask="true"/>
+            <TextField id="loginPass" onReturn="doLogin" passwordMask="true"/>
         </View>
         <View class="heightToContent" layout="horizontal">
             <Label textid="login.stayLoggedIn"/>
