@@ -448,7 +448,12 @@ class cushymoco extends oxUBase
     protected function getMobileContentList($iLangId = null, $sShopId = null)
     {
         if (empty($sShopId)) {
-            $sShopId = 1; // default and fallback for CE
+            $sEdition = $this->getShopEdition();
+	    if ($sEdition == "EE") {
+                $sShopId = 1; // default to first shop
+            } else {
+                $sShopId = "oxbaseshop"; // CE and PE use this as shopid
+            }
         }
         $sViewName = getViewName('oxcontents', $iLangId, $sShopId);
         $sSelect   = "SELECT oxloadid AS contentId, oxtitle AS title FROM `$sViewName` " .

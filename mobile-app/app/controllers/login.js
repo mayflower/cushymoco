@@ -8,6 +8,7 @@ function loginSuccess(response) {
 }
 
 function doLogin(e) {
+	$.loginButton.enabled = false;
     comm.login($.loginUser.value, $.loginPass.value, $.loginStayLoggedIn.value, loginSuccess);
 };
 
