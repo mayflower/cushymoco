@@ -9,21 +9,25 @@
 	layout: "vertical"
 }
 "Label": {
-	color: "#fff"
+	color: "#fff",
+	height: Ti.UI.SIZE
 }
 ".title": {
     font:{
         fontSize:24,
         fontWeight:'bold'
     },
-    border:"15px",
-    backgroundPadding:"30px"
+	top: "20"
+}
+".space": {
+	bottom: "20"
 }
 ".subtitle": {
     font:{
         fontSize:20,
         fontWeight:'bold'
-    }
+    },
+    bottom: "20"
 }
 ".subheader": {
 	font:{

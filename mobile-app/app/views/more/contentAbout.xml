@@ -16,6 +16,7 @@
 				<Label> Mayflower entwickelt seit über 10 Jahren branchenunabhängige Individuallösungen auf Grundlage von PHP und weiteren State-of-the-Art Web-Technologien. Mit mehr als 70 Softwareentwicklern an zwei Standorten ist das Unternehmen einer der größten und kompetentesten Premium-PHP-Dienstleister im deutschsprachigen Raum. Unser international anerkanntes Know-how findet sich in Kundenprojekten unter anderem bei E.ON, Siemens oder Nintendo of Europe. </Label>
 			</View>
 			<View class="creator">
+				<Label class="space"/>
 				<Label class="grey">(C) 2013 Mayflower GmbH</Label>
 				<Label class="grey">Logo Design by Daniel Bergauer</Label>
 			</View>
