@@ -33,7 +33,9 @@
 	font:{
 		fontSize: 20,
 		fontWeight: "bold"
-	}
+	},
+    top: "10",
+    bottom: "20"
 }
 ".grey": {
 	color: "#ddd"
