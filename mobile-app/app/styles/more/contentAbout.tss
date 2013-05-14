@@ -1,0 +1,36 @@
+".container": {
+	backgroundColor: "black",
+	color:"white",
+    height:Ti.UI.FILL,
+	layout:"vertical"
+}
+"View": {
+	height: Ti.UI.SIZE,
+	layout: "vertical"
+}
+"Label": {
+	color: "#fff"
+}
+".title": {
+    font:{
+        fontSize:24,
+        fontWeight:'bold'
+    },
+    border:"15px",
+    backgroundPadding:"30px"
+}
+".subtitle": {
+    font:{
+        fontSize:20,
+        fontWeight:'bold'
+    }
+}
+".subheader": {
+	font:{
+		fontSize: 20,
+		fontWeight: "bold"
+	}
+}
+".grey": {
+	color: "#ddd"
+}

@@ -20,7 +20,9 @@ contentList.on('reset', function () {
 
 function openContent(e) {
 	if (e.rowData.id == 'about') {
-		Ti.API.debug("hallo aboutseite");
+	    var contentWin = Alloy.createController("more/contentAbout").getView();
+	    Alloy.CFG.moreNavGroup.open(contentWin, {animated:true});
+	    contentWin.title = "About";
 	} else {  
 		var selModel = contentList.at(e.index);
 	    var contentWin = Alloy.createController("more/contentDetail", {"contentId":e.rowData.id, "contentData":selModel.get('text')}).getView();

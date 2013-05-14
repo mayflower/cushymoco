@@ -1,0 +1,24 @@
+<Alloy>
+	<Window id="aboutWindow">
+		<View class="container">
+			<View class="head">
+				<Label class="title">Cushymoco</Label>
+				<Label class="subtitle">Dein Shop als App.</Label>
+			</View>
+			<View class="info">
+				<Label class="subheader">Cushymoco Verwandelt Deinen Shop In Eine App</Label>
+				<Label> Mit cushymoco erschließt Du dir ohne unnötigen Mehraufwand die mobilen Kanäle zu Deinen Kunden. Unsere App passt sich flexibel Deinem bestehenden Shopsystem an und läuft maßgeschneidert auf aktuellen Smartphones und Tablets. Zumindest auf iPhones \& iPads, aber sind wir bereits dran, auch die Android-Plattformen mit ins Boot zu holen. Als Shop-Backend unterstützt cushymoco derzeit übrigens OXID eSales in der freien Community- und der professionellen Enterprise Edition, und weitere Systeme sind bereits in Vorbereitung.  </Label>
+				<Label class="subheader">Cushymoco Ist Open Source.</Label>
+				<Label> cushymoco stellen wir Dir quelloffen drüben bei GitHub zur Verfügung.  Du kannst die App so wie sie ist an Dein bestehendes Shopsystem anbinden (aktuell ünterstützen wir OXID eSales CE \& EE, weitere Systeme werden folgen). Oder Du passt die App ganz individuell an Deine eigenen Bedürfnisse an. Wenn Du möchtest übernehmen sogar wir das für Dich – dann kannst Du dich ganz auf Deine Kunden konzentrieren und Dich darauf verlassen, dass cushymoco so funktioniert, wie Du es von einer professionellen App erwartest.  </Label>
+				<Label class="subheader">Native Webtechnologie</Label>
+				<Label> Die cushymoco-Plattform beruht im Kern auf bewährter Webtechnologie, die ein nativer Core für maximale Performance auf Trab bringt. So fühlt sich cushymoco nicht nur an wie eine echte Systemanwendung – die Software integriert sich auch nahtlos in die iOS-Systeme (Android in Vorbereitung) Deiner Kunden. Dabei kannst Du auf Code-Ebene jederzeit die volle Leistung des nativen Appcelerator-Titanium-Frameworks abrufen und profitierst von der optimalen Flexibilität moderner Webkomponenten. cushymoco ist also nicht nur einsteigerfreundlich, sondern wird auch professionellen Ansprüchen gerecht. Psychedelic, Baby!  </Label>
+				<Label class="subheader">Über Mayflower</Label>
+				<Label> Mayflower entwickelt seit über 10 Jahren branchenunabhängige Individuallösungen auf Grundlage von PHP und weiteren State-of-the-Art Web-Technologien. Mit mehr als 70 Softwareentwicklern an zwei Standorten ist das Unternehmen einer der größten und kompetentesten Premium-PHP-Dienstleister im deutschsprachigen Raum. Unser international anerkanntes Know-how findet sich in Kundenprojekten unter anderem bei E.ON, Siemens oder Nintendo of Europe. </Label>
+			</View>
+			<View class="creator">
+				<Label class="grey">(C) 2013 Mayflower GmbH</Label>
+				<Label class="grey">Logo Design by Daniel Bergauer</Label>
+			</View>
+		</View>
+	</Window>
+</Alloy>
