@@ -3,7 +3,8 @@ var webStyle = require('webStyle');
 var windowMapping = {
     "productsTab":{controller:"products",window:"productsWindow"},
     "moreTab":{controller:"more",window:"moreWindow"},
-    "accountTab":{controller:"account",window:"accountWindow",loginRequired:true}
+    "accountTab":{controller:"account",window:"accountWindow",loginRequired:true},
+    "cartTab":{controller:"checkout/cart",window:"cartWindow"}
 };
 
 var windows = {};

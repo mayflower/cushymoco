@@ -17,9 +17,7 @@
         </Tab>
 
         <Tab id="cartTab" titleid="menu.cart.title" icon="/icons/cart_small.png">
-            <Window id="cartWindow">
-                <Label>Buscare</Label>
-            </Window>
+            <Window id="cartWindow" navBarHidden="true"/>
         </Tab>
 
         <Tab id="moreTab" titleid="menu.more.title" icon="/icons/gear_small.png">

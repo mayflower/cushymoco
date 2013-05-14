@@ -1,0 +1,20 @@
+<Alloy>
+    <TableViewRow layout="horizontal" onClick="rowEventListener" onSwipe="rowEventListener">
+        <View id="iconView">
+            <ImageView id="productIcon"/>
+        </View>
+        <View id="labelView">
+            <Label id="productTitle"/>
+            <!--Label id="productShortDesc"/-->
+        </View>
+        <View id="editView">
+            <View class="fitToContentHR">
+                <TextField id="quantity"/>
+                <Button id="deleteButton"/>
+            </View>
+            <View class="fitToContentHR">
+                <Label id="productPrice"/>
+            </View>
+        </View>
+    </TableViewRow>
+</Alloy>

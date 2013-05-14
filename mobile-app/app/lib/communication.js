@@ -7,14 +7,21 @@ var http = {
                 if (this.status >= 300) {
                     http.errorCallback(L('error.network.generic_communication'))
                 } else {
-                    var resp = {result:null,error:null};
+                    var resp = {result:null,error:null,cartItemCount:0};
                     try {
                         resp = JSON.parse(this.responseText);
+                        if (typeof resp.cartItemCount != 'undefined') {
+                            Alloy.Globals.updateCartItemCount(resp.cartItemCount);
+                        }
                     } catch (err) {
                         resp.error = L('error.network.invalid_response');
                     }
                     if (resp.error == null) {
-                        callbackSuccess(resp.result);
+                        if (callbackSuccess) {
+                            callbackSuccess(resp.result);
+                        } else {
+                            Ti.API.warn('*** No success callback given. ***');
+                        }
                     } else {
                         http.errorCallback(resp.error);
                     }
@@ -119,10 +126,34 @@ exports.productVariantId = function(productId, selectedVariants, successCallback
     );
 }
 
+exports.shoppingCart = function(successCallback)
+{
+    http.get(
+        exports.buildUrl({fnc:'getBasket'}),
+        successCallback
+    );
+};
+
 exports.addToCart = function(productId, quantity, successCallback)
 {
     http.get(
         exports.buildUrl({fnc:"addToBasket",anid:productId,qty:quantity}),
+        successCallback
+    );
+};
+
+exports.deleteFromCart = function(productId, successCallback)
+{
+    http.get(
+        exports.buildUrl({fnc:"deleteFromBasket",anid:productId}),
+        successCallback
+    );
+};
+
+exports.updateCartItem = function(productId, quantity, successCallback)
+{
+    http.get(
+        exports.buildUrl({fnc:"updateBasket",anid:productId,qty:quantity}),
         successCallback
     );
 };
@@ -144,13 +175,14 @@ exports.login = function(userId, password, stayLoggedIn, successCallback)
         successCallback
     );
 };
+
 exports.logout = function(successCallback)
 {
     http.get(
         exports.buildUrl({fnc:"logout"}),
         successCallback
     );
-}
+};
 
 exports.user = function(successCallback)
 {
@@ -173,7 +205,7 @@ var serialize = function(obj, prefix)
     }
     
     return queryStringObj.join("&");
-}
+};
 
 exports.buildUrl = function(params)
 {
@@ -183,4 +215,4 @@ exports.buildUrl = function(params)
         url += (url.indexOf("?") == -1 ? "?" : "&") + serialize(params);
 	}
 	return url;
-}
+};

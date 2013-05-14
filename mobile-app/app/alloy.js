@@ -19,9 +19,16 @@ String.prototype.repeat = function (count) {
     return new Array(parseInt(count) + 1).join(this);
 };
 
+Alloy.Globals.updateCartItemCount = function (count) {
+    if (count == 0) {
+        count = null;
+    }
+    Alloy.Globals.cartTab.setBadge(count);
+};
+
 Alloy.Globals.addToCart = function(productId, quantity) {
     communication.addToCart(productId, quantity, function(response){
-        Alloy.Globals.cartTab.setBadge(response);
+        Alloy.Globals.updateCartItemCount(response);
     }, function(error) {
         alert(error);
     });

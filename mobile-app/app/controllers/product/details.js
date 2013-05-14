@@ -13,6 +13,7 @@ productPictures.on("reset", function(){
 productPictures.fetch({data:{productId:args.productId}});
 
 productDetails.on("change", function(){
+    $.detailsWindow.setTitle(productDetails.get("title"));
     $.productTitle.setText(productDetails.get("title"));
     $.productPrice.setText(productDetails.get("formattedPrice"));
     $.cartButton.enabled = true;

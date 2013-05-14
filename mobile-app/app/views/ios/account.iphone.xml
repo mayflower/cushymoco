@@ -1,5 +1,5 @@
 <Alloy>
-<View id="accountView">
-         <Label id="mudda">Deine Mudda ... ist iPhone</Label>
-</View>
+    <View id="accountView">
+        <Label id="mudda">Deine Mudda ... ist iPhone</Label>
+    </View>
 </Alloy>

@@ -1,0 +1,35 @@
+"#baseWin":{
+    title:L('cart.window.title'),
+    layout:"vertical"
+},
+"#cartProducts":{
+    top:"0px",
+    width:Ti.UI.FILL,
+    height:Ti.UI.SIZE
+},
+".summaryRow":{
+    height:Ti.UI.SIZE,
+    layout:"horizontal"
+},
+".title":{
+    width:"48%",
+    textAlign:Ti.UI.TEXT_ALIGNMENT_LEFT,
+    left:"5px",
+    font:{
+        fontSize:13
+    }
+},
+".amount":{
+    width:"48%",
+    textAlign:Ti.UI.TEXT_ALIGNMENT_RIGHT,
+    right:"5px",
+    font:{
+        fontSize:13
+    }
+},
+"#totalCosts":{
+    font:{
+        fontSize:14,
+        fontWeight:"bold"
+    }
+}
