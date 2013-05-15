@@ -418,8 +418,8 @@ class cushymoco extends oxUBase
     /**
      * Get a content snippet
      *
-     * @param string  $sContent oxloadid for the snippet
-     * @param integer $iLangId  Language Id
+     * @param string  $sContentId oxloadid for the snippet
+     * @param integer $iLangId    Language Id
      *
      * @return array
      */
@@ -449,7 +449,7 @@ class cushymoco extends oxUBase
     {
         if (empty($sShopId)) {
             $sEdition = $this->getShopEdition();
-	    if ($sEdition == "EE") {
+            if ($sEdition == "EE") {
                 $sShopId = 1; // default to first shop
             } else {
                 $sShopId = "oxbaseshop"; // CE and PE use this as shopid
@@ -827,6 +827,24 @@ class cushymoco extends oxUBase
             $aProducts[] = $this->_articleToArray($oArticle, true);
         }
         $this->_sAjaxResponse = $this->_successMessage($aProducts);
+    }
+
+    /**
+     * Retrieves a title of a category.
+     */
+    public function getCategoryTitle()
+    {
+        /**
+         * @var oxCategory $oCategory
+         */
+        $sCatId = $this->_oVersionLayer->getRequestParam('cnid');
+        if ($sCatId === null) {
+            $this->_errorMessage('Category ID not given!');
+        }
+
+        $oCategory = oxNew('oxCategory');
+        $oCategory->load($sCatId);
+        $this->_successMessage($oCategory->getTitle());
     }
 
     public function getCategoryList()
