@@ -1,3 +1,4 @@
+var comm = require('communication');
 var args = arguments[0] || {};
 // var categoryList = $.categoryList;
 var categoryList = Alloy.createCollection("category");
@@ -44,8 +45,15 @@ function openNav(e) {
         var navWin = Alloy.createController("product/details", {"productId":selModel.get('productId')}).getView();
     } else  {
         var selModel = categoryList.at(index);
-        var navWin = Alloy.createController("product/categories", {"catId":e.rowData.id}).getView();
+        var navWin = Alloy.createController("product/categories", {"catId":e.rowData.id, title:selModel.get('title')}).getView();
     }
     Alloy.CFG.productNavGroup.open(navWin, {animated:true});
     navWin.title = selModel.get("title");
+}
+if (args.title) {
+    $.index.setTitle(args.title);
+} else {
+    comm.getCategoryTitle(args.catId, function(response) {
+        $.index.setTitle(response);
+    });
 }

@@ -80,7 +80,7 @@ function doLogout(e)
     });
 }
 
-communication.startScreen(function(response) {	
+communication.startScreen(function(response) {
     $.startContent.html = webStyle.getBasicPageLayout(response.pageContent, false);
 
     $.homeWindow.title = response.title;
@@ -91,4 +91,6 @@ communication.startScreen(function(response) {
 });
 
 Alloy.Globals.cartTab = $.cartTab;
+Alloy.Globals.homeTab = $.homeTab;
+Alloy.Globals.productsTab = $.productsTab;
 $.index.open();

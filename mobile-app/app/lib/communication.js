@@ -78,6 +78,14 @@ exports.category = function(categoryId, successCallback)
     );
 }
 
+exports.getCategoryTitle = function(categoryId, successCallback)
+{
+    http.get(
+        exports.buildUrl({fnc:"getCategoryTitle",cnid:categoryId}),
+        successCallback
+    );
+}
+
 exports.productList = function(categoryId, successCallback)
 {
     http.get(
