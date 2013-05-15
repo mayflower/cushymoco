@@ -25,6 +25,12 @@ You can find more information at http://www.cushymoco.com/ - brought to you by [
 
 Please have a look at the [README.md](mobile-app/README.md) in `mobile-app/`
 
+## Screenshots
+
+![Startpage](screenshots/cushymoco_startpage.jpg)
+![Product Overview]()
+![Product Detail]()
+
 ## Bug tracker
 
 Have a bug or a feature request? [Please open a new issue](https://github.com/Mayflower/cushymoco/issues). Before opening any issue, please search for existing issues and read the [Issue Guidelines](https://github.com/necolas/issue-guidelines), written by [Nicolas Gallagher](https://github.com/necolas/).
