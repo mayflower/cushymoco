@@ -29,4 +29,4 @@ Checkout this repository, cd into `shop-connector/OXID/` and move the directorie
 ## License
 
 The shop connector code is subject to the GPL-3 for compatibility with OXID eShop Community Edition
-(see [LICENSE.txt])
+(see [LICENSE.txt](LICENSE.txt))
