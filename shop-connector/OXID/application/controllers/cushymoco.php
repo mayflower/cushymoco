@@ -844,7 +844,7 @@ class cushymoco extends oxUBase
 
         $oCategory = oxNew('oxCategory');
         $oCategory->load($sCatId);
-        $this->_successMessage($oCategory->getTitle());
+        $this->_sAjaxResponse = $this->_successMessage($oCategory->getTitle());
     }
 
     public function getCategoryList()
