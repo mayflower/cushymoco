@@ -110,7 +110,7 @@ ol {
 		
 		.banner-sub {
 			
-			height: 50px;
+			min-height: 50px;
 			display: block;			
 			@include background(linear-gradient(top, #666, #444 60%, #222));
 			
@@ -118,7 +118,7 @@ ol {
 			.banner-text {
 				color: #aaa;
 				
-				padding: 13px 15px;
+				padding: 13px 15px 1px;
 				font-size: 12px;
 				b {
 					color: #fff;

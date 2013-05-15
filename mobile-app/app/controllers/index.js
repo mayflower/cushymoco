@@ -83,6 +83,7 @@ function doLogout(e)
 
 communication.startScreen(function(response) {	
     $.startContent.html = webStyle.getBasicPageLayout(response.pageContent, false);
+    $.startContent.setDisableBounce(true);
 
     $.homeWindow.title = response.title;
     Alloy.Globals.loggedIn = response.loggedIn;
