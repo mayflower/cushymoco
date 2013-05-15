@@ -1,5 +1,16 @@
 <Alloy>
     <View id="accountView">
-        <Label id="mudda">Deine Mudda ... ist iPhone</Label>
+	    <View class="container">
+    	    <Label id="accountUsername"/>
+    	    <Label id="accountEmail"/>
+    	    <Label id="accountCompany"/>
+    	    <Label class="title" textid="account.billingAddress.title"/>
+            <Label id="billingStreet"/>
+            <Label id="billingStreetAdd"/>
+            <Label id="billingZipCity"/>
+            <Label id="billingState"/>
+            <Label id="billingCountry"/>
+	    </View>
+        <Button id="accountCallButton" />
     </View>
 </Alloy>

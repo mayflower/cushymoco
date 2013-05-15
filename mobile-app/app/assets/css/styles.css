@@ -179,7 +179,7 @@ ol {
 }
 /* line 111, ../../sass/styles.scss */
 .teaser-banner li.teaser-item .banner-sub {
-  height: 50px;
+  min-height: 50px;
   display: block;
   background: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #666666), color-stop(60%, #444444), color-stop(100%, #222222));
   background: -webkit-linear-gradient(top, #666666, #444444 60%, #222222);
@@ -190,7 +190,7 @@ ol {
 /* line 118, ../../sass/styles.scss */
 .teaser-banner li.teaser-item .banner-sub .banner-text {
   color: #aaa;
-  padding: 13px 15px;
+  padding: 13px 15px 1px;
   font-size: 12px;
 }
 /* line 123, ../../sass/styles.scss */

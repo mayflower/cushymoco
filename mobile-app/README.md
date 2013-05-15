@@ -1,12 +1,4 @@
-Cushymoco - Mobile App
-======================
+## License cushymoco mobile app
 
-## Setup
-
-Clone the project
-
-    $ git@github.com:Mayflower/cushymoco.git
-
-and run the setup.sh
-
-    $ bash setup.sh
+The mobile app code is subject to a BSD 2-clause license
+(see [LICENSE.txt](LICENSE.txt))
