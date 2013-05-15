@@ -10,8 +10,7 @@ The mobile app code is subject to a BSD 2-clause license
 License Shop Connector
 ----------------------
 
-The shop connector code is subject to the GPL-3 for
-compatibility with Oxid eShop CE 
+The shop connector code is subject to the GPL-3 for compatibility with OXID eShop Community Edition
 (see shop-connector/LICENSE.txt)
 
 License Icons
