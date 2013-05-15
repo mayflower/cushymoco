@@ -3,7 +3,20 @@ Cushymoco
 
 *Cushymoco is a shop-agnostic native mobile app framework for e-commerce shops like OXID, Magento and Shopware.*
 
+You can find more information at http://www.cushymoco.com/
+
 ## Features
+
+  * native mobile app for iOS (other platforms supported soon)
+  * Open Source
+  * for iPhone and iPad
+  * retina-ready
+  * currently supporting OXID eShop Community Edition & Enterprise Edition
+  * custom startpage through the CMS of your shop
+  * browse through categories and products
+  * put products in the basket
+  * login as a shop user
+  * integrate CMS pages from the shop
 
 
 ## Setup
