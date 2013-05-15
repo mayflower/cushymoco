@@ -3,7 +3,7 @@ Cushymoco
 
 *Cushymoco is a shop-agnostic native mobile app framework for e-commerce shops like OXID, Magento and Shopware.*
 
-You can find more information at http://www.cushymoco.com/
+You can find more information at http://www.cushymoco.com/ - brought to you by [MAYFLOWER](http://www.mayflower.de/)
 
 ## Features
 
