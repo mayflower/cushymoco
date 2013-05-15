@@ -28,8 +28,8 @@ Please have a look at the [README.md](mobile-app/README.md) in `mobile-app/`
 ## Screenshots
 
 ![Startpage](screenshots/cushymoco_startpage.jpg)
-![Product Overview]()
-![Product Detail]()
+![Product Overview](screenshots/cushymoco_productoverview.jpg)
+![Product Detail](screenshots/cushymoco_productdetailpage.jpg)
 
 ## Bug tracker
 
