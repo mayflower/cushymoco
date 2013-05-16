@@ -1,5 +1,7 @@
 "#productDetailsPage":{
-    type:"vertical"
+    type:"vertical",
+    showHorizontalScrollIndicator:false,
+    width:Ti.UI.FILL
 },
 "#productDetailsView": {
     layout:"vertical",
