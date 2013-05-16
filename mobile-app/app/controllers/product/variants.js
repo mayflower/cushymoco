@@ -20,6 +20,7 @@ productVariants.on("reset", function() {
     labels.map(function(label) {
         $.variantsView.remove(label);
     });
+    
     labels = [];
 
     for (var i = 0; i < args.variantGroupCount; i++) {
@@ -43,7 +44,7 @@ productVariants.on("reset", function() {
             var group = productVariantGroups.where({groupId:currentGroupId})[0];
             
             selectedVariant[currentGroupId] = variant.get('variantId');
-            labels[currentGroupId].text = group.get('title') + ': '  + variant.get('title');
+            labels[currentGroupId].value = group.get('title') + ': '  + variant.get('title');
             productVariantGroups.fetch({data:{productId:args.productId}});
         });
 
@@ -54,16 +55,30 @@ productVariants.on("reset", function() {
             labelText += ': ' + variant.get('title');
         }
         
-        var label = Titanium.UI.createLabel({
-            text:labelText,
+        var selectButton = Titanium.UI.createButton({
+            style:Ti.UI.iPhone.SystemButton.DISCLOSURE,
+            transform:Titanium.UI.create2DMatrix({ rotate: 90 })
+        });
+        
+        var label = Titanium.UI.createTextField({
+            value:labelText,
+            height:"40px",
+            width:"95%",
+            top:"5px",
+            editable:false,
+            rightButton:selectButton,
+            rightButtonMode:Ti.UI.INPUT_BUTTONMODE_ALWAYS,
+            borderStyle:Ti.UI.INPUT_BORDERSTYLE_ROUNDED,
             id:groupId
         });
+        
         label.addEventListener('click', function(e) {
             currentGroupId = e.source.id;
             variantSelects[currentGroupId].show();
         });
-        labels[groupId] = label;
         
+        labels[groupId] = label;
+                
         $.variantsView.add(label);
     }
     
