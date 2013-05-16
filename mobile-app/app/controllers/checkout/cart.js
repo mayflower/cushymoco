@@ -1,5 +1,7 @@
 var cartModel = Alloy.createModel('cart');
 var tableData = [];
+var shoppingCartView = $.shoppingCart;
+var emptyCartHintView = $.emptyCartHint;
 
 function onProductDelete(e)
 {
@@ -14,6 +16,11 @@ function onProductDelete(e)
                 	$.shippingCosts.text = response.shipping + ' ' + response.currency;
                 }
                 $.totalCosts.text = response.total + ' ' + response.currency;
+                
+                if (cartModel.products.length == 0) {
+                    $.baseWin.remove(shoppingCartView);
+                    $.baseWin.add(emptyCartHintView);
+                }
             } else {
                 cartModel.fetch();
             }
@@ -79,12 +86,12 @@ function updateCart()
 
 cartModel.on('change', function() {
     if (Alloy.Globals.cartItemCount > 0) {
-        $.baseWin.remove($.emptyCartHint);
+        $.baseWin.remove(emptyCartHintView);
         updateCart();
         return;
     }
     
-        $.baseWin.remove($.shoppingCart);
+        $.baseWin.remove(shoppingCartView);
 });
 
 cartModel.fetch();
