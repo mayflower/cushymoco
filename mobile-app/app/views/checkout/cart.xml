@@ -2,7 +2,7 @@
     <NavigationGroup id="cartNavigation">
         <Window id="baseWin">
             <View id="emptyCartHint">
-                <Label id="emptyCartHintLabel">Ohh nix drin.</Label>
+                <Label id="emptyCartHintLabel" textid="cart.empty.hint"/>
             </View>
             <ScrollView id="shoppingCart" showHorizontalScrollIndicator="false" layout="vertical">
                 <TableView id="cartProducts"/>
