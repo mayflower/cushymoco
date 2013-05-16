@@ -32,4 +32,10 @@
         fontSize:14,
         fontWeight:"bold"
     }
+},
+"#emptyCartHint":{
+    top:"0px"
+},
+"#shoppingCart":{
+    top:"0px"
 }
