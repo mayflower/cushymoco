@@ -25,6 +25,7 @@ Alloy.Globals.updateCartItemCount = function (count) {
     if (count == 0) {
         count = null;
     }
+    Alloy.Globals.cartItemCount = count;
     Alloy.Globals.cartTab.setBadge(count);
 };
 

@@ -1,7 +1,10 @@
 <Alloy>
     <NavigationGroup id="cartNavigation">
         <Window id="baseWin">
-            <ScrollView showHorizontalScrollIndicator="false" layout="vertical">
+            <View id="emptyCartHint">
+                <Label id="emptyCartHintLabel">Ohh nix drin.</Label>
+            </View>
+            <ScrollView id="shoppingCart" showHorizontalScrollIndicator="false" layout="vertical">
                 <TableView id="cartProducts"/>
                 <View height="2" backgroundColor="#444"/>
                 <View class="summaryRow">
