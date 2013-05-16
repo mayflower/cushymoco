@@ -34,7 +34,9 @@ productDetails.on("change", function(){
     }
     
     var content = webStyle.getBasicPageLayout(productDetails.get("longDesc"));
-    $.productInfo.addView(Titanium.UI.createWebView({html:content}));
+    var contentView = Titanium.UI.createWebView({html:content});
+    contentView.setDisableBounce(true);
+    $.productInfo.addView(contentView);
     
     // Show paging control if there are more than one information pages.
     $.productInfo.showPagingControl = ($.productInfo.views.length > 1);

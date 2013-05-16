@@ -8,7 +8,11 @@ function onProductDelete(e)
             if (response.success) {
                 $.cartProducts.deleteRow(e.rowIndex, {animated: true});
                 $.totalProducts.text = response.totalProducts + ' ' + response.currency;
-                $.shippingCosts.text = response.shipping + ' ' + response.currency;
+                if (response.shipping == false) {
+                	$.shippingCosts.text = '';
+                } else {
+                	$.shippingCosts.text = response.shipping + ' ' + response.currency;
+                }
                 $.totalCosts.text = response.total + ' ' + response.currency;
             } else {
                 cartModel.fetch();
@@ -28,7 +32,11 @@ function onProductUpdate(e)
             }
             
             $.totalProducts.text = response.totalProducts + ' ' + response.currency;
-            $.shippingCosts.text = response.shipping + ' ' + response.currency;
+                if (response.shipping == false) {
+                	$.shippingCosts.text = '';
+                } else {
+                	$.shippingCosts.text = response.shipping + ' ' + response.currency;
+                }
             $.totalCosts.text = response.total + ' ' + response.currency;
         }
     });
@@ -60,7 +68,12 @@ function updateCart()
     
     var currency = cartModel.get('currency');
     $.totalProducts.text = cartModel.get('totalProducts') + ' ' + currency;
-    $.shippingCosts.text = cartModel.get('shipping') + ' ' + currency;
+    var shipping = cartModel.get('shipping');
+    if (shipping == false) {
+    	$.shippingCosts.text = '';
+    } else {
+    	$.shippingCosts.text = cartModel.get('shipping') + ' ' + currency;
+    }
     $.totalCosts.text = cartModel.get('total') + ' ' + currency;
 }
 

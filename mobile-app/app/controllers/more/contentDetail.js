@@ -7,4 +7,5 @@ contentDetails.fetch({data:{contentId:args.contentId}});
 contentDetails.on('change', function(){
 	var contentData = contentDetails.get('content') || '';
 	$.contentData.html = webStyle.getBasicPageLayout(contentData);
+	$.contentData.setDisableBounce(true);
 });

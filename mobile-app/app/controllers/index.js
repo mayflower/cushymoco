@@ -62,10 +62,19 @@ function openWindow(e)
     }
 }
 
+function onTabFocus(e)
+{
+    if (e.source.id == 'homeTab') {
+        loadStartPage();
+    }
+    
+    openWindow(e);
+}
+
 function bindTabEvents(e)
 {
     e.source.tabs.map(function(tab) {
-        tab.addEventListener('focus', openWindow);
+        tab.addEventListener('focus', onTabFocus);
     });
 }
 
@@ -75,21 +84,28 @@ function doLogout(e)
         Alloy.Globals.loggedIn = false;
         hideLogoutButton();
         if (windowMapping[tabId] && windowMapping[tabId].loginRequired) {
-            var event 
             $.index.getActiveTab().fireEvent('focus', {previousTab:$.getView(tabId),source:$.getView(tabId)});
         }
     });
 }
 
-communication.startScreen(function(response) {	
-    $.startContent.html = webStyle.getBasicPageLayout(response.pageContent, false);
+function loadStartPage()
+{
+    communication.startScreen(function(response) {
+        $.startContent.html = webStyle.getBasicPageLayout(response.pageContent, false);
+        $.startContent.setDisableBounce(true);
+    
+        $.homeWindow.title = response.title;
+        Alloy.Globals.loggedIn = response.loggedIn;
+        if (response.loggedIn) {
+            showLogoutButton();
+        }
+    });
+}
 
-    $.homeWindow.title = response.title;
-    Alloy.Globals.loggedIn = response.loggedIn;
-    if (response.loggedIn) {
-        showLogoutButton();
-    }
-});
+loadStartPage();
 
 Alloy.Globals.cartTab = $.cartTab;
+Alloy.Globals.homeTab = $.homeTab;
+Alloy.Globals.productsTab = $.productsTab;
 $.index.open();
