@@ -1,0 +1,47 @@
+".container": {
+	backgroundColor: "black",
+	color:"white",
+    height:Ti.UI.FILL,
+	layout:"vertical"
+}
+"View": {
+	height: Ti.UI.SIZE,
+	layout: "vertical"
+}
+"#logo": {
+	borderRadius: 20,
+	borderColor: "#000",
+	brderWidth: 1
+}
+"Label": {
+	color: "#fff",
+	height: Ti.UI.SIZE
+}
+".title": {
+    font:{
+        fontSize:24,
+        fontWeight:'bold'
+    },
+	top: "20"
+}
+".space": {
+	bottom: "20"
+}
+".subtitle": {
+    font:{
+        fontSize:20,
+        fontWeight:'bold'
+    },
+    bottom: "20"
+}
+".subheader": {
+	font:{
+		fontSize: 20,
+		fontWeight: "bold"
+	},
+    top: "10",
+    bottom: "20"
+}
+".grey": {
+	color: "#ddd"
+}

@@ -1,0 +1,36 @@
+<html>
+	<head>
+	    <script type="text/javascript">
+            var clickEventHandler = function(e) {
+                var TiAppEventData = {
+                    hash: this.hash,
+                    host: this.host,
+                    href: this.href,
+                    hostname: this.hostname,
+                    pathname: this.pathname,
+                    port: this.port,
+                    protocol: this.protocol,
+                    search: this.search                    
+                };
+                Ti.App.fireEvent('webView:linkClick', TiAppEventData);
+                e.cancelBubble = true;
+                return false;
+            };
+
+	        document.addEventListener('DOMContentLoaded', function (e) {
+                var anchorElements = document.getElementsByTagName('a');
+                for (var i = 0; i < anchorElements.length; i++) {
+                    anchorElements[i].onclick = clickEventHandler; 
+                }
+	        });
+	    </script>
+		<link rel="stylesheet" type="text/css" href="css/styles.css"/>
+		<!-- TODO: add script here -->
+	</head>
+	
+	<body>
+		<div class="defaultWebview">
+			<%=content%>
+		</div>
+	</body>
+</html>

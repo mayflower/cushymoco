@@ -1,0 +1,7 @@
+<Alloy>
+	<NavigationGroup id="moreNavGroup">
+	    <Window id="moreWindow">
+		    <Require src="more/contents" contentId="" />
+	    </Window>
+	</NavigationGroup>
+</Alloy>

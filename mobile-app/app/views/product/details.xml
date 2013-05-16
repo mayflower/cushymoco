@@ -1,0 +1,15 @@
+<Alloy>
+    <Window id="detailsWindow">
+        <ScrollView id="productDetailsPage">
+            <View id="productDetailsView">
+                <ScrollableView id="productPictures"/>
+                <View backgroundColor="#000" width="Ti.UI.FILL" height="Ti.UI.SIZE">
+                    <Label id="productTitle"/>
+                    <Label id="productPrice"/>
+                    <Button id="cartButton" onClick="addToBasket"/>
+                </View>
+                <ScrollableView id="productInfo"/>
+            </View>
+        </ScrollView>
+    </Window>
+</Alloy>

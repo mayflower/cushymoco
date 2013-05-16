@@ -1,0 +1,23 @@
+<Alloy>
+    <NavigationGroup id="cartNavigation">
+        <Window id="baseWin">
+            <ScrollView showHorizontalScrollIndicator="false" layout="vertical">
+                <TableView id="cartProducts"/>
+                <View height="2" backgroundColor="#444"/>
+                <View class="summaryRow">
+                    <Label class="title" text="Warenwert:"/>
+                    <Label class="amount" id="totalProducts"/>
+                </View>
+                <View class="summaryRow">
+                    <Label class="title" text="Versand:"/>
+                    <Label class="amount" id="shippingCosts"/>
+                </View>
+                <View height="1" backgroundColor="#888"/>
+                <View class="summaryRow">
+                    <Label class="title" text="Gesamt:"/>
+                    <Label class="amount" id="totalCosts"/>
+                </View>
+            </ScrollView>
+        </Window>
+    </NavigationGroup>
+</Alloy>

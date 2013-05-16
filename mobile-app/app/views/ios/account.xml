@@ -1,0 +1,6 @@
+<Alloy>
+    <Window id="accountWindow">
+        <Require platform="ios" formFactor="handheld" src="account.iphone" />
+        <Require platform="ios" formFactor="tablet" src="account.ipad" catId=""/>
+    </Window>
+</Alloy>

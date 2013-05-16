@@ -1,0 +1,10 @@
+"#accountWindow":{
+    title:L('account.window.title')
+},
+"#cartWindow":{
+    title:L('cart.window.title')
+},
+"#moreWindow":{
+    navBarHidden:true,
+    title:L('more.window.title')
+}

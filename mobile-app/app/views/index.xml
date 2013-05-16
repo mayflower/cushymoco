@@ -1,0 +1,27 @@
+<Alloy>
+	<TabGroup onOpen="bindTabEvents">
+		<!-- Explicit Window declaration -->
+		<Tab id="homeTab" titleid="menu.home.title" icon="/icons/home_small.png">
+			<Window id="homeWindow" title="Shop">
+			    <Button id="logoutButton" titleid="login.logoutButton" visible="false" onClick="doLogout"/>
+			 	<WebView id="startContent"></WebView>
+			</Window>
+		</Tab>
+
+        <Tab id="productsTab" titleid="menu.products.title" icon="/icons/shopping_bag_small.png">
+            <Window id="productsWindow" navBarHidden="true"/>
+        </Tab>
+
+        <Tab id="accountTab" titleid="menu.account.title" icon="/icons/user_small.png">
+            <Window id="accountWindow" title="Account" />
+        </Tab>
+
+        <Tab id="cartTab" titleid="menu.cart.title" icon="/icons/cart_small.png">
+            <Window id="cartWindow" navBarHidden="true"/>
+        </Tab>
+
+        <Tab id="moreTab" titleid="menu.more.title" icon="/icons/gear_small.png">
+            <Window id="moreWindow"/>
+        </Tab>
+	</TabGroup>
+</Alloy>

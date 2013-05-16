@@ -1,0 +1,6 @@
+<Alloy>
+    <Collection id="categoryList" src="category" instance="true"/>
+    <Window id="index">
+        <TableView id="categoryTable" onClick="openNav"/>
+    </Window>
+</Alloy>

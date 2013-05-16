@@ -1,0 +1,7 @@
+<Alloy>
+			<NavigationGroup id="productNavGroup">
+			    <Window id="categoriesWindow" titleid="products.window.title">
+				    <Require src="product/categories" catId=""/>
+		        </Window>
+			</NavigationGroup>
+</Alloy>

@@ -1,0 +1,136 @@
+/* Welcome to Compass.
+ * In this file you should write your main styles. (or centralize your imports)
+ * Import this file using the following HTML or equivalent:
+ * <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css" /> */
+
+@import "compass/reset";
+
+@import "compass/css3/images";
+@import "compass/css3/transition";
+
+
+
+html {
+	
+	font-family: "Helvetica Neue", HelveticaNeue, Helvetica, sans-serif;
+	background-color: #000;
+	color: #eee;
+	
+}
+
+
+b, strong {
+	font-weight: bold;
+}
+p {
+	margin-bottom: 1.5em;
+}
+a {
+	color: #fff;
+	text-decoration: underlined;
+}
+
+.embedded-view {
+	padding: 5px;
+}
+
+h1 {
+	font-size: 26px;
+	font-weight: bold;
+	margin: 1.5em 0;
+}
+h2 {
+	font-size: 22px;
+	font-weight: bold;
+	margin: 1.5em 0;
+}
+h3 {
+	font-size: 20px;
+	font-weight: bold;
+	margin: 1.5em 0;
+}
+
+ul, ol {
+	margin: 1em 0 1em 1em;
+	padding-left: 1em;
+	li {
+		margin-bottom: 1.5em;
+	}
+}
+
+ul {
+	list-style-type: disc;
+}
+ol {
+	list-style-type: decimal;
+}
+
+
+.sub-teaser {
+	.teaser-item {
+		&:nth-child(2n+1) {
+			width: 48.5%;
+			float: left;
+			clear: both;
+			margin-top: 30px;
+		}
+		&:nth-child(2n+2) {
+			width: 48.5%;
+			float: right;
+			margin-top: 30px;
+		}
+	}
+}
+
+
+
+.teaser-banner {
+	list-style-type: none;
+	padding: 0;
+	margin: 0;
+	width: 100%;
+	height: auto;
+	li.teaser-item {
+		padding: 0;
+		margin: 0;
+		position: relative;
+		
+		img.banner-image {
+			display: block;
+			width: 100%;
+		}		
+		
+		.teaser-link {
+			display: block;
+			position: absolute;
+			width: 100%;
+			height: 100%;
+			text-decoration: none;
+		}
+		
+		.banner-sub {
+			
+			min-height: 50px;
+			display: block;			
+			@include background(linear-gradient(top, #666, #444 60%, #222));
+			
+			
+			.banner-text {
+				color: #aaa;
+				
+				padding: 13px 15px 1px;
+				font-size: 12px;
+				b {
+					color: #fff;
+				}
+			}
+			.banner-icon {
+				width: 30px;
+				height: 30px;
+				margin: 10px;
+				float: left;
+			}
+		}
+		
+	}
+}
