@@ -43,7 +43,8 @@ function onProductDetails(e)
     });
 }
 
-cartModel.on('change', function() {
+function updateCart()
+{
     cartModel.products.map(function(cartProduct) {
         var row = Alloy.createController('checkout/cartProductRow', {
             'productId': cartProduct.get('productId'),
@@ -61,6 +62,18 @@ cartModel.on('change', function() {
     $.totalProducts.text = cartModel.get('totalProducts') + ' ' + currency;
     $.shippingCosts.text = cartModel.get('shipping') + ' ' + currency;
     $.totalCosts.text = cartModel.get('total') + ' ' + currency;
+}
+
+cartModel.on('change', function() {
+    if (Alloy.Globals.cartItemCount > 0) {
+        $.shoppingCart.setVisible(true);
+        $.emptyCartHint.setVisible(false);
+        updateCart();
+        return;
+    }
+    
+    $.shoppingCart.setVisible(false);
+    $.emptyCartHint.setVisible(true);
 });
 
 cartModel.fetch();
