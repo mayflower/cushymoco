@@ -79,14 +79,12 @@ function updateCart()
 
 cartModel.on('change', function() {
     if (Alloy.Globals.cartItemCount > 0) {
-        $.shoppingCart.setVisible(true);
-        $.emptyCartHint.setVisible(false);
+        $.baseWin.remove($.emptyCartHint);
         updateCart();
         return;
     }
     
-    $.shoppingCart.setVisible(false);
-    $.emptyCartHint.setVisible(true);
+        $.baseWin.remove($.shoppingCart);
 });
 
 cartModel.fetch();
