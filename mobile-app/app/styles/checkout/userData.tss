@@ -1,0 +1,30 @@
+"#userDataWindow":{
+    title:L('cart.userData.title')
+},
+".container": {
+    color:"#000",
+    backgroundColor:"#FFF",
+    layout:"vertical"
+},
+"Label":{
+    left:"10px",
+    width:Ti.UI.SIZE,
+    height:Ti.UI.SIZE,
+    font:{
+        fontSize:12,
+        fontWeight:"normal"
+    }
+},
+"#accountUsername":{
+    font:{
+        fontSize:18,
+        fontWeight:"bold"
+    }
+},
+".title":{
+    top:"10px",
+    font:{
+        fontSize:14,
+        fontWeight:"bold"
+    }
+}
