@@ -690,8 +690,8 @@ class cushymoco extends oxUBase
     protected function _hasVariants($oProduct)
     {
         return empty($oProduct->oxarticles__oxparentid->value) &&
-            !empty($oProduct->oxarticles__oxvarcount->value) &&
-            ($oProduct->oxarticles__oxvarcount->value > 0);
+        !empty($oProduct->oxarticles__oxvarcount->value) &&
+        ($oProduct->oxarticles__oxvarcount->value > 0);
     }
 
     /**
@@ -1218,16 +1218,13 @@ class cushymoco extends oxUBase
 
         // load sets, active set, and active set payment list
         list($aAllSets, $sActShipSet, $aPaymentList) = $this->_oVersionLayer->getDeliverySetList()
-            ->getDeliverySetData($sActShipSet, $this->getUser(), $oBasket);
+                                                       ->getDeliverySetData($sActShipSet, $this->getUser(), $oBasket);
 
-        $result = array(
-            'deliveries' => array(),
-            'payments'   => array(),
-            'actship'    => $sActShipSet,
-        );
+        $aShippings = array();
+        $aPayments  = array();
 
         foreach ($aAllSets as $set) {
-            $result['deliveries'][] = array(
+            $aShippings[] = array(
                 'id'    => $set->oxdeliveryset__oxid->value,
                 'title' => $set->oxdeliveryset__oxtitle->value,
                 'pos'   => $set->oxdeliveryset__oxpos->value,
@@ -1235,14 +1232,20 @@ class cushymoco extends oxUBase
         }
 
         foreach ($aPaymentList as $pay) {
-            $result['payments'][] = array(
+            $aPayments = array(
                 'id'    => $pay->oxpayments__oxid->value,
                 'title' => $pay->oxpayments__oxdesc->value,
                 'pos'   => $pay->oxpayments__oxsort->value,
             );
         }
 
-        $this->_sAjaxResponse = $this->_successMessage($result);
+        $this->_sAjaxResponse = $this->_successMessage(
+            array(
+                'shippings'         => $aShippings,
+                'payments'          => $aPayments,
+                'currentShippingId' => $sActShipSet,
+            )
+        );
     }
 
     /**
