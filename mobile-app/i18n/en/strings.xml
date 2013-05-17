@@ -1,12 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
   Language: English (en)
-  Translators: stefan (27)
+  Translators: stefan (31)
 -->
 <resources>
     <string name="account.billingAddress.title">Billing address</string>
     <string name="account.window.title">Account</string>
     <string name="cart.empty.hint">Shopping cart is empty.</string>
+    <string name="cart.grandTotal.label">Grand total:</string>
+    <string name="cart.productsTotal.label">Products total:</string>
+    <string name="cart.shippingTotal.label">Shipping costs:</string>
+    <string name="cart.userData.title">User data</string>
     <string name="cart.window.title">Shopping Cart</string>
     <string name="error.dialog.generic_title">An error has occurred.</string>
     <string name="error.network.generic_communication">Network communication error.</string>
