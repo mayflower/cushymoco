@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
   Language: Deutsch (de)
-  Translators: stefan (32)
+  Translators: stefan (34)
 -->
 <resources>
     <string name="account.billingAddress.title">Rechnungsadresse</string>
     <string name="account.window.title">Konto</string>
     <string name="cart.empty.hint">Der Warenkorb ist leer.</string>
     <string name="cart.grandTotal.label">Gesamtsumme:</string>
+    <string name="cart.payment.title">Zahlungsart</string>
     <string name="cart.productsTotal.label">Summe Artikel:</string>
+    <string name="cart.shipping.title">Versandart</string>
     <string name="cart.shippingTotal.label">Versandkosten:</string>
     <string name="cart.userData.title">Benutzerdaten</string>
     <string name="cart.window.title">Warenkorb</string>
