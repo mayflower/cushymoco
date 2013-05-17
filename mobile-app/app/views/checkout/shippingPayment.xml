@@ -1,0 +1,16 @@
+<Alloy>
+    <Window id="shippingPaymentWin">
+        <View id="shippingView">
+            <View layout="horizontal" height="Ti.UI.SIZE">
+                <Label width="50%" height="Ti.UI.SIZE">ID</Label>
+                <Label width="50%" height="Ti.UI.SIZE">Titel</Label>
+            </View>
+        </View>
+        <View id="paymentView">
+            <View layout="horizontal" height="Ti.UI.SIZE">
+                <Label width="50%" height="Ti.UI.SIZE">ID</Label>
+                <Label width="50%" height="Ti.UI.SIZE">Titel</Label>
+            </View>
+        </View>
+    </Window>
+</Alloy>

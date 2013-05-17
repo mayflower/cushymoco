@@ -10,6 +10,7 @@
             <Label id="billingZipCity"/>
             <Label id="billingState"/>
             <Label id="billingCountry"/>
+            <!-- TODO Add shipping address selection. -->
         </View>
     </Window>
 </Alloy>

@@ -24,9 +24,7 @@ var nextStepButton = Ti.UI.createButton({
     title:"Weiter >"
 });
 nextStepButton.addEventListener('click', function(e) {
-    var shippingPaymentWin = Ti.UI.createWindow({
-        title:"Ramses Pyramiden Verleih"
-    });
+    var shippingPaymentWin = Alloy.createController('checkout/shippingPayment', {nav:args.nav}).getView();
     args.nav.open(shippingPaymentWin);
 });
 $.userDataWindow.rightNavButton = nextStepButton;
