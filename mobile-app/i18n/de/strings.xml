@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
   Language: Deutsch (de)
-  Translators: stefan (28)
+  Translators: stefan (31)
 -->
 <resources>
     <string name="account.billingAddress.title">Rechnungsadresse</string>
     <string name="account.window.title">Konto</string>
     <string name="cart.empty.hint">Der Warenkorb ist leer.</string>
+    <string name="cart.grandTotal.label">Gesamtsumme:</string>
+    <string name="cart.productsTotal.label">Summe Artikel:</string>
+    <string name="cart.shippingTotal.label">Versandkosten:</string>
     <string name="cart.window.title">Warenkorb</string>
     <string name="error.dialog.generic_title">Ein Fehler ist aufgetreten.</string>
     <string name="error.network.generic_communication">Fehler während der Datenübertragung.</string>
