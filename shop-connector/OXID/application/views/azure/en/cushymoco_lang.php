@@ -1,7 +1,7 @@
 <?php
 /**
  * Language: English (en)
- * Translators: stefan (31)
+ * Translators: stefan (33)
  */
 $sLangName = "English";
 $aLang = array(
