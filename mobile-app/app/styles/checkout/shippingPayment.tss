@@ -1,0 +1,15 @@
+"#shippingPaymentWin":{
+    layout:'vertical'
+},
+"#shippingView":{
+    top:"10px",
+    layout:'vertical',
+    height:Ti.UI.SIZE,
+    width:Ti.UI.FILL
+},
+"#paymentView":{
+    top:"10px",
+    layout:'vertical',
+    height:Ti.UI.SIZE,
+    width:Ti.UI.FILL
+}
