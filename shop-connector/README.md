@@ -7,6 +7,17 @@ All required files are located under `OXID/` directory.
 
 ## Setup
 
+There is a setup.php script in the shop-connector directory that
+can automate the steps described below. It also can use symbolic
+links instead of copying files, so you get to keep your ability to
+interact with the git repository. "php setup.php -h" shows you
+information on the use, but the short version is:
+
+php setup.php --shop=oxid --version=4.7 --path=/www/oxid --use-links 
+
+This sets up symbolic links of the connector into the running
+instance of your shop (point the path to your shop directory)
+
 ### OXID eShop 4.7.0+
 To use the shop connector with *OXID eShop 4.7.0 (and higher)*, checkout this repository and cd into `shop-connector/OXID/`. From here, copy all files to your OXID root directory:
 
