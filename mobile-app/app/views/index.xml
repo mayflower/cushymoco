@@ -12,6 +12,10 @@
             <Window id="productsWindow" navBarHidden="true"/>
         </Tab>
 
+        <Tab id="searchTab" titleid="menu.search.title" icon="/icons/magnifier_small.png">
+            <Window id="searchWindow" navBarHidden="true"/>
+        </Tab>
+
         <Tab id="accountTab" titleid="menu.account.title" icon="/icons/user_small.png">
             <Window id="accountWindow" title="Account" />
         </Tab>

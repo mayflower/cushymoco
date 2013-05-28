@@ -1,0 +1,27 @@
+".heightToContent":{
+    top:"10px",
+    height:Ti.UI.SIZE
+},
+"Label":{
+    left:"10px",
+    width:"125px"
+},
+"TextField":{
+    borderStyle:Ti.UI.INPUT_BORDERSTYLE_ROUNDED,
+    width:Ti.UI.FILL,
+    right:"10px",
+    autocorrect:false
+},
+"#searchButton":{
+    style:Titanium.UI.iPhone.SystemButtonStyle.BORDERED,
+    width:"125px",
+    height:"45px"
+},
+
+"#numberOfResults": {
+	width:"100%",
+	height:Ti.UI.SIZE
+},
+"#searchResultTable": {
+	top: "20px"
+}

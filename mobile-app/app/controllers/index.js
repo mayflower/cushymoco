@@ -4,7 +4,8 @@ var windowMapping = {
     "productsTab":{controller:"products",window:"productsWindow"},
     "moreTab":{controller:"more",window:"moreWindow"},
     "accountTab":{controller:"account",window:"accountWindow",loginRequired:true},
-    "cartTab":{controller:"checkout/cart",window:"cartWindow"}
+    "cartTab":{controller:"checkout/cart",window:"cartWindow"},
+    "searchTab":{controller:"search", window:"searchWindow"}
 };
 
 var windows = {};

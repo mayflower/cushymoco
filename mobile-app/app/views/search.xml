@@ -1,2 +1,9 @@
 <Alloy>
+	<NavigationGroup id="searchNavGroup">
+	    <Window id="searchWindow" titleid="search.window.title">
+	    	<View layout="vertical">
+			    <Require src="search/input"  id="input"/>
+		    </View>
+        </Window>
+	</NavigationGroup>
 </Alloy>

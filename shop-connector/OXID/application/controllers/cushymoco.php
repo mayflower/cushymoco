@@ -922,6 +922,7 @@ class cushymoco extends oxUBase
                 'title' => $oArticle->oxarticles__oxtitle->value,
                 'short' => $oArticle->oxarticles__oxshortdesc->value,
                 'price' => $oArticle->oxarticles__oxprice->value,
+                'icon'  => $oArticle->getIconUrl(),
                 //       'link'  => $oArticle->getLink(),
             );
         }

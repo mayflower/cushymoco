@@ -1,0 +1,13 @@
+<Alloy>
+    <View id="searchInputView" layout="vertical">
+    	
+	    <View class="heightToContent" layout="horizontal">
+	        <Label textid="search.input.title"/>
+	        <TextField id="searchPhrase"/>
+        </View>
+        <Button id="searchButton" titleid="search.input.searchButton" onClick="doSearch"/>
+        
+        <Label id="numberOfResults" text="Bitte geben Sie einen Begriff ein, nach dem sie Suchen möchten." />
+        <TableView id="searchResultTable" visible="false" onClick = "onSearchItemClicked"/>
+    </View>
+</Alloy>
