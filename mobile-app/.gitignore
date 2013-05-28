@@ -19,6 +19,8 @@ app/Resources
 
 .setup/.tmp/*
 !.setup/.tmp/.gitkeep
+!.setup/manifest
+!.setup/tiapp.xml
 
 # +-----------------------------+
 # |             SASS            |
