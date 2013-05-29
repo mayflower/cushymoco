@@ -2,6 +2,7 @@
 
 namespace Setup\Abstracts;
 
+use Setup\Exception\LogfileNotFoundException;
 use Logger\Logger;
 use Logger\Exception\LogAlreadyExistsException;
 
@@ -226,7 +227,7 @@ abstract class SetupAbstract
     }
 
     /**
-     *
+     * @return string
      */
     protected function _getInstallPath()
     {
@@ -257,6 +258,7 @@ abstract class SetupAbstract
 
     /**
      * @return string
+     *
      * @throws \Exception
      */
     protected function _getLogFile()
@@ -302,16 +304,22 @@ abstract class SetupAbstract
      *
      * @param string $startMsg
      * @param string $endMsg
+     *
+     * @throws LogfileNotFoundException
      */
     protected function _rollback($startMsg = "Rolling back...", $endMsg = "Rollback done.")
     {
-        $this->_printInfo($startMsg);
+        $logFile = $this->_getLogFile();
+
+        if (!file_exists($logFile)) {
+            throw new LogfileNotFoundException("Couldn't find logfile '$logFile'");
+        }
 
         $installedItems = file($this->_getLogFile(), FILE_IGNORE_NEW_LINES + FILE_SKIP_EMPTY_LINES);
         // Reverse array to remove files before folders
         $installedItems = array_reverse($installedItems);
 
-
+        $this->_printInfo($startMsg);
 
         foreach ($installedItems as $item) {
             if (is_file($item)) {
@@ -410,10 +418,14 @@ abstract class SetupAbstract
         // Validate install path
         $this->_getInstallPath();
 
-        $this->_rollback(
-            'Uninstalling shop connector...',
-            'Uninstall complete.'
-        );
+        try {
+            $this->_rollback(
+                'Uninstalling shop connector...',
+                'Uninstall complete.'
+            );
+        } catch (LogfileNotFoundException $e) {
+            $this->_printerr("No installation found. " . $e->getMessage());
+        }
     }
 
     /**
