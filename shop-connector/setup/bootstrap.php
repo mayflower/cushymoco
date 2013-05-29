@@ -19,20 +19,10 @@ use Setup\CliSetup;
 use Setup\WebSetup;
 
 
-
-
-
 if (Setup::onCLI()) {
     $setup = new CliSetup();
 } else {
     $setup = new WebSetup();
 }
-
-//try {
-//    $setup->run();
-//} catch (ShopNotFoundException $e) {
-//    $this->_println($e->getMessage());
-//    exit(1);
-//}
 
 $setup->run();
