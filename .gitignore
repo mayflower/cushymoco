@@ -13,3 +13,22 @@ atlassian-ide-plugin.xml
 
 .DS_Store
 
+
+
+# +-----------------------------+
+# | Shop-Connector install logs |
+# +-----------------------------+
+
+shop-connector/setup/logs/*
+
+
+
+# +-----------------------------+
+# |      Keep all .gitkeep      |
+# |-----------------------------+----------------------------------------------+
+# | Keep this at the bottom of this .gitignore.                                |
+# | Ignore a direcotrys contents with an asterisk (/dir/*) and put a .gitkeep  |
+# | in this directory to keep an empty directory in your repository.           |
+# +----------------------------------------------------------------------------+
+
+!.gitkeep
