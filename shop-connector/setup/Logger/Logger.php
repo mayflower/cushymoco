@@ -2,6 +2,8 @@
 
 namespace Logger;
 
+use Logger\Exception\LogAlreadyExistsException;
+
 class Logger
 {
     /** @var String */
@@ -11,11 +13,17 @@ class Logger
     protected $_fileHandle;
 
     /**
-     * @param $file
+     * @param $logFile
+     *
+     * @throws Exception\LogAlreadyExistsException
      */
-    public function __construct($file)
+    public function __construct($logFile)
     {
-        $this->_logFile = $file;
+        if (file_exists($logFile)) {
+            throw new LogAlreadyExistsException("Log '$logFile' already exists");
+        }
+
+        $this->_logFile = $logFile;
     }
 
     /** */
@@ -24,18 +32,19 @@ class Logger
         $fh = $this->_fileHandle;
 
         if (is_resource($fh)) {
-            echo "[Logger] Close logfile: " . $this->_logFile . "\n";
             fclose($fh);
         }
     }
 
+    /**
+     * @param $message
+     */
     public function log($message)
     {
         $fh = $this->_fileHandle;
 
         // open logfile on demand
         if (!is_resource($fh)) {
-            echo "[Logger] Open logfile: " . $this->_logFile . "\n";
             $fh = $this->_lOpen();
         }
 
@@ -44,10 +53,12 @@ class Logger
 
     /**
      * @return resource
+     * @throws Exception\LogAlreadyExistsException
      */
     protected function _lOpen()
     {
         $logFile = $this->_logFile;
+
         $fh = fopen($logFile, 'a') or exit("Can't open logfile: " . $logFile);
         $this->_fileHandle = $fh;
 
