@@ -16,14 +16,6 @@ atlassian-ide-plugin.xml
 
 
 # +-----------------------------+
-# | Shop-Connector install logs |
-# +-----------------------------+
-
-shop-connector/setup/logs/*
-
-
-
-# +-----------------------------+
 # |      Keep all .gitkeep      |
 # |-----------------------------+----------------------------------------------+
 # | Keep this at the bottom of this .gitignore.                                |

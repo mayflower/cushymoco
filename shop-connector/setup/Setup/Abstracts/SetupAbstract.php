@@ -25,7 +25,7 @@ abstract class SetupAbstract
     protected $_logger;
 
     /** @var String */
-    protected $_logName;
+    protected $_installPath;
 
     /**
      * Gets all registered parameters and returns them as associative array.
@@ -45,6 +45,7 @@ abstract class SetupAbstract
         $this->_registerOption('path',      'p', null, self::VALUE_REQUIRED);
         $this->_registerOption('use-links', 'l');
         $this->_registerOption('force',     'f');
+        $this->_registerOption('uninstall', 'u');
 
         $this->_params = $this->_getParameters();
 
@@ -57,22 +58,13 @@ abstract class SetupAbstract
         }
 
         if (!empty($params)) {
-            if (isset($this->_params['path'])) {
-                $this->_params['path'] = rtrim(
-                    preg_replace(
-                        '/\/+|\\\\+/',
-                        '/',
-                        $this->_params['path']
-                    ),
-                    '/'
-                );
-            }
-
             // this might be removed
             $this->_printUsedParams();
 
-            // shop installation
-            if (isset($params['shop'])) {
+            // shop installation / uninstallation
+            if (isset($params['uninstall'])) {
+                $this->_uninstall();
+            } else if (isset($params['shop'])) {
                 $shop = $params['shop'];
 
                 $installerMethod = "_install_$shop";
@@ -222,6 +214,7 @@ abstract class SetupAbstract
                 '    -p, --path=       The path to the existing shop installation.' . "\n" .
                 '    -l, --use-links   Create links instead of copying files.' . "\n" .
                 '    -f, --force       Force installation, uninstall old installation if necessary.' . "\n" .
+                '    -u, --uninstall   Uninstall shop connector for specified shop.' . "\n" .
                 '' . "\n" .
                 '' . "\n" .
                 'SHOPS AND VERSIONS:' . "\n" .
@@ -233,18 +226,44 @@ abstract class SetupAbstract
     }
 
     /**
+     *
+     */
+    protected function _getInstallPath()
+    {
+        if (!isset($this->_installPath)) {
+            if (!isset($this->_params['path'])) {
+                // shop path not set: inform user
+                $this->_printerr('You have to specify an installation path');
+                exit(1);
+            } else if (!is_dir($this->_params['path'])) {
+                // shop path not a directory: inform user
+                $this->_printerr('You have specified an invalid installation path');
+                exit(1);
+            }
+
+            // Validate path to only use '/'
+            $this->_installPath = rtrim(
+                preg_replace(
+                    '/\/+|\\\\+/',
+                    '/',
+                    $this->_params['path']
+                ),
+                '/'
+            );
+        }
+
+        return $this->_installPath;
+    }
+
+    /**
      * @return string
      * @throws \Exception
      */
     protected function _getLogFile()
     {
-        $logName = $this->_logName;
+        $path = $this->_getInstallPath();
 
-        if (!isset($logName)) {
-            throw New \Exception('Log name not specified');
-        }
-
-        return APPLICATION_PATH . '/logs/installLog_' . $logName . '.log';
+        return $path . '/.cushymoco_install_log.log';
     }
 
     /**
@@ -279,11 +298,14 @@ abstract class SetupAbstract
     }
 
     /**
-     * @param string $msg
+     * Rollback
+     *
+     * @param string $startMsg
+     * @param string $endMsg
      */
-    protected function _rollback($msg = "Rolling back...")
+    protected function _rollback($startMsg = "Rolling back...", $endMsg = "Rollback done.")
     {
-        $this->_printInfo($msg);
+        $this->_printInfo($startMsg);
 
         $installedItems = file($this->_getLogFile(), FILE_IGNORE_NEW_LINES + FILE_SKIP_EMPTY_LINES);
         // Reverse array to remove files before folders
@@ -305,7 +327,7 @@ abstract class SetupAbstract
 
         unlink($this->_getLogFile());
 
-        $this->_printInfo("Rollback done.");
+        $this->_printInfo($endMsg);
     }
 
     /**
@@ -352,6 +374,8 @@ abstract class SetupAbstract
     }
 
     /**
+     * Installer
+     *
      * @param $src
      * @param $dst
      * @param $useLinks
@@ -379,6 +403,20 @@ abstract class SetupAbstract
     }
 
     /**
+     * Uninstaller
+     */
+    protected function _uninstall()
+    {
+        // Validate install path
+        $this->_getInstallPath();
+
+        $this->_rollback(
+            'Uninstalling shop connector...',
+            'Uninstall complete.'
+        );
+    }
+
+    /**
      * Installer for OXID shop
      */
     protected function _install_oxid()
@@ -386,16 +424,6 @@ abstract class SetupAbstract
         $params = $this->_params;
 
         $shop = $params['shop'];
-
-        if (!isset($params['path'])) {
-            // shop path not set: inform user
-            $this->_printerr('You have to specify an installation path');
-            exit(1);
-        } else if (!is_dir($params['path'])) {
-            // shop path not a directory: inform user
-            $this->_printerr('You have specified an invalid installation path');
-            exit(1);
-        }
 
         if (isset($params['version'])) {
             $version = $params['version'];
@@ -424,10 +452,8 @@ abstract class SetupAbstract
     {
         $params = $this->_params;
 
-        $this->_logName = "oxid_4_6";
-
         $connectorPath = realpath(APPLICATION_ROOT . '/OXID');
-        $shopPath      = $params['path'];
+        $shopPath      = $this->_getInstallPath();
 
         $useLinks = (isset($params['use-links'])
             ? self::USE_LINKS
@@ -452,10 +478,8 @@ abstract class SetupAbstract
     {
         $params = $this->_params;
 
-        $this->_logName = "oxid_4_7";
-
         $connectorPath = realpath(APPLICATION_ROOT . '/OXID');
-        $shopPath      = $params['path'];
+        $shopPath      = $this->_getInstallPath();
 
         $useLinks = (isset($params['use-links'])
             ? self::USE_LINKS
