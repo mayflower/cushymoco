@@ -2,6 +2,10 @@
 
 namespace Setup\Abstracts;
 
+use Setup\Exception\LogfileNotFoundException;
+use Logger\Logger;
+use Logger\Exception\LogAlreadyExistsException;
+
 abstract class SetupAbstract
 {
 
@@ -17,6 +21,12 @@ abstract class SetupAbstract
 
     /** @var array */
     protected $_registeredOptions = array();
+
+    /** @var Logger */
+    protected $_logger;
+
+    /** @var String */
+    protected $_installPath;
 
     /**
      * Gets all registered parameters and returns them as associative array.
@@ -35,8 +45,12 @@ abstract class SetupAbstract
         $this->_registerOption('version',   'v', null, self::VALUE_REQUIRED);
         $this->_registerOption('path',      'p', null, self::VALUE_REQUIRED);
         $this->_registerOption('use-links', 'l');
+        $this->_registerOption('force',     'f');
+        $this->_registerOption('uninstall', 'u');
 
-        $params = $this->_params = $this->_getParameters();
+        $this->_params = $this->_getParameters();
+
+        $params = $this->_params;
 
         // help
         if (isset($params['help'])) {
@@ -45,12 +59,13 @@ abstract class SetupAbstract
         }
 
         if (!empty($params)) {
-
             // this might be removed
             $this->_printUsedParams();
 
-            // shop installation
-            if (isset($params['shop'])) {
+            // shop installation / uninstallation
+            if (isset($params['uninstall'])) {
+                $this->_uninstall();
+            } else if (isset($params['shop'])) {
                 $shop = $params['shop'];
 
                 $installerMethod = "_install_$shop";
@@ -199,6 +214,8 @@ abstract class SetupAbstract
                 '                      be installed. Available shops along with version are listed below.' . "\n" .
                 '    -p, --path=       The path to the existing shop installation.' . "\n" .
                 '    -l, --use-links   Create links instead of copying files.' . "\n" .
+                '    -f, --force       Force installation, uninstall old installation if necessary.' . "\n" .
+                '    -u, --uninstall   Uninstall shop connector for specified shop.' . "\n" .
                 '' . "\n" .
                 '' . "\n" .
                 'SHOPS AND VERSIONS:' . "\n" .
@@ -207,6 +224,118 @@ abstract class SetupAbstract
                 '                          4.7' . "\n" .
                 '' . "\n"
         );
+    }
+
+    /**
+     * @return string
+     */
+    protected function _getInstallPath()
+    {
+        if (!isset($this->_installPath)) {
+            if (!isset($this->_params['path'])) {
+                // shop path not set: inform user
+                $this->_printerr('You have to specify an installation path');
+                exit(1);
+            } else if (!is_dir($this->_params['path'])) {
+                // shop path not a directory: inform user
+                $this->_printerr('You have specified an invalid installation path');
+                exit(1);
+            }
+
+            // Validate path to only use '/'
+            $this->_installPath = rtrim(
+                preg_replace(
+                    '/\/+|\\\\+/',
+                    '/',
+                    $this->_params['path']
+                ),
+                '/'
+            );
+        }
+
+        return $this->_installPath;
+    }
+
+    /**
+     * @return string
+     *
+     * @throws \Exception
+     */
+    protected function _getLogFile()
+    {
+        $path = $this->_getInstallPath();
+
+        return $path . '/.cushymoco_install_log.log';
+    }
+
+    /**
+     * @return Logger
+     */
+    protected function _getLogger()
+    {
+        if (!($this->_logger instanceof Logger)) {
+            $logFile = $this->_getLogFile();
+            $this->_logger = new Logger($logFile);
+        }
+
+        return $this->_logger;
+    }
+
+    /**
+     * @param $dir
+     *
+     * @return bool
+     */
+    protected function _dirEmpty($dir)
+    {
+        $directory = scandir($dir);
+
+        // Remove '.' and '..' from directory array
+        $directory = array_diff(
+            array('.', '..'),
+            $directory
+        );
+
+        return (count($directory) == 0);
+    }
+
+    /**
+     * Rollback
+     *
+     * @param string $startMsg
+     * @param string $endMsg
+     *
+     * @throws LogfileNotFoundException
+     */
+    protected function _rollback($startMsg = "Rolling back...", $endMsg = "Rollback done.")
+    {
+        $logFile = $this->_getLogFile();
+
+        if (!file_exists($logFile)) {
+            throw new LogfileNotFoundException("Couldn't find logfile '$logFile'");
+        }
+
+        $installedItems = file($this->_getLogFile(), FILE_IGNORE_NEW_LINES + FILE_SKIP_EMPTY_LINES);
+        // Reverse array to remove files before folders
+        $installedItems = array_reverse($installedItems);
+
+        $this->_printInfo($startMsg);
+
+        foreach ($installedItems as $item) {
+            if (is_file($item)) {
+                $this->_printInfo("    Removing file: " . $item);
+                unlink($item);
+            } else if (is_dir($item) && $this->_dirEmpty($item)) {
+                $this->_printInfo("    Removing directory: " . $item);
+                rmdir($item);
+            } else {
+                $this->_printInfo("    Skipping '$item': File or directory not found.");
+            }
+        }
+
+        unlink($this->_getLogFile());
+
+        $this->_printInfo($endMsg);
     }
 
     /**
@@ -221,8 +350,13 @@ abstract class SetupAbstract
      */
     protected function _copyRecursive($src, $dst, $useLinks = false) {
         $dir = opendir($src);
+        $logger = $this->_getLogger();
 
-        @mkdir($dst);
+        if (!file_exists($dst)) {
+            $this->_printInfo('    Createing dir: ' . $dst);
+            mkdir($dst);
+            $logger->log($dst);
+        }
 
         while(false !== ($file = readdir($dir))) {
             if (($file != '.') && ($file != '..')) {
@@ -232,10 +366,12 @@ abstract class SetupAbstract
                     $srcTrimmed = str_replace(APPLICATION_ROOT . '/', '', $src);
 
                     if ($useLinks === self::USE_LINKS) {
-                        $this->_printInfo("Creating link: ${srcTrimmed}/${file} -> ${dst}/${file}");
+                        $this->_printInfo("    Creating link: ${srcTrimmed}/${file} -> ${dst}/${file}");
+                        $logger->log("${dst}/${file}");
                         symlink($src . '/' . $file, $dst . '/' . $file);
                     } else {
-                        $this->_printInfo("Copying file: ${srcTrimmed}/${file} -> ${dst}/${file}");
+                        $this->_printInfo("    Copying file: ${srcTrimmed}/${file} -> ${dst}/${file}");
+                        $logger->log("${dst}/${file}");
                         copy($src . '/' . $file, $dst . '/' . $file);
                     }
                 }
@@ -246,6 +382,53 @@ abstract class SetupAbstract
     }
 
     /**
+     * Installer
+     *
+     * @param $src
+     * @param $dst
+     * @param $useLinks
+     */
+    protected function _install($src, $dst, $useLinks)
+    {
+        $force = isset($this->_params['force']);
+
+        try {
+            // Try getting logger. If logfile is found, an exception will be thrown and the installation should be canceled.
+            $this->_getLogger();
+        } catch (LogAlreadyExistsException $e) {
+            if ($force) {
+                // Uninstall old installation and continue installation
+                $this->_rollback("Rolling back old installation...");
+            } else {
+                $this->_printerr("Previous installation detected. Use option '-f' to force installation.");
+                exit(1);
+            }
+        }
+
+        $this->_printInfo('Installing shop connector: ' . $this->_params['shop'] . ' v' . $this->_params['version']);
+        $this->_copyRecursive($src, $dst, $useLinks);
+        $this->_printInfo('Installation done.');
+    }
+
+    /**
+     * Uninstaller
+     */
+    protected function _uninstall()
+    {
+        // Validate install path
+        $this->_getInstallPath();
+
+        try {
+            $this->_rollback(
+                'Uninstalling shop connector...',
+                'Uninstall complete.'
+            );
+        } catch (LogfileNotFoundException $e) {
+            $this->_printerr("No installation found. " . $e->getMessage());
+        }
+    }
+
+    /**
      * Installer for OXID shop
      */
     protected function _install_oxid()
@@ -253,16 +436,6 @@ abstract class SetupAbstract
         $params = $this->_params;
 
         $shop = $params['shop'];
-
-        if (!isset($params['path'])) {
-            // shop path not set: inform user
-            $this->_printerr('You have to specify an installation path');
-            exit(1);
-        } else if (!is_dir($params['path'])) {
-            // shop path not a directory: inform user
-            $this->_printerr('You have specified an invalid installation path');
-            exit(1);
-        }
 
         if (isset($params['version'])) {
             $version = $params['version'];
@@ -292,7 +465,7 @@ abstract class SetupAbstract
         $params = $this->_params;
 
         $connectorPath = realpath(APPLICATION_ROOT . '/OXID');
-        $shopPath      = $params['path'];
+        $shopPath      = $this->_getInstallPath();
 
         $useLinks = (isset($params['use-links'])
             ? self::USE_LINKS
@@ -306,7 +479,7 @@ abstract class SetupAbstract
         );
 
         foreach ($pathMapping as $original => $new) {
-            $this->_copyRecursive($connectorPath . '/' . $original, $shopPath . '/' . $new, $useLinks);
+            $this->_install($connectorPath . '/' . $original, $shopPath . '/' . $new, $useLinks);
         }
     }
 
@@ -318,14 +491,14 @@ abstract class SetupAbstract
         $params = $this->_params;
 
         $connectorPath = realpath(APPLICATION_ROOT . '/OXID');
-        $shopPath      = $params['path'];
+        $shopPath      = $this->_getInstallPath();
 
         $useLinks = (isset($params['use-links'])
             ? self::USE_LINKS
             : null
         );
 
-        $this->_copyRecursive($connectorPath, $shopPath, $useLinks);
+        $this->_install($connectorPath, $shopPath, $useLinks);
     }
 
 }
