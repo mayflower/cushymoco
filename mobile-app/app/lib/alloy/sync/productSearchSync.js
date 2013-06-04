@@ -1,5 +1,8 @@
 var communication = require("communication");
 module.exports.sync = function(method, model, options) {
+	
+	var that = this;
+	
     // Simple callback function for http requests.
     function callback(success, response) {
     	var articles = _.map(response.articles, function(article) {return article;});

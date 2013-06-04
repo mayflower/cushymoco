@@ -9,5 +9,6 @@
         
         <Label id="numberOfResults" text="Bitte geben Sie einen Begriff ein, nach dem sie Suchen möchten." />
         <TableView id="searchResultTable" visible="false" onClick = "onSearchItemClicked"/>
+
     </View>
 </Alloy>
