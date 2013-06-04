@@ -86,10 +86,15 @@ exports.getCategoryTitle = function(categoryId, successCallback)
     );
 }
 
-exports.searchProducts = function(searchPhrase, successCallback)
+exports.searchProducts = function(searchPhrase, itemsPerPage, page, successCallback, errorCallback)
 {
     http.get(
-        exports.buildUrl({fnc:"searchProducts",searchparam:searchPhrase}),
+        exports.buildUrl({
+        	fnc:"searchProducts",
+        	searchparam:searchPhrase, 
+        	pgNr:page,
+        	_artperpage: itemsPerPage
+    	}),
         successCallback
     );
 }

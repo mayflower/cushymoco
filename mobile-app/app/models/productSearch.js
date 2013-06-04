@@ -19,6 +19,7 @@ exports.definition = {
     		fetch: function(options) {
     			var that = this;
     		    var _callback = function(success, response) {
+    		    	that.reset(undefined, {silent:true});
 	    			_.each(response.articles, function(article) {
 	    				that.push(article);
 	    			});
@@ -34,7 +35,9 @@ exports.definition = {
     			
     			
     		    var searchParam = options.data.searchParam || '';
-    			communication.searchProducts(searchParam, _successCallback, _errorCallback);
+    		    var itemsPerPage = options.data.itemsPerPage || 10;
+    		    var page = options.data.page || 0;
+    			communication.searchProducts(searchParam, itemsPerPage, page, _successCallback, _errorCallback);
     		}
     	});
     	return Model;

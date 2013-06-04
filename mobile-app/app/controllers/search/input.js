@@ -3,10 +3,12 @@ var searchList = Alloy.createCollection("productSearch");
 
 var searchMoreButtonPosition = -1;
 var itemsShown = 0;
-
 var currentSearchPhrase = "";
 var tableData = [];
 var productData = [];
+
+var itemsPerPage = 10;
+var currentPage = 0;
 
 searchList.on('reset', redrawList);
 
@@ -17,7 +19,7 @@ function onSearchMoreButtonClicked(e) {
 	if(searchMoreButtonPosition > 0 ) {
 		$.searchResultTable.deleteRow(searchMoreButtonPosition);		
 	}
-	searchList.fetch({data:{searchParam:currentSearchPhrase}});	
+	searchList.fetch({data:{searchParam:currentSearchPhrase, itemsPerPage: 5, page: currentPage}});	
 
 }
 
@@ -26,12 +28,13 @@ function doSearch(e) {
 	currentSearchPhrase = $.searchPhrase.value;
 	tableData = [];
 	productData = [];
-	searchList.fetch({data:{searchParam:currentSearchPhrase}});	
+	itemsShown = 0;
+	searchList.fetch({data:{searchParam:currentSearchPhrase, itemsPerPage: 5, page: currentPage}});	
 };
 
 
 function redrawList() {
-    
+    currentPage++;
    
     if (_.size(searchList) == 0) {
     	$.searchResultTable.visible = false;
@@ -55,14 +58,21 @@ function redrawList() {
     var searchMoreRow = Ti.UI.createTableViewRow({
     	height:110
     });
-    var searchMoreButton = Ti.UI.createButton({systemButton: Ti.UI.iPhone.SystemButton.REFRESH, top:6, left:10, width:50, height: 50});
-    searchMoreButton.addEventListener('click', onSearchMoreButtonClicked);
-    searchMoreRow.add(searchMoreButton);
-    searchMoreButtonPosition = tableData.length;
-    tableData.push(searchMoreRow);
+    
+    itemsShown += _.size(searchList);
+    
     $.searchResultTable.setData(tableData);
-    tableData.pop();
+    
+    if (itemsShown < searchList.totalAmount) {
+	    var searchMoreButton = Ti.UI.createButton({systemButton: Ti.UI.iPhone.SystemButton.REFRESH, top:6, left:10, width:50, height: 50});
+	    searchMoreButton.addEventListener('click', onSearchMoreButtonClicked);
+	    searchMoreRow.add(searchMoreButton);
+	    searchMoreButtonPosition = tableData.length;
+	    $.searchResultTable.appendRow(searchMoreRow);    	
+    }
     $.searchResultTable.visible = true;
+    
+    
     
 }
 
