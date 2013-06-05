@@ -13,7 +13,7 @@ exports.definition = {
 	},		
 	extendModel: function(Model) {
 		_.extend(Model.prototype, {
-		    realSet:Model.prototype.set,
+            realSet:Model.prototype.set,
 		    initialize:function() {
 		        this.products = Alloy.createCollection('cartProduct');
 		    },
