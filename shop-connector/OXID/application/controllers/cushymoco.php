@@ -900,6 +900,11 @@ class cushymoco extends oxUBase
         $searchVendor       = $this->_oVersionLayer->getRequestParam('searchvendor');
         $searchManufacturer = $this->_oVersionLayer->getRequestParam('searchmanufacturer');
 
+        $iNrofCatArticles = $this->_oVersionLayer->getConfig()->getConfigParam('iNrofCatArticles');
+
+        $itemsPerPage = $this->_oVersionLayer->getRequestParam('itemsPerPage');
+        $this->_oVersionLayer->getConfig()->setConfigParam('iNrofCatArticles', $itemsPerPage);
+
         $oSearchHandler = oxNew('oxsearch');
         $oSearchList    = $oSearchHandler->getSearchArticles(
             $searchParam,
@@ -926,7 +931,7 @@ class cushymoco extends oxUBase
                 //       'link'  => $oArticle->getLink(),
             );
         }
-
+        $this->_oVersionLayer->getConfig()->setConfigParam('iNrofCatArticles', $iNrofCatArticles);
         $this->_sAjaxResponse = $this->_successMessage(array('count' => $count, 'articles' => $result));
     }
 
