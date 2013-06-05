@@ -93,7 +93,7 @@ exports.searchProducts = function(searchPhrase, itemsPerPage, page, successCallb
         	fnc:"searchProducts",
         	searchparam:searchPhrase, 
         	pgNr:page,
-        	_artperpage: itemsPerPage
+        	itemsPerPage: itemsPerPage
     	}),
         successCallback
     );
