@@ -26,7 +26,7 @@ function onSearchMoreButtonClicked(e) {
 		  font: { fontSize:22 },
 		  shadowColor: '#aaa',
 		  shadowOffset: {x:1, y:1},
-		  text: 'Lade weitere Produkte... bitte warten!',
+		  text: L('search.label.loadingProducts'),
 		  textAlign: Ti.UI.TEXT_ALIGNMENT_CENTER,
 		  top: 30,
 		  width: Ti.UI.SIZE, height: Ti.UI.SIZE
@@ -56,11 +56,11 @@ function redrawList() {
    
     if (_.size(searchList) == 0) {
     	$.searchResultTable.visible = false;
-    	$.numberOfResults.text = "Es wurden leider keine zur Suchanfrage passenden Produkte gefunden.";
-    	alert("Zu diesem Begriff konnten leider keine Ergebnisse gefunden werden.");
+    	$.numberOfResults.text = L("search.label.noResultsFound");
+    	alert("search.alert.noResultsFound");
     	return;
     }
-    $.numberOfResults.text = "Es wurden "+ searchList.totalAmount +" Produkte gefunden.";
+    $.numberOfResults.text = L("search.label.searchAmountFound.pre" + searchList.totalAmount + L("search.label.searchAmountFound.post"));
     
     searchList.each(function (product, index, list) {    	
         var row = Alloy.createController("product/productRow", {
@@ -100,7 +100,7 @@ function redrawList() {
 		  font: { fontSize:22 },
 		  shadowColor: '#aaa',
 		  shadowOffset: {x:1, y:1},
-		  text: 'Zu dieser Suche wurden keine weiteren Produkte gefunden. Versuchen Sie es mit einem anderen Suchbegriff!',
+		  text: L('search.label.noAdditionalProductsFound'),
 		  textAlign: Ti.UI.TEXT_ALIGNMENT_CENTER,
 		  top: 30,
 		  width: Ti.UI.SIZE, height: Ti.UI.SIZE
