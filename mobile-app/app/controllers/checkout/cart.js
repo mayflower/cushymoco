@@ -2,6 +2,7 @@ var cartModel = Alloy.createModel('cart');
 var tableData = [];
 var shoppingCartView = $.shoppingCart;
 var emptyCartHintView = $.emptyCartHint;
+var nextStepButton;
 
 function onProductDelete(e)
 {
@@ -20,6 +21,7 @@ function onProductDelete(e)
                 if (cartModel.products.length == 0) {
                     $.baseWin.remove(shoppingCartView);
                     $.baseWin.add(emptyCartHintView);
+                    $.baseWin.rightNavButton = null;
                 }
             } else {
                 cartModel.fetch();
@@ -87,11 +89,23 @@ function updateCart()
 cartModel.on('change', function() {
     if (Alloy.Globals.cartItemCount > 0) {
         $.baseWin.remove(emptyCartHintView);
+        $.baseWin.rightNavButton = nextStepButton;
         updateCart();
         return;
     }
     
-        $.baseWin.remove(shoppingCartView);
+    $.baseWin.rightNavButton = null;
+    
+    $.baseWin.remove(shoppingCartView);
+});
+
+nextStepButton = Ti.UI.createButton({
+    title:'Weiter >'
+});
+
+nextStepButton.addEventListener('click', function(e) {
+    var userDataWin = Alloy.createController('checkout/userData', {nav:$.cartNavigation}).getView();
+    $.cartNavigation.open(userDataWin);
 });
 
 cartModel.fetch();

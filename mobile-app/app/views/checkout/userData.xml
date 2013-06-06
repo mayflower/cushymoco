@@ -1,0 +1,16 @@
+<Alloy>
+    <Window id="userDataWindow">
+        <View class="container">
+            <Label id="accountUsername"/>
+            <Label id="accountEmail"/>
+            <Label id="accountCompany"/>
+            <Label class="title" textid="account.billingAddress.title"/>
+            <Label id="billingStreet"/>
+            <Label id="billingStreetAdd"/>
+            <Label id="billingZipCity"/>
+            <Label id="billingState"/>
+            <Label id="billingCountry"/>
+            <!-- TODO Add shipping address selection. -->
+        </View>
+    </Window>
+</Alloy>
