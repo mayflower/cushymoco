@@ -200,6 +200,14 @@ exports.user = function(successCallback)
     );
 };
 
+exports.shippingPayment = function(successCallback)
+{
+    http.get(
+        exports.buildUrl({fnc:"getShippingPayment"}),
+        successCallback
+    );
+}
+
 var serialize = function(obj, prefix)
 {
     var queryStringObj = [];
