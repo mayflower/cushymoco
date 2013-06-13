@@ -920,6 +920,10 @@ class cushymoco extends oxUBase
             $searchVendor,
             $searchManufacturer
         );
+
+        $oLang = $this->_oVersionLayer->getLang();
+        $oCur = $this->_oVersionLayer->getConfig()->getActShopCurrencyObject();
+
         $result = array();
         foreach ($oSearchList as $key => $oArticle) {
             $result[$key] = array(
@@ -927,6 +931,7 @@ class cushymoco extends oxUBase
                 'title' => $oArticle->oxarticles__oxtitle->value,
                 'short' => $oArticle->oxarticles__oxshortdesc->value,
                 'price' => $oArticle->oxarticles__oxprice->value,
+                'fPrice' => $oLang->formatCurrency($oArticle->oxarticles__oxprice->value, $oCur). ' ' . $oCur->name,
                 'icon'  => $oArticle->getIconUrl(),
                 //       'link'  => $oArticle->getLink(),
             );
