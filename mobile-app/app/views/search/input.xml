@@ -1,7 +1,6 @@
 <Alloy>
     <View id="searchInputView" layout="vertical">
     	
-    	<Label textid="search.input.title"/>
 	    <View class="heightToContent" layout="horizontal">	        
 	        <TextField id="searchPhrase" onReturn="doSearch"/>
 	        <View class="searchSpacer" />

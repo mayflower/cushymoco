@@ -60,7 +60,7 @@ function redrawList() {
     	alert("search.alert.noResultsFound");
     	return;
     }
-    $.numberOfResults.text = L("search.label.searchAmountFound.pre") + searchList.totalAmount + L("search.label.searchAmountFound.post");
+    $.numberOfResults.text = L("search.label.searchAmountFound.pre")+" " + searchList.totalAmount +" "+ L("search.label.searchAmountFound.post");
     
     searchList.each(function (product, index, list) {    	
         var row = Alloy.createController("product/productRow", {
@@ -105,7 +105,7 @@ function redrawList() {
 
 		var noMoreProductsLabel = Ti.UI.createLabel({
 		  color: '#000',
-		  font: { fontSize:22 },
+		  font: { fontSize:16 },
 		  shadowColor: '#aaa',
 		  shadowOffset: {x:1, y:1},
 		  text: L('search.label.noAdditionalProductsFound'),
