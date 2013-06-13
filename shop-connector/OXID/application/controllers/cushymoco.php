@@ -931,7 +931,7 @@ class cushymoco extends oxUBase
                 'title' => $oArticle->oxarticles__oxtitle->value,
                 'short' => $oArticle->oxarticles__oxshortdesc->value,
                 'price' => $oArticle->oxarticles__oxprice->value,
-                'fPrice' => $oLang->formatCurrency($oArticle->oxarticles__oxprice->value, $oCur). ' ' . $oCur->name,
+                'fPrice' => $oLang->formatCurrency($oArticle->oxarticles__oxprice->value, $oCur). ' ' . $oCur->sign,
                 'icon'  => $oArticle->getIconUrl(),
                 //       'link'  => $oArticle->getLink(),
             );
