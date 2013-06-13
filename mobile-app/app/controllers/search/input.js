@@ -57,7 +57,7 @@ function redrawList() {
     if (_.size(searchList) == 0) {
     	$.searchResultTable.visible = false;
     	$.numberOfResults.text = L("search.label.noResultsFound");
-    	alert("search.alert.noResultsFound");
+    	alert(L("search.alert.noResultsFound"));
     	return;
     }
     $.numberOfResults.text = L("search.label.searchAmountFound.pre")+" " + searchList.totalAmount +" "+ L("search.label.searchAmountFound.post");

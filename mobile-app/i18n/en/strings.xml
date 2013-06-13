@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
   Language: English (en)
-  Translators: jbrosi (10), stefan (33)
+  Translators: jbrosi (11), stefan (33)
 -->
 <resources>
     <string name="account.billingAddress.title">Billing address</string>
@@ -29,13 +29,13 @@
     <string name="menu.home.title">Home</string>
     <string name="menu.more.title">More</string>
     <string name="menu.products.title">Products</string>
+    <string name="menu.search.title">Search</string>
     <string name="more.window.title">Information</string>
     <string name="products.variants.title">Product variants</string>
     <string name="products.window.title">Catalog</string>
     <string name="search.alert.noResultsFound">There were no products found matching your search phrase! Consider using a different search phrase.</string>
     <string name="search.button.loadMoreProducts">Show additional products...</string>
     <string name="search.button.searchProducts">Search</string>
-    <string name="search.input.title">Please enter a search phrase and press the 'Search' Button!</string>
     <string name="search.label.loadingProducts">Loading additional products... please be patient!</string>
     <string name="search.label.noAdditionalProductsFound">No more products could be found. Use a different search phrase for finding additional products.</string>
     <string name="search.label.pleaseEnterSearchPhrase">Please enter a search phrase</string>
