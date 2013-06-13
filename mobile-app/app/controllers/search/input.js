@@ -67,7 +67,7 @@ function redrawList() {
             "icon":product.get("icon"),
             "title":product.get("title"),
             "shortDesc":product.get("short"),
-            "price":product.get("price")
+            "price":product.get("fPrice")
         }).getView();
         tableData.push(row);
 		productData.push(product);

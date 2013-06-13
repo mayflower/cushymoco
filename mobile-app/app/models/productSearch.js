@@ -7,6 +7,7 @@ exports.definition = {
             "title":"string",
             "short":"string",
             "price":"string",
+            "fPrice":"string",
             "icon": "string"
         },
         adapter: {
