@@ -42,6 +42,7 @@ function onSearchMoreButtonClicked(e) {
 
 
 function doSearch(e) {
+	$.searchPhrase.blur();
 	currentSearchPhrase = $.searchPhrase.value;
 	tableData = [];
 	productData = [];
@@ -49,7 +50,6 @@ function doSearch(e) {
 	currentPage = 0;
 	searchList.fetch({data:{searchParam:currentSearchPhrase, itemsPerPage: itemsPerPage, page: currentPage}});	
 };
-
 
 function redrawList() {
     currentPage++;
@@ -60,7 +60,7 @@ function redrawList() {
     	alert("search.alert.noResultsFound");
     	return;
     }
-    $.numberOfResults.text = L("search.label.searchAmountFound.pre" + searchList.totalAmount + L("search.label.searchAmountFound.post"));
+    $.numberOfResults.text = L("search.label.searchAmountFound.pre") + searchList.totalAmount + L("search.label.searchAmountFound.post");
     
     searchList.each(function (product, index, list) {    	
         var row = Alloy.createController("product/productRow", {
@@ -84,7 +84,15 @@ function redrawList() {
     searchMoreButtonPosition = tableData.length;
     
     if (itemsShown < searchList.totalAmount) {
-	    var searchMoreButton = Ti.UI.createButton({systemButton: Ti.UI.iPhone.SystemButton.REFRESH, top:6, left:10, width:50, height: 50});
+	    var searchMoreButton = Ti.UI.createButton({
+	    	systemButton: Ti.UI.iPhone.SystemButton.REFRESH, 
+	    	top:6, 
+	    	left:10, 
+	    	width:250, 
+	    	title: L('search.button.loadMoreProducts'),
+	    	color: '#000',
+	    	height: Ti.UI.SIZE
+    	});
 	    searchMoreButton.addEventListener('click', onSearchMoreButtonClicked);
 	    searchMoreRow.add(searchMoreButton);
 	    $.searchResultTable.appendRow(searchMoreRow);    	
@@ -125,3 +133,5 @@ function onSearchItemClicked(e) {
     Alloy.CFG.searchNavGroup.open(navWin, {animated:true});
 	navWin.title = selModel.get("title");
 }
+
+

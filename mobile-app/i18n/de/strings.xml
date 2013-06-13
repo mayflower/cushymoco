@@ -1,12 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
   Language: Deutsch (de)
-  Translators: stefan (28)
+  Translators: jbrosi (10), stefan (34)
 -->
 <resources>
     <string name="account.billingAddress.title">Rechnungsadresse</string>
     <string name="account.window.title">Konto</string>
     <string name="cart.empty.hint">Der Warenkorb ist leer.</string>
+    <string name="cart.grandTotal.label">Gesamtsumme:</string>
+    <string name="cart.payment.title">Zahlungsart</string>
+    <string name="cart.productsTotal.label">Summe Artikel:</string>
+    <string name="cart.shipping.title">Versandart</string>
+    <string name="cart.shippingTotal.label">Versandkosten:</string>
+    <string name="cart.userData.title">Benutzerdaten</string>
     <string name="cart.window.title">Warenkorb</string>
     <string name="error.dialog.generic_title">Ein Fehler ist aufgetreten.</string>
     <string name="error.network.generic_communication">Fehler während der Datenübertragung.</string>
@@ -26,4 +32,14 @@
     <string name="more.window.title">Informationen</string>
     <string name="products.variants.title">Artikel-Varianten</string>
     <string name="products.window.title">Katalog</string>
+    <string name="search.alert.noResultsFound">Es wurden keine Produkte gefunden, die Ihrer Suchanfrage entsprachen! Bitte versuchen Sie es mit einer anderen Eingabe.</string>
+    <string name="search.button.loadMoreProducts">Weitere Artikel anzeigen...</string>
+    <string name="search.button.searchProducts">Suchen</string>
+    <string name="search.input.title">Bitte geben Sie einen Suchbegriff ein und klicken Sie auf den 'Suchen'-Button!</string>
+    <string name="search.label.loadingProducts">Lade weitere Produkte... Bitte haben Sie etwas Geduld!</string>
+    <string name="search.label.noAdditionalProductsFound">Es konnten keine weiteren Produkte gefunden werden. Benutzen Sie eine andere Suchanfrage, um weitere Produkte zu finden.</string>
+    <string name="search.label.pleaseEnterSearchPhrase">Bitte geben Sie einen Suchbegriff ein</string>
+    <string name="search.label.searchAmountFound.post">Produkte gefunden.</string>
+    <string name="search.label.searchAmountFound.pre">Es wurden</string>
+    <string name="search.window.title">Suche</string>
 </resources>

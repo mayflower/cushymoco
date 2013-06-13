@@ -1,11 +1,13 @@
 <Alloy>
     <View id="searchInputView" layout="vertical">
     	
-	    <View class="heightToContent" layout="horizontal">
-	        <Label textid="search.input.title"/>
-	        <TextField id="searchPhrase"/>
+    	<Label textid="search.input.title"/>
+	    <View class="heightToContent" layout="horizontal">	        
+	        <TextField id="searchPhrase" onReturn="doSearch"/>
+	        <View class="searchSpacer" />
+	        <Button id="searchButton" titleid="search.button.searchProducts" onClick="doSearch"/>
         </View>
-        <Button id="searchButton" titleid="search.input.searchButton" onClick="doSearch"/>
+        
         
         <Label id="numberOfResults" textid="search.label.pleaseEnterSearchPhrase" />
         <TableView id="searchResultTable" visible="false" onClick = "onSearchItemClicked"/>
