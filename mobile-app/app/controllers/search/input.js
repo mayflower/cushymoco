@@ -26,7 +26,7 @@ function onSearchMoreButtonClicked(e) {
 		  font: { fontSize:22 },
 		  shadowColor: '#aaa',
 		  shadowOffset: {x:1, y:1},
-		  text: 'Lade weitere Produkte... bitte warten!',
+		  text: L('search.label.loadingProducts'),
 		  textAlign: Ti.UI.TEXT_ALIGNMENT_CENTER,
 		  top: 30,
 		  width: Ti.UI.SIZE, height: Ti.UI.SIZE
@@ -42,6 +42,7 @@ function onSearchMoreButtonClicked(e) {
 
 
 function doSearch(e) {
+	$.searchPhrase.blur();
 	currentSearchPhrase = $.searchPhrase.value;
 	tableData = [];
 	productData = [];
@@ -50,17 +51,16 @@ function doSearch(e) {
 	searchList.fetch({data:{searchParam:currentSearchPhrase, itemsPerPage: itemsPerPage, page: currentPage}});	
 };
 
-
 function redrawList() {
     currentPage++;
    
     if (_.size(searchList) == 0) {
     	$.searchResultTable.visible = false;
-    	$.numberOfResults.text = "Es wurden leider keine zur Suchanfrage passenden Produkte gefunden.";
-    	alert("Zu diesem Begriff konnten leider keine Ergebnisse gefunden werden.");
+    	$.numberOfResults.text = L("search.label.noResultsFound");
+    	alert("search.alert.noResultsFound");
     	return;
     }
-    $.numberOfResults.text = "Es wurden "+ searchList.totalAmount +" Produkte gefunden.";
+    $.numberOfResults.text = L("search.label.searchAmountFound.pre")+" " + searchList.totalAmount +" "+ L("search.label.searchAmountFound.post");
     
     searchList.each(function (product, index, list) {    	
         var row = Alloy.createController("product/productRow", {
@@ -84,7 +84,15 @@ function redrawList() {
     searchMoreButtonPosition = tableData.length;
     
     if (itemsShown < searchList.totalAmount) {
-	    var searchMoreButton = Ti.UI.createButton({systemButton: Ti.UI.iPhone.SystemButton.REFRESH, top:6, left:10, width:50, height: 50});
+	    var searchMoreButton = Ti.UI.createButton({
+	    	systemButton: Ti.UI.iPhone.SystemButton.REFRESH, 
+	    	top:6, 
+	    	left:10, 
+	    	width:250, 
+	    	title: L('search.button.loadMoreProducts'),
+	    	color: '#000',
+	    	height: Ti.UI.SIZE
+    	});
 	    searchMoreButton.addEventListener('click', onSearchMoreButtonClicked);
 	    searchMoreRow.add(searchMoreButton);
 	    $.searchResultTable.appendRow(searchMoreRow);    	
@@ -97,10 +105,10 @@ function redrawList() {
 
 		var noMoreProductsLabel = Ti.UI.createLabel({
 		  color: '#000',
-		  font: { fontSize:22 },
+		  font: { fontSize:16 },
 		  shadowColor: '#aaa',
 		  shadowOffset: {x:1, y:1},
-		  text: 'Zu dieser Suche wurden keine weiteren Produkte gefunden. Versuchen Sie es mit einem anderen Suchbegriff!',
+		  text: L('search.label.noAdditionalProductsFound'),
 		  textAlign: Ti.UI.TEXT_ALIGNMENT_CENTER,
 		  top: 30,
 		  width: Ti.UI.SIZE, height: Ti.UI.SIZE
@@ -125,3 +133,5 @@ function onSearchItemClicked(e) {
     Alloy.CFG.searchNavGroup.open(navWin, {animated:true});
 	navWin.title = selModel.get("title");
 }
+
+
