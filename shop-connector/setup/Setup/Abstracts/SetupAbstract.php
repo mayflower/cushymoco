@@ -26,6 +26,9 @@ abstract class SetupAbstract
     protected $_logger;
 
     /** @var String */
+    protected $_logfileName = '.cushymoco_install.log';
+
+    /** @var String */
     protected $_installPath;
 
     /**
@@ -236,36 +239,45 @@ abstract class SetupAbstract
                 // shop path not set: inform user
                 $this->_printerr('You have to specify an installation path');
                 exit(1);
-            } else if (!is_dir($this->_params['path'])) {
-                // shop path not a directory: inform user
-                $this->_printerr('You have specified an invalid installation path');
-                exit(1);
+            } else {
+                $installPath = realpath($this->_params['path']);
+
+                if ($installPath === false) {
+                    $this->_printerr('You have specified an invalid installation path');
+                    exit(1);
+                } else if (!is_dir($installPath)) {
+                    // shop path not a directory: inform user
+                    $this->_printerr('The installation path is no valid directory');
+                    exit(1);
+                }
             }
 
-            // Validate path to only use '/'
-            $this->_installPath = rtrim(
-                preg_replace(
-                    '/\/+|\\\\+/',
-                    '/',
-                    $this->_params['path']
-                ),
-                '/'
-            );
+            $this->_installPath = realpath($this->_params['path']);
         }
 
         return $this->_installPath;
     }
 
     /**
-     * @return string
+     * @param $path
      *
-     * @throws \Exception
+     * @return string
+     */
+    protected function _getInstallDirRelativePath($path) {
+        $installPath = $this->_getInstallPath() . '/';
+        $relativePath = substr($path, strlen($installPath));
+
+        return $relativePath;
+    }
+
+    /**
+     * @return string
      */
     protected function _getLogFile()
     {
         $path = $this->_getInstallPath();
 
-        return $path . '/.cushymoco_install_log.log';
+        return $path . '/' . $this->_logfileName;
     }
 
     /**
@@ -322,14 +334,16 @@ abstract class SetupAbstract
         $this->_printInfo($startMsg);
 
         foreach ($installedItems as $item) {
-            if (is_file($item)) {
-                $this->_printInfo("    Removing file: " . $item);
-                unlink($item);
-            } else if (is_dir($item) && $this->_dirEmpty($item)) {
-                $this->_printInfo("    Removing directory: " . $item);
-                rmdir($item);
+            $path = $this->_getInstallPath() . '/' . $item;
+
+            if (is_file($path)) {
+                $this->_printInfo("    Removing file: " . $path);
+                unlink($path);
+            } else if (is_dir($path) && $this->_dirEmpty($path)) {
+                $this->_printInfo("    Removing directory: " . $path);
+                rmdir($path);
             } else {
-                $this->_printInfo("    Skipping '$item': File or directory not found.");
+                $this->_printInfo("    Skipping '$path': File or directory not found.");
             }
         }
 
@@ -355,7 +369,7 @@ abstract class SetupAbstract
         if (!file_exists($dst)) {
             $this->_printInfo('    Createing dir: ' . $dst);
             mkdir($dst);
-            $logger->log($dst);
+            $logger->log($this->_getInstallDirRelativePath("${dst}"));
         }
 
         while(false !== ($file = readdir($dir))) {
@@ -367,11 +381,11 @@ abstract class SetupAbstract
 
                     if ($useLinks === self::USE_LINKS) {
                         $this->_printInfo("    Creating link: ${srcTrimmed}/${file} -> ${dst}/${file}");
-                        $logger->log("${dst}/${file}");
+                        $logger->log($this->_getInstallDirRelativePath("${dst}/${file}"));
                         symlink($src . '/' . $file, $dst . '/' . $file);
                     } else {
                         $this->_printInfo("    Copying file: ${srcTrimmed}/${file} -> ${dst}/${file}");
-                        $logger->log("${dst}/${file}");
+                        $logger->log($this->_getInstallDirRelativePath("${dst}/${file}"));
                         copy($src . '/' . $file, $dst . '/' . $file);
                     }
                 }
